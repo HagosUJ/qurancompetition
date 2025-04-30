@@ -1,0 +1,172 @@
+
+:root {
+    --primary-green: #2c6e49;
+    --secondary-green: #4d9078;
+    --background-light: #f4f4f4;
+    --text-dark: #333;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: #ebebeb;
+}
+
+.card-container {
+    display: flex;
+    width: auto;
+    height: auto;
+    perspective: 1000px;
+    background-color: #ebebeb;
+}
+
+.membership-card {
+    width: 340px;
+    height: 522px;
+    position: relative;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    background: url('../images/card1.png');
+    background-size: 100%;
+    border-radius: 15px;
+}
+
+.membership-card-back {
+    width: 340px;
+    height: 522px;
+    position: relative;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    background: url('../images/back.png');
+    background-size: 100%;
+    border-radius: 15px;
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-front {
+    /*! background: white; */
+    display: flex;
+    flex-direction: column;
+}
+
+.card-back {
+    background: white;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Front Card Styles */
+.card-header {
+    background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+    border-radius: 10px;
+    background: white;
+    padding: 5px;
+}
+
+.org-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.member-photo {
+    width: 150px;
+    height: 160px;
+    object-fit: cover;
+    align-self: center;
+    margin: 15px 0;
+    border-radius: 100px;
+    border: 7px solid white;
+}
+
+.card-details {
+    padding: 0 20px;
+    flex-grow: 1;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 5px;
+}
+
+.detail-label {
+    color: var(--primary-green);
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.detail-value {
+    font-weight: 600;
+    text-align: right;
+    font-size: 12px;
+}
+
+.card-footer {
+    background: var(--primary-green);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+}
+
+/* Back Card Styles */
+.back-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.back-details {
+    width: 80%;
+    text-align: center;
+}
+
+.qr-code {
+    width: 120px;
+    height: 120px;
+    margin: 20px 0;
+}
+
+.signature-line {
+    width: 200px;
+    border-bottom: 1px solid var(--text-dark);
+    margin-top: 10px;
+}
+
+#barcode-svg {
+    width: 220px;
+    height: 55px;
+}
+
+#qrcode-canvas {
+    width: 70px;
+    border-radius: 6px;
+}
