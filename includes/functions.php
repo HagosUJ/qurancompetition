@@ -118,4 +118,39 @@ function is_strong_password(string $password): bool
 
     return true;
 }
+
+/**
+ * Logs out the current user by destroying the session and redirecting.
+ *
+ * @param string $redirect_url The URL to redirect to after logout. Defaults to 'sign-in.php'.
+ */
+function logout_user(string $redirect_url = 'sign-in.php') {
+    // Ensure session is started before trying to manipulate it
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start(); // Or use your secure session start function if available
+    }
+
+    // Unset all session variables
+    $_SESSION = array();
+
+    // If it's desired to kill the session, also delete the session cookie.
+    // Note: This will destroy the session, and not just the session data!
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+
+    // Finally, destroy the session.
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_destroy();
+    }
+
+    // Redirect to the specified page
+    // Use the existing redirect function if it handles exit()
+    redirect($redirect_url);
+    // exit; // exit() is likely handled within your redirect() function already
+}
 ?>

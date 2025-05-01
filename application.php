@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($application)) { // Only pro
 
         if ($contestant_type === 'nigerian' || $contestant_type === 'international') {
             // Double-check if application was created between page load and POST
-            $stmt_double_check = $conn->prepare("SELECT id FROM applications WHERE user_id = ?");
+            $stmt_double_check = $conn->prepare("SELECT id, status, current_step, contestant_type FROM applications WHERE user_id = ?"); // Fetch more data
             $stmt_double_check->bind_param("i", $user_id);
             $stmt_double_check->execute();
             $result_double_check = $stmt_double_check->get_result();
@@ -93,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($application)) { // Only pro
                 }
             } else {
                 // Application was created concurrently, fetch it and proceed
-                $application = $result_double_check->fetch_assoc(); // Re-fetch needed data if required later
-                 // Decide where to redirect based on the newly created application's state (logic below)
+                $application = $result_double_check->fetch_assoc(); // Re-fetch needed data
+                 // Let the logic below handle the redirect based on the newly created application's state
             }
              $stmt_double_check->close();
 
@@ -123,26 +123,38 @@ if ($application) {
     }
     // --- Redirect Logic for In-Progress Applications ---
     // Check statuses that indicate the application is actively being worked on or needs user action
-    elseif (in_array($app_status, ['Not Started', 'Personal Info Complete', 'Sponsor Info Complete', 'Documents Uploaded', 'Information Requested'])) {
+    elseif (in_array($app_status, ['Not Started', 'Personal Info Complete', 'Sponsor Info Complete', 'Documents Uploaded', 'Documents Complete', 'Information Requested'])) { // Added 'Documents Complete'
 
         $next_page = 'index.php'; // Default fallback
 
-        // Determine the target page based primarily on current_step
+        // Determine the target page based primarily on current_step and contestant_type
         switch ($current_step) {
             case 'step1':
-                // Should be on step 1 page
                 $next_page = ($contestant_type === 'nigerian') ? 'application-step1-nigerian.php' : 'application-step1-international.php';
                 break;
             case 'step2':
-                // Should be on step 2 page (Sponsor/Nominator)
                 $next_page = ($contestant_type === 'nigerian') ? 'application-step2-nigerian.php' : 'application-step2-international.php';
                 break;
-            case 'documents':
-                 // Should be on documents page
-                 $next_page = 'documents.php'; // Assuming documents page is common
+            case 'step3': // Specific step 3 for international
+                 if ($contestant_type === 'international') {
+                     $next_page = 'application-step3-international.php';
+                 } else {
+                     // Nigerian might use a generic documents page or have a different step name
+                     $next_page = 'documents.php'; // Assuming Nigerian uses this
+                 }
                  break;
-            case 'review':
-                 // Should be on review page
+            case 'step4': // Specific step 4 for international review
+                 if ($contestant_type === 'international') {
+                     $next_page = 'application-step4-international.php';
+                 } else {
+                     // Nigerian might use a generic review page
+                     $next_page = 'application-review.php'; // Assuming Nigerian uses this
+                 }
+                 break;
+            case 'documents': // Generic documents step (likely for Nigerian)
+                 $next_page = 'documents.php';
+                 break;
+            case 'review': // Generic review step (likely for Nigerian)
                  $next_page = 'application-review.php';
                  break;
             // Add more specific steps if needed
@@ -151,9 +163,11 @@ if ($application) {
                 if ($app_status === 'Personal Info Complete') {
                     $next_page = ($contestant_type === 'nigerian') ? 'application-step2-nigerian.php' : 'application-step2-international.php';
                 } elseif ($app_status === 'Sponsor Info Complete') {
-                    $next_page = 'documents.php';
-                } elseif ($app_status === 'Documents Uploaded') {
-                    $next_page = 'application-review.php';
+                    // Nigerian goes to generic documents, International to specific step 3
+                    $next_page = ($contestant_type === 'international') ? 'application-step3-international.php' : 'documents.php';
+                } elseif ($app_status === 'Documents Uploaded' || $app_status === 'Documents Complete') { // Status after document upload
+                    // Nigerian goes to generic review, International to specific step 4
+                    $next_page = ($contestant_type === 'international') ? 'application-step4-international.php' : 'application-review.php';
                 } elseif ($app_status === 'Information Requested') {
                     $next_page = 'provide-information.php'; // Assuming this page exists
                 } elseif ($app_status === 'Not Started') {
@@ -270,7 +284,8 @@ header("X-XSS-Protection: 1; mode=block");
 
                                             <div class="row">
                                                 <div class="col-md-6 mb-3 mb-md-0">
-                                                    <div class="card text-center selection-card h-100" onclick="submitType('nigerian')">
+                                                    <!-- Updated onclick -->
+                                                    <div class="card text-center selection-card h-100" onclick="showConfirmationModal('nigerian')">
                                                         <div class="card-body">
                                                         <i class="ri-flag-fill icon-lg text-success mb-2"></i>
                                                             <h5 class="card-title">Nigerian Contestant</h5>
@@ -279,7 +294,8 @@ header("X-XSS-Protection: 1; mode=block");
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="card text-center selection-card h-100" onclick="submitType('international')">
+                                                     <!-- Updated onclick -->
+                                                    <div class="card text-center selection-card h-100" onclick="showConfirmationModal('international')">
                                                         <div class="card-body">
                                                             <i class="ri-earth-line icon-lg text-success mb-2"></i>
                                                             <h5 class="card-title">International Contestant</h5>
@@ -326,7 +342,10 @@ header("X-XSS-Protection: 1; mode=block");
                                                     case 'Submitted':
                                                     case 'Under Review':
                                                         $status_message = 'We have received your application and it is currently being reviewed. You will be notified of any updates.';
-                                                        $next_action_link = 'application-review.php'; // Link to view submitted data
+                                                        // Link to appropriate review page based on type
+                                                        $next_action_link = ($application['contestant_type'] === 'international')
+                                                                          ? 'application-step4-international.php'
+                                                                          : 'application-review.php';
                                                         $next_action_text = 'View Submitted Application';
                                                         break;
                                                     case 'Approved':
@@ -373,31 +392,72 @@ header("X-XSS-Protection: 1; mode=block");
     </div>
     <!-- END wrapper -->
 
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirm Selection</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>You have selected: <strong id="selectedTypeDisplay"></strong></p>
+                    <p class="text-danger fw-bold">Are you sure you want to proceed? This choice cannot be changed later.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmSelectionBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include 'layouts/right-sidebar.php'; ?>
-    <?php include 'layouts/footer-scripts.php'; ?>
-    
-    <script src="assets/js/pages/demo.dashboard.js"></script> <!-- If needed for any dashboard-like elements -->
+    <?php include 'layouts/footer-scripts.php'; // Ensure Bootstrap JS is included here ?>
+
+    <!-- Removed redundant dashboard script -->
     <script src="assets/js/app.min.js"></script> <!-- Essential for template functionality -->
 
     <?php if ($page_content === 'selection'): ?>
     <script>
-        // Simple script to submit the form when a card is clicked
-        function submitType(type) {
-            const typeInput = document.getElementById('contestant_type_input');
-            const typeForm = document.getElementById('typeSelectionForm');
+        let selectedContestantType = null; // Variable to store the type temporarily
+        const confirmationModalElement = document.getElementById('confirmationModal');
+        const confirmationModal = confirmationModalElement ? new bootstrap.Modal(confirmationModalElement) : null;
+        const selectedTypeDisplay = document.getElementById('selectedTypeDisplay');
+        const confirmBtn = document.getElementById('confirmSelectionBtn');
+        const typeInput = document.getElementById('contestant_type_input');
+        const typeForm = document.getElementById('typeSelectionForm');
 
-            if (typeInput && typeForm) {
-                typeInput.value = type;
-                typeForm.submit();
-            } else {
-                console.error("Form or input element not found for type selection.");
-                alert("An error occurred. Please try refreshing the page."); // User feedback
+        // Function called when a selection card is clicked
+        function showConfirmationModal(type) {
+            if (!confirmationModal || !selectedTypeDisplay || !typeInput || !typeForm) {
+                console.error("Modal or form elements not found.");
+                alert("An error occurred setting up the confirmation. Please refresh.");
+                return;
             }
+
+            selectedContestantType = type; // Store the selected type
+            selectedTypeDisplay.textContent = (type === 'nigerian' ? 'Nigerian Contestant' : 'International Contestant'); // Update modal text
+            confirmationModal.show(); // Show the modal
+        }
+
+        // Add event listener for the final confirmation button in the modal
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                if (selectedContestantType && typeInput && typeForm) {
+                    typeInput.value = selectedContestantType; // Set the hidden input value
+                    typeForm.submit(); // Submit the form
+                } else {
+                     console.error("Selected type or form elements missing on confirm.");
+                     alert("An error occurred submitting the form. Please try again.");
+                     confirmationModal.hide(); // Hide modal on error
+                }
+            });
+        } else {
+             console.error("Confirmation button not found.");
         }
     </script>
-       
     <?php endif; ?>
-    
 
 </body>
 </html>

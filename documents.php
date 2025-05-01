@@ -34,6 +34,7 @@ global $conn;
 $application_id = null;
 $contestant_type = null;
 $application_status = null;
+$current_step = null;
 
 // Verify that the user has an application and is at the correct step
 $stmt_app = $conn->prepare("SELECT id, status, current_step, contestant_type FROM applications WHERE user_id = ?");
@@ -45,17 +46,29 @@ if ($stmt_app) {
         $application_id = $app['id'];
         $contestant_type = $app['contestant_type'];
         $application_status = $app['status'];
+        $current_step = $app['current_step'];
 
-        // Check if the user should be on this step
+        // --- Redirect International Users ---
+        if ($contestant_type === 'international') {
+            // International users have their own Step 3 page
+            redirect('application-step3-international.php');
+            exit;
+        }
+        // --- End Redirect ---
+
+        // Check if the user (Nigerian) should be on this step
         // Allow access if step 2 is complete OR if they are already on documents step or beyond
-        if (!in_array($app['status'], ['Sponsor Info Complete', 'Documents Uploaded', 'Submitted', 'Under Review', 'Approved', 'Rejected', 'Information Requested']) || ($app['status'] === 'Personal Info Complete' && $app['current_step'] !== 'documents')) {
-             // Redirect back to step 2 if they haven't completed it.
-             $prev_step_page = ($contestant_type === 'nigerian') ? 'application-step2-nigerian.php' : 'application-step2-international.php';
-             redirect($prev_step_page . '?error=step2_incomplete');
+        $allowed_statuses = ['Sponsor Info Complete', 'Documents Uploaded', 'Submitted', 'Under Review', 'Approved', 'Rejected', 'Information Requested'];
+        $is_correct_prior_step = ($application_status === 'Sponsor Info Complete');
+        $is_on_or_after_this_step = in_array($application_status, $allowed_statuses) && $current_step !== 'step1' && $current_step !== 'step2'; // Crude check, adjust as needed
+
+        if (!$is_correct_prior_step && !$is_on_or_after_this_step) {
+             // Redirect back to step 2 (Nigerian) if they haven't completed it.
+             redirect('application-step2-nigerian.php?error=step2_incomplete');
              exit;
         }
-         // If status is beyond this step, maybe redirect to review or dashboard? For now, allow viewing/editing.
-         // if (in_array($app['status'], ['Submitted', 'Under Review', ...])) { redirect('application-review.php'); exit; }
+         // If status is submitted/reviewed, maybe redirect to review or dashboard?
+         // if (in_array($application_status, ['Submitted', 'Under Review', 'Approved', 'Rejected'])) { redirect('application-review.php'); exit; }
 
     } else {
         // No application found
@@ -68,34 +81,39 @@ if ($stmt_app) {
     die("Error verifying application status. Please try again later.");
 }
 
-// --- Define Required Documents ---
-// This could be dynamic based on contestant_type or fetched from settings
+// --- Define Required Documents (Nigerian Specific) ---
 $required_documents = [
-    'national_id' => 'National ID Card / Passport Data Page', // Combined for simplicity
+    'national_id' => 'National ID Card / NIN Slip', // Nigerian specific
     'birth_certificate' => 'Birth Certificate / Declaration of Age',
-    'recommendation_letter' => 'Recommendation Letter from Sponsor/Nominator',
-    // Add more as needed, e.g., 'previous_certificate' => 'Certificate of Previous Participation (if any)'
+    'recommendation_letter' => 'Recommendation Letter from Sponsor', // Nigerian specific term
+    'lg_indigene_certificate' => 'LG Indigene Certificate', // Nigerian specific
+    // Add/remove documents specific to Nigerian applicants
 ];
 
-// --- Fetch Existing Documents ---
+// --- Fetch Existing Documents (Using the generic application_documents table) ---
 $existing_documents = [];
+// IMPORTANT: This assumes a generic 'application_documents' table exists and is used for Nigerians.
+// If Nigerians also use a specific table like 'application_documents_nigerian', update the query.
 $stmt_docs = $conn->prepare("SELECT id, document_type, file_path, original_filename, created_at FROM application_documents WHERE application_id = ?");
 if ($stmt_docs) {
     $stmt_docs->bind_param("i", $application_id);
     $stmt_docs->execute();
     $result_docs = $stmt_docs->get_result();
     while ($doc = $result_docs->fetch_assoc()) {
-        $existing_documents[$doc['document_type']] = $doc;
+        // Only store documents relevant to the Nigerian required list
+        if (array_key_exists($doc['document_type'], $required_documents)) {
+            $existing_documents[$doc['document_type']] = $doc;
+        }
     }
     $stmt_docs->close();
 } else {
     error_log("Failed to prepare statement for fetching existing documents: " . $conn->error);
-    // Non-fatal error, proceed but might not show existing docs
+    // Non-fatal error
 }
 
 
 // --- File Upload Configuration ---
-$upload_dir = 'uploads/documents/';
+$upload_dir = 'uploads/documents/'; // Common directory okay if filenames are unique
 $allowed_types = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
 $max_file_size = 5 * 1024 * 1024; // 5MB
 
@@ -113,15 +131,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!is_dir($upload_dir)) {
             if (!mkdir($upload_dir, 0755, true)) {
                  $errors['form'] = "Failed to create upload directory. Please contact support.";
-                 // Stop processing if directory cannot be created
-                 goto end_of_post_processing; // Jump past file processing
+                 goto end_of_post_processing;
             }
         }
 
-        $conn->begin_transaction(); // Start transaction before processing files
+        $conn->begin_transaction();
 
         try {
-            // Loop through the defined document types to process uploads
+            // Loop through the defined NIGERIAN document types
             foreach ($required_documents as $doc_type => $doc_label) {
                 if (isset($_FILES[$doc_type]) && $_FILES[$doc_type]['error'] === UPLOAD_ERR_OK) {
                     $file = $_FILES[$doc_type];
@@ -129,27 +146,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $file_tmp_path = $file['tmp_name'];
                     $file_size = $file['size'];
                     $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-                    $original_filename = sanitize_filename($file_name); // Sanitize original name
+                    $original_filename = sanitize_filename($file_name);
 
                     // Validation
                     if (!in_array($file_ext, $allowed_types)) {
                         $errors[$doc_type] = "Invalid file type for {$doc_label}. Allowed: " . implode(', ', $allowed_types);
-                        continue; // Skip to next file
+                        continue;
                     }
                     if ($file_size > $max_file_size) {
                         $errors[$doc_type] = "File size for {$doc_label} exceeds the limit (" . ($max_file_size / 1024 / 1024) . "MB).";
-                        continue; // Skip to next file
+                        continue;
                     }
 
-                    // Generate unique filename
+                    // Generate unique filename (includes user/app ID)
                     $unique_filename = "user_{$user_id}_app_{$application_id}_doc_{$doc_type}_" . uniqid() . '.' . $file_ext;
                     $destination = $upload_dir . $unique_filename;
 
                     // Move the uploaded file
                     if (move_uploaded_file($file_tmp_path, $destination)) {
-                        $files_uploaded_in_request[$doc_type] = $destination; // Track successful upload
+                        $files_uploaded_in_request[$doc_type] = $destination;
 
-                        // Check if document record exists
+                        // Check if document record exists in the generic table
                         $stmt_check_doc = $conn->prepare("SELECT id, file_path FROM application_documents WHERE application_id = ? AND document_type = ?");
                         if (!$stmt_check_doc) throw new Exception("Prepare failed (Check Doc): " . $conn->error);
                         $stmt_check_doc->bind_param("is", $application_id, $doc_type);
@@ -179,29 +196,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         // Delete old file *after* successful DB update
                         if ($old_file_path && file_exists($old_file_path) && $old_file_path !== $destination) {
-                            unlink($old_file_path);
+                            @unlink($old_file_path); // Use @ to suppress errors if file already gone
                         }
 
                         // Update the $existing_documents array for immediate display feedback
                         $existing_documents[$doc_type] = [
-                            'id' => $existing_doc_record['id'] ?? $conn->insert_id, // Get new ID if inserted
+                            'id' => $existing_doc_record['id'] ?? $conn->insert_id,
                             'document_type' => $doc_type,
                             'file_path' => $destination,
                             'original_filename' => $original_filename,
-                            'created_at' => $existing_doc_record['created_at'] ?? date('Y-m-d H:i:s') // Approx
+                            'created_at' => $existing_doc_record['created_at'] ?? date('Y-m-d H:i:s')
                         ];
-
 
                     } else {
                         $errors[$doc_type] = "Failed to move uploaded file for {$doc_label}. Check permissions.";
                     }
                 } elseif (isset($_FILES[$doc_type]) && $_FILES[$doc_type]['error'] !== UPLOAD_ERR_NO_FILE) {
-                    // Handle other upload errors
                     $errors[$doc_type] = "Error uploading {$doc_label}: Code " . $_FILES[$doc_type]['error'];
                 }
-            } // End foreach loop for documents
+            } // End foreach
 
-            // Check if all required documents are now uploaded (considering newly uploaded ones)
+            // Check if all NIGERIAN required documents are now uploaded
             $all_required_uploaded = true;
             foreach (array_keys($required_documents) as $req_doc_type) {
                 if (!isset($existing_documents[$req_doc_type])) {
@@ -210,10 +225,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Update main application status/step only if appropriate
+            // Update main application status/step for NIGERIAN applicant
             if ($all_required_uploaded && $application_status === 'Sponsor Info Complete') {
                 $new_status = 'Documents Uploaded';
-                $next_step = 'review'; // Next step is review
+                $next_step = 'review'; // Nigerian review step/page name
                 $stmt_update_app = $conn->prepare("UPDATE applications SET status = ?, current_step = ?, last_updated = NOW() WHERE id = ?");
                 if (!$stmt_update_app) throw new Exception("Prepare failed (App Update): " . $conn->error);
                 $stmt_update_app->bind_param("ssi", $new_status, $next_step, $application_id);
@@ -222,8 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $stmt_update_app->close();
                 $application_status = $new_status; // Update status locally
-            } elseif (!empty($files_uploaded_in_request)) { // Only update timestamp if files were actually processed
-                 // If status is already past 'Sponsor Info Complete', just update the timestamp
+            } elseif (!empty($files_uploaded_in_request)) {
                  $stmt_update_time = $conn->prepare("UPDATE applications SET last_updated = NOW() WHERE id = ?");
                  if (!$stmt_update_time) throw new Exception("Prepare failed (App Time Update): " . $conn->error);
                  $stmt_update_time->bind_param("i", $application_id);
@@ -234,51 +248,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn->commit();
             if (!empty($files_uploaded_in_request) && empty($errors)) {
                  $success = "Documents uploaded successfully.";
-            } elseif (empty($files_uploaded_in_request) && empty($errors)) {
-                 // If form submitted but no files changed/uploaded, maybe redirect or show a neutral message
-                 // For now, just don't show a success message.
             }
 
-             // Redirect to review page if all docs are uploaded and status updated
+             // Redirect NIGERIAN user to review page if all docs are uploaded and status updated
             if ($all_required_uploaded && $application_status === 'Documents Uploaded') {
-                 redirect('application-review.php');
+                 redirect('application-review.php'); // Assuming this is the Nigerian review page
                  exit;
             }
-
 
         } catch (Exception $e) {
             $conn->rollback();
             error_log("Error processing documents for app ID {$application_id}: " . $e->getMessage());
             $errors['form'] = "An error occurred while saving documents. Please try again.";
 
-            // Attempt to delete files uploaded in this failed request
             foreach ($files_uploaded_in_request as $doc_type => $filepath) {
                 if (file_exists($filepath)) {
-                    unlink($filepath);
+                    @unlink($filepath);
                 }
             }
         }
 
-        end_of_post_processing: // Label for goto jump on critical error
+        end_of_post_processing:; // Label for goto jump
 
     } // End CSRF check
 } // End POST check
 
 // --- Security Headers ---
+// ... (keep existing headers) ...
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: strict-origin-when-cross-origin");
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;"); // Adjust img-src if needed for previews
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;");
 header("X-XSS-Protection: 1; mode=block");
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Application: Document Upload | Musabaqa</title>
+    <title>Application: Document Upload (Nigerian) | Musabaqa</title> <!-- Updated Title -->
     <?php include 'layouts/title-meta.php'; ?>
     <?php include 'layouts/head-css.php'; ?>
     <style>
+        /* ... (keep existing styles) ... */
         .form-control.is-invalid { border-color: #dc3545; }
         .invalid-feedback { display: block; color: #dc3545; font-size: 0.875em; }
         .form-label { font-weight: 500; }
@@ -293,7 +304,7 @@ header("X-XSS-Protection: 1; mode=block");
     <!-- Begin page -->
     <div class="wrapper">
 
-        <?php include 'layouts/menu.php'; // Include the sidebar menu ?>
+        <?php include 'layouts/menu.php'; ?>
 
         <!-- ============================================================== -->
         <!-- Start Page Content here -->
@@ -309,7 +320,8 @@ header("X-XSS-Protection: 1; mode=block");
                     <div class="row">
                         <div class="col-12">
                             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                <h4 class="page-title">Application - Step 3: Document Upload</h4>
+                                <!-- Updated Title -->
+                                <h4 class="page-title">Application - Step 3: Document Upload (Nigerian Applicants)</h4>
                                 <div class="page-title-right">
                                      <ol class="breadcrumb m-0">
                                         <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
@@ -347,12 +359,13 @@ header("X-XSS-Protection: 1; mode=block");
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title mb-3">Required Documents</h5>
+                                    <h5 class="card-title mb-3">Required Documents (Nigerian Applicants)</h5> <!-- Updated Title -->
                                     <p class="text-muted mb-4">Please upload clear copies of the following documents. Allowed file types: PDF, DOC, DOCX, JPG, PNG. Max size: 5MB per file.</p>
 
                                     <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data" novalidate>
                                         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 
+                                        <!-- Loop through NIGERIAN required documents -->
                                         <?php foreach ($required_documents as $doc_type => $doc_label): ?>
                                             <div class="upload-section document-list-item">
                                                 <div class="row align-items-center">
@@ -363,8 +376,6 @@ header("X-XSS-Protection: 1; mode=block");
                                                         <?php if (isset($existing_documents[$doc_type])):
                                                             $doc = $existing_documents[$doc_type];
                                                             $file_url = htmlspecialchars($doc['file_path']);
-                                                            // Basic check if it's an image for potential preview
-                                                            $is_image = in_array(strtolower(pathinfo($doc['file_path'], PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png']);
                                                         ?>
                                                             <div class="mb-2">
                                                                 <i class="ri-check-double-line text-success me-1"></i> Uploaded:
@@ -372,9 +383,6 @@ header("X-XSS-Protection: 1; mode=block");
                                                                     <?php echo htmlspecialchars($doc['original_filename']); ?>
                                                                 </a>
                                                                 <span class="file-info ms-2">(Uploaded: <?php echo date('M d, Y H:i', strtotime($doc['created_at'])); ?>)</span>
-                                                                <?php /* Optional: Add Delete Button Here (requires separate handling)
-                                                                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="confirmDelete('<?php echo $doc['id']; ?>', '<?php echo $doc_type; ?>')">Delete</button>
-                                                                */ ?>
                                                             </div>
                                                             <label for="<?php echo $doc_type; ?>" class="form-label text-muted small">Replace file (optional):</label>
                                                         <?php endif; ?>
@@ -391,13 +399,13 @@ header("X-XSS-Protection: 1; mode=block");
 
                                         <div class="mt-4 d-flex justify-content-between">
                                              <?php
-                                                // Determine previous step link based on type
-                                                $prev_step_page = ($contestant_type === 'nigerian') ? 'application-step2-nigerian.php' : 'application-step2-international.php';
+                                                // Back button always points to Nigerian Step 2 now
+                                                $prev_step_page = 'application-step2-nigerian.php';
                                              ?>
                                             <a href="<?php echo $prev_step_page; ?>" class="btn btn-secondary"><i class="ri-arrow-left-line me-1"></i> Back to Sponsor Info</a>
 
                                             <?php
-                                                // Check if all required documents are uploaded to enable/change the button text
+                                                // Check if all NIGERIAN required documents are uploaded
                                                 $all_required_uploaded_final = true;
                                                 foreach (array_keys($required_documents) as $req_doc_type) {
                                                     if (!isset($existing_documents[$req_doc_type])) {
@@ -430,26 +438,19 @@ header("X-XSS-Protection: 1; mode=block");
 
     </div>
     <!-- END wrapper -->
-   
-
-<!-- App js -->
 
 
     <?php include 'layouts/right-sidebar.php'; ?>
     <?php include 'layouts/footer-scripts.php'; ?>
 
-    <script src="assets/js/pages/demo.dashboard.js"></script> <!-- If needed for any dashboard-like elements -->
-    <script src="assets/js/app.min.js"></script> <!-- Essential for template functionality -->
+    <!-- Removed redundant dashboard script -->
+    <script src="assets/js/app.min.js"></script>
 
-    <!-- Add any page-specific JS here if needed -->
-    <?php /* Optional: JavaScript for Delete Confirmation
+    <!-- Optional: JavaScript for Delete Confirmation (Keep if needed) -->
+    <?php /*
     <script>
         function confirmDelete(docId, docType) {
-            if (confirm(`Are you sure you want to delete the document for "${docType.replace('_', ' ')}"? This cannot be undone.`)) {
-                // Redirect to a handler script or submit a specific form
-                // Example: window.location.href = 'delete_document.php?id=' + docId + '&csrf=<?php echo $_SESSION['csrf_token']; ?>';
-                alert('Delete functionality not yet implemented.'); // Placeholder
-            }
+            // ... (keep existing delete confirmation JS if implemented) ...
         }
     </script>
     */ ?>

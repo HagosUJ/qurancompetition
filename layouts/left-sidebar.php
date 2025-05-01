@@ -71,13 +71,13 @@ $user_avatar_sidebar = $_SESSION['user_avatar'] ?? 'assets/images/users/avatar-d
           <span> Application </span>
         </a>
       </li>
-
+<!-- 
       <li class="side-nav-item">
         <a href="documents.php" class="side-nav-link">
-          <i class="ri-folder-upload-line"></i> <!-- Changed icon -->
+          <i class="ri-folder-upload-line"></i> 
           <span> Documents </span>
         </a>
-      </li>
+      </li> -->
 
        <li class="side-nav-item">
         <a href="schedule.php" class="side-nav-link">
@@ -85,21 +85,21 @@ $user_avatar_sidebar = $_SESSION['user_avatar'] ?? 'assets/images/users/avatar-d
           <span> Schedule </span>
         </a>
       </li>
-
+<!-- 
        <li class="side-nav-item">
-        <a href="messages.php" class="side-nav-link"> <!-- Or notifications.php -->
-          <i class="ri-message-2-line"></i> <!-- Changed icon -->
+        <a href="messages.php" class="side-nav-link"> 
+          <i class="ri-message-2-line"></i>
           <span> Messages </span>
-          <!-- Optional: Add badge for unread count here if needed -->
+      
         </a>
-      </li>
+      </li> -->
 
-       <li class="side-nav-item">
+       <!-- <li class="side-nav-item">
         <a href="resources.php" class="side-nav-link">
-          <i class="ri-book-open-line"></i> <!-- Changed icon -->
+          <i class="ri-book-open-line"></i> 
           <span> Resources </span>
         </a>
-      </li>
+      </li> -->
 
       <!-- Optional Sections (Uncomment as needed) -->
       <!--

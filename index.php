@@ -81,14 +81,17 @@ if ($stmt_app) {
                 $next_step_text = 'Review & Submit';
                 $app_status_description = 'Documents uploaded. Please review and submit your application.';
                 break;
-            case 'Submitted':
-            case 'Under Review':
-                $progress = 90; // Submitted but not finished
-                $next_step_link = 'application-review.php'; // Allow viewing submitted data
-                $next_step_text = 'View Submitted Application';
-                $app_status = 'Under Review'; // Normalize
-                $app_status_description = 'Your application has been submitted and is under review.';
-                break;
+                case 'Submitted':
+                    case 'Under Review':
+                        $progress = 90; // Submitted but not finished
+                        // Link to the appropriate review page based on type
+                        $next_step_link = ($contestant_type === 'international')
+                                          ? 'application-step4-international.php' // International uses Step 4 for review
+                                          : 'application-review.php';          // Nigerian uses the common review page
+                        $next_step_text = 'View Submitted Application';
+                        $app_status = 'Under Review'; // Normalize
+                        $app_status_description = 'Your application has been submitted and is under review.';
+                        break;
             case 'Approved':
                 $progress = 100;
                 $next_step_link = 'schedule.php'; // Link to competition schedule
@@ -314,7 +317,7 @@ header("X-XSS-Protection: 1; mode=block");
                             </div>
                         </div>
                         <!-- Documents Link -->
-                        <div class="col-xl-4 col-md-6">
+                        <!-- <div class="col-xl-4 col-md-6">
                             <div class="card cta-box overflow-hidden">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -327,9 +330,9 @@ header("X-XSS-Protection: 1; mode=block");
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- Notifications Link -->
-                         <div class="col-xl-4 col-md-6">
+                         <!-- <div class="col-xl-4 col-md-6">
                             <div class="card cta-box overflow-hidden">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -347,7 +350,7 @@ header("X-XSS-Protection: 1; mode=block");
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- Schedule Link -->
                          <div class="col-xl-4 col-md-6">
                             <div class="card cta-box overflow-hidden">
@@ -364,7 +367,7 @@ header("X-XSS-Protection: 1; mode=block");
                             </div>
                         </div>
                          <!-- Resources Link -->
-                         <div class="col-xl-4 col-md-6">
+                         <!-- <div class="col-xl-4 col-md-6">
                             <div class="card cta-box overflow-hidden">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center justify-content-between">
@@ -377,7 +380,7 @@ header("X-XSS-Protection: 1; mode=block");
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                     </div> <!-- end row -->
 
