@@ -25,6 +25,7 @@ if (!$user_id) {
     logout_user('sign-in.php?reason=error');
     exit;
 }
+$profile_picture = $_SESSION['user_profile_pic'] ?? 'assets/media/avatars/blank.png'; // Default avatar
 
 // Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {

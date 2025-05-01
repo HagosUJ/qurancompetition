@@ -19,6 +19,7 @@ $_SESSION['last_activity'] = time();
 // Get user details (optional for this page, but good practice)
 $user_id = $_SESSION['user_id'] ?? null;
 $user_fullname = $_SESSION['user_fullname'] ?? 'Participant';
+$profile_picture = $_SESSION['user_profile_pic'] ?? 'assets/media/avatars/blank.png'; // Default avatar
 
 if (!$user_id) {
     error_log("User ID missing from session for logged-in user on schedule.php.");

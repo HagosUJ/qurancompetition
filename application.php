@@ -20,6 +20,7 @@ $_SESSION['last_activity'] = time();
 $user_id = $_SESSION['user_id'] ?? null;
 $user_fullname = $_SESSION['user_fullname'] ?? 'Participant';
 $user_role = $_SESSION['user_role'] ?? 'user';
+$profile_picture = $_SESSION['user_profile_pic'] ?? 'assets/media/avatars/blank.png'; // Default avatar
 
 if (!$user_id) {
     error_log("User ID missing from session for logged-in user on application.php.");

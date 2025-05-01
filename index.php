@@ -20,6 +20,7 @@ $_SESSION['last_activity'] = time();
 $user_id = $_SESSION['user_id'] ?? null;
 $user_fullname = $_SESSION['user_fullname'] ?? 'Participant';
 $user_role = $_SESSION['user_role'] ?? 'user';
+$profile_picture = $_SESSION['user_profile_pic'] ?? 'assets/media/avatars/blank.png';
 
 if (!$user_id) {
     error_log("User ID missing from session for logged-in user on index.php.");
@@ -192,6 +193,24 @@ header("X-XSS-Protection: 1; mode=block");
         .notification-badge { position: absolute; top: -5px; right: -5px; padding: 2px 6px; border-radius: 50%; background: red; color: white; font-size: 0.7rem; }
         .icon-container { position: relative; display: inline-block; }
         .cta-box .fs-20 { font-size: 36px !important; opacity: 0.6; } /* Make icons slightly larger and less prominent */
+        .btn-custom-blue {
+            display: inline-block;
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            padding: 0.5rem 1rem; /* Adjust padding as needed */
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: 600; /* font-semibold */
+            text-decoration: none;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-custom-blue:hover {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            text-decoration: none;
+        }
+        .btn-custom-blue i {
+            vertical-align: middle; /* Align icon nicely */
+        }
     </style>
 </head>
 
@@ -218,7 +237,7 @@ header("X-XSS-Protection: 1; mode=block");
                                 <h4 class="page-title">Welcome, <?php echo htmlspecialchars($user_fullname); ?>!</h4>
                                 <div class="page-title-right">
                                     <form class="d-flex">
-                                        <a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="btn btn-primary ms-2">
+                                        <a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="btn-custom-blue">
                                             <i class="ri-refresh-line"></i> Refresh
                                         </a>
                                     </form>
@@ -266,7 +285,7 @@ header("X-XSS-Protection: 1; mode=block");
                                     <?php // Only show button if there's a valid next step link ?>
                                     <?php if ($next_step_link !== '#'): ?>
                                         <div class="mt-3">
-                                            <a href="<?php echo htmlspecialchars($next_step_link); ?>" class="btn btn-primary btn-sm">
+                                            <a href="<?php echo htmlspecialchars($next_step_link); ?>" class="btn-custom-blue">
                                                 <?php echo htmlspecialchars($next_step_text); ?> <i class="ri-arrow-right-line ms-1"></i>
                                             </a>
                                         </div>

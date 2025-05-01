@@ -47,6 +47,23 @@ function redirect($url, $message = "", $type = "success") {
     exit();
 }
 
+/**
+ * Sets a flash message in the session.
+ *
+ * @param string $message The message content.
+ * @param string $type The message type (e.g., 'success', 'error', 'warning', 'info'). Defaults to 'success'.
+ */
+function set_flash_message(string $message, string $type = 'success') {
+    // Ensure session is active (though it should be from auth.php)
+    if (session_status() === PHP_SESSION_NONE) {
+        // Log warning or start session if absolutely necessary, but ideally auth.php handles this
+        error_log("Warning: Session not started before calling set_flash_message.");
+        // session_start(); // Uncomment cautiously if needed, but prefer starting earlier
+    }
+    $_SESSION['flash_message'] = $message;
+    $_SESSION['flash_type'] = $type;
+}
+
 // Get flash message and clear it
 function get_flash_message() {
     $message = "";
