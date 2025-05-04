@@ -6,18 +6,27 @@ if (session_status() === PHP_SESSION_NONE) {
 $user_fullname_sidebar = $_SESSION['user_fullname'] ?? 'Participant';
 $user_role_sidebar = $_SESSION['user_role'] ?? 'user';
 // Placeholder for profile picture - fetch from DB or use default
-$user_avatar_sidebar = $_SESSION['user_avatar'] ?? 'assets/images/users/avatar-default.png'; // Example default
+$user_avatar_sidebar = $_SESSION['user_avatar'] ?? 'assets/images/users/avatar-default.png';
+
+// Default language if not set
+if (!isset($_SESSION['language'])) {
+    $_SESSION['language'] = 'en';
+    $_SESSION['lang'] = 'en';
+}
+$current_lang = $_SESSION['language'] ?? 'en';
+
+// Log sidebar language for debugging
+error_log("Sidebar loaded with language: $current_lang");
 ?>
+
 <!-- ========== Left Sidebar Start ========== -->
 <div class="leftside-menu">
   <!-- Brand Logo Light -->
   <a href="index.php" class="logo logo-light">
     <span class="logo-lg" style="text-align: start;">
-      <!-- TODO: Replace with Musabaqa Logo -->
       <img src="assets/images/musabaqa-logo-light.png" alt="Musabaqa Logo" style="height: 40px;">
     </span>
     <span class="logo-sm">
-      <!-- TODO: Replace with Musabaqa Small Logo -->
       <img src="assets/images/musabaqa-logo-sm-light.png" alt="Musabaqa Logo" style="height: 30px;" />
     </span>
   </a>
@@ -25,11 +34,9 @@ $user_avatar_sidebar = $_SESSION['user_avatar'] ?? 'assets/images/users/avatar-d
   <!-- Brand Logo Dark -->
   <a href="index.php" class="logo logo-dark">
     <span class="logo-lg" style="text-align: start;">
-      <!-- TODO: Replace with Musabaqa Logo -->
       <img src="assets/images/musabaqa-logo-dark.png" alt="Musabaqa Logo" style="height: 40px;">
     </span>
     <span class="logo-sm">
-      <!-- TODO: Replace with Musabaqa Small Logo -->
       <img src="assets/images/musabaqa-logo-sm-dark.png" alt="Musabaqa Logo" style="height: 30px;" />
     </span>
   </a>
@@ -48,7 +55,7 @@ $user_avatar_sidebar = $_SESSION['user_avatar'] ?? 'assets/images/users/avatar-d
   <div class="h-100" id="leftside-menu-container" data-simplebar>
     <!-- Leftbar User -->
     <div class="leftbar-user">
-      <a href="profile.php"> <!-- Link to profile page -->
+      <a href="profile.php">
         <img src="<?php echo htmlspecialchars($user_avatar_sidebar); ?>" alt="user-image" height="42" width="42" class="rounded-circle shadow-sm" />
         <span class="leftbar-user-name mt-2"><?php echo htmlspecialchars($user_fullname_sidebar); ?></span>
       </a>
@@ -56,102 +63,77 @@ $user_avatar_sidebar = $_SESSION['user_avatar'] ?? 'assets/images/users/avatar-d
 
     <!--- Sidemenu -->
     <ul class="side-nav">
-      <li class="side-nav-title">Navigation</li>
+      <li class="side-nav-title sidebar-lang">
+        <span class="lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Navigation</span>
+        <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">التنقل</span>
+      </li>
 
       <li class="side-nav-item">
         <a href="index.php" class="side-nav-link">
-          <i class="ri-dashboard-line"></i> <!-- Changed icon -->
-          <span> Dashboard </span>
+          <i class="ri-dashboard-line"></i>
+          <span class="sidebar-lang lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Dashboard</span>
+          <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">لوحة التحكم</span>
         </a>
       </li>
 
       <li class="side-nav-item">
-        <a href="application.php" class="side-nav-link"> <!-- Link to main application page or first step -->
-          <i class="ri-file-list-3-line"></i> <!-- Changed icon -->
-          <span> Application </span>
+        <a href="application.php" class="side-nav-link">
+          <i class="ri-file-list-3-line"></i>
+          <span class="sidebar-lang lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Application</span>
+          <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">الطلب</span>
         </a>
       </li>
-<!-- 
-      <li class="side-nav-item">
-        <a href="documents.php" class="side-nav-link">
-          <i class="ri-folder-upload-line"></i> 
-          <span> Documents </span>
-        </a>
-      </li> -->
 
-       <li class="side-nav-item">
+      <li class="side-nav-item">
         <a href="schedule.php" class="side-nav-link">
-          <i class="ri-calendar-2-line"></i> <!-- Changed icon -->
-          <span> Schedule </span>
-        </a>
-      </li>
-<!-- 
-       <li class="side-nav-item">
-        <a href="messages.php" class="side-nav-link"> 
-          <i class="ri-message-2-line"></i>
-          <span> Messages </span>
-      
-        </a>
-      </li> -->
-
-       <!-- <li class="side-nav-item">
-        <a href="resources.php" class="side-nav-link">
-          <i class="ri-book-open-line"></i> 
-          <span> Resources </span>
-        </a>
-      </li> -->
-
-      <!-- Optional Sections (Uncomment as needed) -->
-      <!--
-      <li class="side-nav-item">
-        <a href="performance.php" class="side-nav-link">
-          <i class="ri-line-chart-line"></i>
-          <span> Performance </span>
+          <i class="ri-calendar-2-line"></i>
+          <span class="sidebar-lang lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Schedule</span>
+          <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">الجدول</span>
         </a>
       </li>
 
-      <li class="side-nav-item">
-        <a href="travel.php" class="side-nav-link">
-          <i class="ri-plane-line"></i>
-          <span> Travel & Accomm. </span>
-        </a>
+      <li class="side-nav-title sidebar-lang mt-2">
+        <span class="lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Account</span>
+        <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">الحساب</span>
       </li>
-      -->
-
-      <li class="side-nav-title mt-2">Account</li>
 
       <li class="side-nav-item">
         <a href="profile.php" class="side-nav-link">
-          <i class="ri-user-settings-line"></i> <!-- Changed icon -->
-          <span> My Profile </span>
+          <i class="ri-user-settings-line"></i>
+          <span class="sidebar-lang lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">My Profile</span>
+          <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">ملفي الشخصي</span>
         </a>
       </li>
 
       <li class="side-nav-item">
         <a href="logout.php" class="side-nav-link">
-          <i class="ri-logout-box-line"></i> <!-- Kept icon -->
-          <span> Logout </span>
+          <i class="ri-logout-box-line"></i>
+          <span class="sidebar-lang lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Logout</span>
+          <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">تسجيل الخروج</span>
         </a>
       </li>
 
       <!-- Admin Section (Conditional) -->
       <?php if ($user_role_sidebar === 'admin' || $user_role_sidebar === 'reviewer'): ?>
-        <li class="side-nav-title mt-2">Admin Area</li>
+        <li class="side-nav-title sidebar-lang mt-2">
+          <span class="lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Admin Area</span>
+          <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">منطقة الإدارة</span>
+        </li>
         <li class="side-nav-item">
           <a href="admin/review-applications.php" class="side-nav-link">
             <i class="ri-file-search-line"></i>
-            <span> Review Apps </span>
+            <span class="sidebar-lang lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Review Apps</span>
+            <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">مراجعة الطلبات</span>
           </a>
         </li>
-         <li class="side-nav-item">
+        <li class="side-nav-item">
           <a href="admin/manage-users.php" class="side-nav-link">
             <i class="ri-group-line"></i>
-            <span> Manage Users </span>
+            <span class="sidebar-lang lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Manage Users</span>
+            <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">إدارة المستخدمين</span>
           </a>
         </li>
-        <!-- Add more admin links as needed -->
       <?php endif; ?>
-
     </ul>
     <!--- End Sidemenu -->
 
@@ -159,3 +141,32 @@ $user_avatar_sidebar = $_SESSION['user_avatar'] ?? 'assets/images/users/avatar-d
   </div>
 </div>
 <!-- ========== Left Sidebar End ========== -->
+
+<!-- Sidebar Translation Styles -->
+<style>
+  .sidebar-lang.hidden {
+    display: none !important;
+  }
+  [dir="rtl"] .leftside-menu {
+    font-family: 'Amiri', serif;
+    text-align: right;
+  }
+  [dir="rtl"] .side-nav-link {
+    flex-direction: row-reverse;
+  }
+  [dir="rtl"] .side-nav-link i {
+    margin-left: 10px;
+    margin-right: 0;
+  }
+  [dir="rtl"] .leftbar-user {
+    text-align: right;
+  }
+  [dir="rtl"] .logo-lg,
+  [dir="rtl"] .logo-sm {
+    text-align: right !important;
+  }
+</style>
+<?php
+// Log sidebar render completion
+error_log("Sidebar rendered with language: $current_lang");
+?>

@@ -9,6 +9,9 @@ if (!is_logged_in()) {
     exit;
 }
 
+$language = $_SESSION['language'] ?? 'en'; // Default to English
+$is_rtl = ($language === 'ar');
+
 // Session timeout check
 $timeout_duration = SESSION_TIMEOUT_DURATION ?? 1800;
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
@@ -32,6 +35,102 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// --- Language-Specific Strings ---
+$translations = [
+    'en' => [
+        'page_title' => 'Application: Step 2 - Nominator Details (International) | Musabaqa',
+        'page_header' => 'Application - Step 2: Nominator Details (International)',
+        'dashboard' => 'Dashboard',
+        'application' => 'Application',
+        'step_2' => 'Step 2',
+        'welcome_message' => 'Please provide details about the organization or individual nominating/sponsoring you.',
+        'nominator_information' => 'Nominator/Sponsor Information',
+        'nomination_letter' => 'Letter of Nomination/Sponsorship',
+        'nominator_type' => 'Nominator/Sponsor Type',
+        'nominator_type_required' => 'Nominator/Sponsor Type is required.',
+        'select_type' => '-- Select Type --',
+        'nominator_type_organization' => 'Organization / Institution',
+        'nominator_type_individual' => 'Individual',
+        'nominator_name' => 'Nominator/Sponsor Name',
+        'nominator_name_required' => 'Nominator/Sponsor Name is required.',
+        'nominator_name_placeholder' => 'Full name of person or organization',
+        'nominator_address' => 'Address',
+        'nominator_city' => 'City',
+        'nominator_country' => 'Country',
+        'select_country' => '-- Select Country --',
+        'nominator_phone' => 'Phone Number',
+        'nominator_phone_placeholder' => 'e.g., +1 212 555 1234',
+        'nominator_email' => 'Email Address',
+        'nominator_email_invalid' => 'Invalid Email format.',
+        'nominator_email_placeholder' => 'nominator@example.com',
+        'relationship' => 'Relationship to Contestant (Optional)',
+        'relationship_placeholder' => 'e.g., Teacher, Imam, Organization Representative',
+        'upload_letter' => 'Upload Letter',
+        'letter_instructions' => 'Upload the official nomination or sponsorship letter (PDF, DOC, DOCX, JPG, PNG, max 5MB).',
+        'letter_invalid_type' => 'Invalid file type. Allowed: PDF, DOC, DOCX, JPG, JPEG, PNG.',
+        'letter_size_exceeded' => 'File size exceeds the limit (5MB).',
+        'letter_upload_failed' => 'Failed to upload document.',
+        'letter_upload_error' => 'Error uploading document: Code %s',
+        'current_letter_uploaded' => 'Current letter uploaded:',
+        'view_letter' => 'View Letter',
+        'back_to_step_1' => 'Back to Step 1',
+        'save_continue' => 'Save and Continue to Step 3',
+        'error_invalid_submission' => 'Invalid form submission. Please try again.',
+        'error_load_details' => 'Could not load existing application details. Please try again later.',
+        'error_save' => 'An error occurred while saving your information. Please check your inputs and try again.',
+        'success_save' => 'Nominator information saved successfully.',
+        'error_app_not_found' => 'Application not found or type mismatch.',
+        'error_verify_app' => 'Error verifying application status. Please try again later.',
+        'error_step_sequence' => 'Please complete the previous step first.',
+    ],
+    'ar' => [
+        'page_title' => 'الطلب: الخطوة الثانية - تفاصيل المرشح (دولي) | المسابقة',
+        'page_header' => 'الطلب - الخطوة الثانية: تفاصيل المرشح (دولي)',
+        'dashboard' => 'لوحة التحكم',
+        'application' => 'الطلب',
+        'step_2' => 'الخطوة الثانية',
+        'welcome_message' => 'يرجى تقديم تفاصيل المنظمة أو الفرد الذي يرشحك/يكفلك.',
+        'nominator_information' => 'معلومات المرشح/الكفيل',
+        'nomination_letter' => 'خطاب الترشيح/الكفالة',
+        'nominator_type' => 'نوع المرشح/الكفيل',
+        'nominator_type_required' => 'نوع المرشح/الكفيل مطلوب.',
+        'select_type' => '-- اختر النوع --',
+        'nominator_type_organization' => 'منظمة / مؤسسة',
+        'nominator_type_individual' => 'فرد',
+        'nominator_name' => 'اسم المرشح/الكفيل',
+        'nominator_name_required' => 'اسم المرشح/الكفيل مطلوب.',
+        'nominator_name_placeholder' => 'الاسم الكامل للشخص أو المنظمة',
+        'nominator_address' => 'العنوان',
+        'nominator_city' => 'المدينة',
+        'nominator_country' => 'البلد',
+        'select_country' => '-- اختر البلد --',
+        'nominator_phone' => 'رقم الهاتف',
+        'nominator_phone_placeholder' => 'مثال: +1 212 555 1234',
+        'nominator_email' => 'عنوان البريد الإلكتروني',
+        'nominator_email_invalid' => 'تنسيق البريد الإلكتروني غير صالح.',
+        'nominator_email_placeholder' => 'nominator@example.com',
+        'relationship' => 'العلاقة بالمتسابق (اختياري)',
+        'relationship_placeholder' => 'مثال: معلم، إمام، ممثل المنظمة',
+        'upload_letter' => 'رفع الخطاب',
+        'letter_instructions' => 'ارفع خطاب الترشيح أو الكفالة الرسمي (PDF، DOC، DOCX، JPG، PNG، بحد أقصى 5 ميجابايت).',
+        'letter_invalid_type' => 'نوع الملف غير صالح. المسموح: PDF، DOC، DOCX، JPG، JPEG، PNG.',
+        'letter_size_exceeded' => 'حجم الملف يتجاوز الحد (5 ميجابايت).',
+        'letter_upload_failed' => 'فشل في رفع المستند.',
+        'letter_upload_error' => 'خطأ في رفع المستند: الكود %s',
+        'current_letter_uploaded' => 'الخطاب الحالي تم رفعه:',
+        'view_letter' => 'عرض الخطاب',
+        'back_to_step_1' => 'العودة إلى الخطوة الأولى',
+        'save_continue' => 'حفظ ومتابعة إلى الخطوة الثالثة',
+        'error_invalid_submission' => 'إرسال نموذج غير صالح. يرجى المحاولة مرة أخرى.',
+        'error_load_details' => 'تعذر تحميل تفاصيل الطلب الحالية. يرجى المحاولة مرة أخرى لاحقًا.',
+        'error_save' => 'حدث خطأ أثناء حفظ المعلومات. يرجى التحقق من مدخلاتك والمحاولة مرة أخرى.',
+        'success_save' => 'تم حفظ معلومات المرشح بنجاح.',
+        'error_app_not_found' => 'الطلب غير موجود أو هناك عدم تطابق في النوع.',
+        'error_verify_app' => 'خطأ في التحقق من حالة الطلب. يرجى المحاولة مرة أخرى لاحقًا.',
+        'error_step_sequence' => 'يرجى إكمال الخطوة السابقة أولاً.',
+    ]
+];
+
 // --- Application Verification ---
 global $conn;
 $application_id = null;
@@ -50,14 +149,11 @@ if ($stmt_app) {
         $current_step = $app['current_step'];
 
         // --- Step Access Control ---
-        // Allow access if current step is 'step2' or if they completed step 1 ('Personal Info Complete')
         if ($current_step !== 'step2' && $application_status !== 'Personal Info Complete') {
-             // Redirect back to the correct step or overview page
-             $redirect_target = ($current_step && $current_step !== 'step2') ? 'application-' . $current_step . '-international.php' : 'application.php';
-             redirect($redirect_target . '?error=step_sequence');
-             exit;
+            $redirect_target = ($current_step && $current_step !== 'step2') ? 'application-' . $current_step . '-international.php' : 'application.php';
+            redirect($redirect_target . '?error=step_sequence');
+            exit;
         }
-
 
         // Fetch existing nominator details for this application step
         $stmt_details = $conn->prepare("SELECT * FROM application_nominators_international WHERE application_id = ?");
@@ -70,35 +166,33 @@ if ($stmt_app) {
             }
             $stmt_details->close();
         } else {
-             error_log("Failed to prepare statement for fetching International Nominator details: " . $conn->error);
-             $errors['form'] = "Could not load existing application details. Please try again later.";
+            error_log("Failed to prepare statement for fetching International Nominator details: " . $conn->error);
+            $errors['form'] = $translations[$language]['error_load_details'];
         }
-
     } else {
-        // No international application found for this user
         redirect('application.php?error=app_not_found_or_mismatch');
         exit;
     }
     $stmt_app->close();
 } else {
     error_log("Failed to prepare statement for checking application: " . $conn->error);
-    die("Error verifying application status. Please try again later.");
+    die($translations[$language]['error_verify_app']);
 }
 
-// --- Define profile picture for topbar (fetch from step 1 if needed) ---
-$profile_picture = $_SESSION['user_profile_picture'] ?? 'assets/images/users/avatar-1.jpg'; // Simplified for now
+// --- Define profile picture for topbar ---
+$profile_picture = $_SESSION['user_profile_picture'] ?? 'assets/images/users/avatar-1.jpg';
 
 // --- Form Processing ---
 $errors = [];
 $success = '';
-$upload_dir = 'uploads/nominations/'; // Define upload directory for letters
-$allowed_types = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']; // Allowed letter formats
-$max_file_size = 5 * 1024 * 1024; // 5MB limit for letter
+$upload_dir = 'Uploads/nominations/';
+$allowed_types = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+$max_file_size = 5 * 1024 * 1024; // 5MB
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verify CSRF token
     if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        $errors['form'] = "Invalid form submission. Please try again.";
+        $errors['form'] = $translations[$language]['error_invalid_submission'];
     } else {
         // Sanitize and retrieve POST data
         $nominator_type = sanitize_input($_POST['nominator_type'] ?? '');
@@ -108,15 +202,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nominator_country = sanitize_input($_POST['nominator_country'] ?? '');
         $nominator_phone = sanitize_input($_POST['nominator_phone'] ?? '');
         $nominator_email = filter_input(INPUT_POST, 'nominator_email', FILTER_VALIDATE_EMAIL);
-        $relationship = sanitize_input($_POST['relationship'] ?? ''); // Optional
+        $relationship = sanitize_input($_POST['relationship'] ?? '');
 
         // --- Validation ---
-        if (empty($nominator_type) || !in_array($nominator_type, ['Organization', 'Individual'])) $errors['nominator_type'] = "Nominator/Sponsor Type is required.";
-        if (empty($nominator_name)) $errors['nominator_name'] = "Nominator/Sponsor Name is required.";
-        // Add more validation as needed (e.g., phone format, country exists)
-        if ($nominator_email === false && !empty($_POST['nominator_email'])) $errors['nominator_email'] = "Invalid Email format."; // Only error if provided and invalid
+        if (empty($nominator_type) || !in_array($nominator_type, ['Organization', 'Individual'])) $errors['nominator_type'] = $translations[$language]['nominator_type_required'];
+        if (empty($nominator_name)) $errors['nominator_name'] = $translations[$language]['nominator_name_required'];
+        if ($nominator_email === false && !empty($_POST['nominator_email'])) $errors['nominator_email'] = $translations[$language]['nominator_email_invalid'];
 
-        // --- File Upload Handling (Nomination Letter) ---
+        // --- File Upload Handling ---
         $nomination_letter_path = $application_data['nomination_letter_path'] ?? null;
         $new_file_uploaded = false;
 
@@ -127,23 +220,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
 
             if (!in_array($file_ext, $allowed_types)) {
-                $errors['nomination_letter'] = "Invalid file type. Allowed: PDF, DOC, DOCX, JPG, JPEG, PNG.";
+                $errors['nomination_letter'] = $translations[$language]['letter_invalid_type'];
             } elseif ($file_size > $max_file_size) {
-                $errors['nomination_letter'] = "File size exceeds the limit (" . ($max_file_size / 1024 / 1024) . "MB).";
+                $errors['nomination_letter'] = $translations[$language]['letter_size_exceeded'];
             } else {
                 if (!is_dir($upload_dir)) {
                     if (!mkdir($upload_dir, 0755, true)) {
-                        $errors['nomination_letter'] = "Failed to create upload directory for documents.";
+                        $errors['nomination_letter'] = $translations[$language]['letter_upload_failed'];
                         goto skip_file_move_nomination_intl;
                     }
                 }
-                // Sanitize filename before using it
                 $safe_basename = preg_replace("/[^a-zA-Z0-9._-]/", "_", basename($file_name));
                 $unique_filename = "app_{$application_id}_nomination_" . uniqid() . '_' . $safe_basename;
                 $destination = $upload_dir . $unique_filename;
 
                 if (move_uploaded_file($file_tmp_path, $destination)) {
-                    // Delete old file if replacing
                     $old_letter_path = $application_data['nomination_letter_path'] ?? null;
                     if ($old_letter_path && file_exists($old_letter_path) && $old_letter_path !== $destination) {
                         @unlink($old_letter_path);
@@ -152,24 +243,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $new_file_uploaded = true;
                 } else {
                     error_log("move_uploaded_file failed for nomination letter: From '{$file_tmp_path}' to '{$destination}' for app {$application_id}");
-                    $errors['nomination_letter'] = "Failed to upload document.";
+                    $errors['nomination_letter'] = $translations[$language]['letter_upload_failed'];
                 }
             }
         } elseif (isset($_FILES['nomination_letter']) && $_FILES['nomination_letter']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $errors['nomination_letter'] = "Error uploading document: Code " . $_FILES['nomination_letter']['error'];
-        } elseif (empty($nomination_letter_path)) {
-             // Make letter optional or required based on your rules
-             // $errors['nomination_letter'] = "Nomination/Sponsorship Letter is required."; // Uncomment if required
+            $errors['nomination_letter'] = sprintf($translations[$language]['letter_upload_error'], $_FILES['nomination_letter']['error']);
         }
 
-        skip_file_move_nomination_intl: // Label for goto jump
+        skip_file_move_nomination_intl:
 
-        // --- Database Operation ---
         if (empty($errors)) {
             try {
                 $conn->begin_transaction();
 
-                // Check if record exists in 'application_nominators_international'
                 $stmt_check = $conn->prepare("SELECT id FROM application_nominators_international WHERE application_id = ?");
                 if (!$stmt_check) throw new Exception("Prepare failed (Check Nominator): " . $conn->error);
                 $stmt_check->bind_param("i", $application_id);
@@ -179,7 +265,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt_check->close();
 
                 if ($existing_record) {
-                    // Update existing record
                     $sql = "UPDATE application_nominators_international SET
                                 nominator_type = ?, nominator_name = ?, nominator_address = ?, nominator_city = ?,
                                 nominator_country = ?, nominator_phone = ?, nominator_email = ?, relationship = ?,
@@ -187,26 +272,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             WHERE application_id = ?";
                     $stmt_save = $conn->prepare($sql);
                     if (!$stmt_save) throw new Exception("Prepare failed (UPDATE Nominator): " . $conn->error);
-                    // 9 data fields + application_id = 10 params (s s s s s s s s s i)
                     $stmt_save->bind_param("sssssssssi",
                         $nominator_type, $nominator_name, $nominator_address, $nominator_city,
                         $nominator_country, $nominator_phone, $nominator_email, $relationship,
-                        $nomination_letter_path,
-                        $application_id
-                    );
+                        $nomination_letter_path, $application_id);
                 } else {
-                    // Insert new record
                     $sql = "INSERT INTO application_nominators_international
                                 (application_id, nominator_type, nominator_name, nominator_address, nominator_city,
                                  nominator_country, nominator_phone, nominator_email, relationship, nomination_letter_path)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; // 10 placeholders
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     $stmt_save = $conn->prepare($sql);
-                     if (!$stmt_save) throw new Exception("Prepare failed (INSERT Nominator): " . $conn->error);
-                     // 10 params (i s s s s s s s s s)
+                    if (!$stmt_save) throw new Exception("Prepare failed (INSERT Nominator): " . $conn->error);
                     $stmt_save->bind_param("isssssssss",
                         $application_id, $nominator_type, $nominator_name, $nominator_address, $nominator_city,
-                        $nominator_country, $nominator_phone, $nominator_email, $relationship, $nomination_letter_path
-                    );
+                        $nominator_country, $nominator_phone, $nominator_email, $relationship, $nomination_letter_path);
                 }
 
                 if (!$stmt_save->execute()) {
@@ -214,49 +293,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $stmt_save->close();
 
-                // Update main application status/step
-                // Only update status if moving forward from the previous step's status
                 if ($application_status === 'Personal Info Complete') {
-                    $new_status = 'Nominator Info Complete'; // Or similar status
-                    $next_step = 'step3'; // Assuming step 3 is next
+                    $new_status = 'Nominator Info Complete';
+                    $next_step = 'step3';
                     $stmt_update_app = $conn->prepare("UPDATE applications SET status = ?, current_step = ?, last_updated = NOW() WHERE id = ?");
                     if (!$stmt_update_app) throw new Exception("Prepare failed (App Update): " . $conn->error);
                     $stmt_update_app->bind_param("ssi", $new_status, $next_step, $application_id);
                     if (!$stmt_update_app->execute()) {
-                         throw new Exception("Execute failed (App Update): " . $stmt_update_app->error);
+                        throw new Exception("Execute failed (App Update): " . $stmt_update_app->error);
                     }
                     $stmt_update_app->close();
                 } else {
-                     // Just update the timestamp if already past this stage but editing
-                     $stmt_update_time = $conn->prepare("UPDATE applications SET last_updated = NOW() WHERE id = ?");
-                     if (!$stmt_update_time) throw new Exception("Prepare failed (App Time Update): " . $conn->error);
-                     $stmt_update_time->bind_param("i", $application_id);
-                     $stmt_update_time->execute();
-                     $stmt_update_time->close();
+                    $stmt_update_time = $conn->prepare("UPDATE applications SET last_updated = NOW() WHERE id = ?");
+                    if (!$stmt_update_time) throw new Exception("Prepare failed (App Time Update): " . $conn->error);
+                    $stmt_update_time->bind_param("i", $application_id);
+                    $stmt_update_time->execute();
+                    $stmt_update_time->close();
                 }
 
-
                 $conn->commit();
-                $success = "Nominator information saved successfully.";
+                $success = $translations[$language]['success_save'];
 
-                // Update $application_data with new values
-                 $application_data = [
+                $application_data = [
                     'nominator_type' => $nominator_type, 'nominator_name' => $nominator_name,
                     'nominator_address' => $nominator_address, 'nominator_city' => $nominator_city,
                     'nominator_country' => $nominator_country, 'nominator_phone' => $nominator_phone,
                     'nominator_email' => $nominator_email, 'relationship' => $relationship,
                     'nomination_letter_path' => $nomination_letter_path
-                 ];
+                ];
 
-                // Redirect to next step:
-                 redirect('application-step3-international.php'); // *** Make sure this file exists ***
-                 exit;
-
+                redirect('application-step3-international.php');
+                exit;
             } catch (Exception $e) {
                 $conn->rollback();
                 error_log("Error saving International application step 2 for app ID {$application_id}: " . $e->getMessage());
-                $errors['form'] = "An error occurred while saving your information. Details: " . htmlspecialchars($e->getMessage());
-                // Rollback file upload if it happened during the failed transaction
+                $errors['form'] = $translations[$language]['error_save'] . " Details: " . htmlspecialchars($e->getMessage());
                 if ($new_file_uploaded && isset($destination) && file_exists($destination)) {
                     @unlink($destination);
                 }
@@ -268,19 +339,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // --- Security Headers ---
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
-// ... other headers ...
+header("Referrer-Policy: strict-origin-when-cross-origin");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; frame-src 'none';");
+header("X-XSS-Protection: 1; mode=block");
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo $language; ?>" <?php echo $is_rtl ? 'dir="rtl"' : ''; ?>>
 <head>
     <meta charset="utf-8" />
-    <title>Application: Step 2 - Nominator Details (International) | Musabaqa</title>
+    <title><?php echo $translations[$language]['page_title']; ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include 'layouts/title-meta.php'; ?>
     <?php include 'layouts/head-css.php'; ?>
     <style>
-        /* Existing styles */
         .form-control.is-invalid, .form-select.is-invalid { border-color: #dc3545; }
         .invalid-feedback { display: block; color: #dc3545; font-size: 0.875em; }
         .form-label { font-weight: 500; }
@@ -311,12 +383,12 @@ header("X-Content-Type-Options: nosniff");
                     <div class="row">
                         <div class="col-12">
                             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                <h4 class="page-title">Application - Step 2: Nominator Details (International)</h4>
+                                <h4 class="page-title"><?php echo $translations[$language]['page_header']; ?></h4>
                                 <div class="page-title-right">
-                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="application.php">Application</a></li>
-                                        <li class="breadcrumb-item active">Step 2</li>
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="index.php"><?php echo $translations[$language]['dashboard']; ?></a></li>
+                                        <li class="breadcrumb-item"><a href="application.php"><?php echo $translations[$language]['application']; ?></a></li>
+                                        <li class="breadcrumb-item active"><?php echo $translations[$language]['step_2']; ?></li>
                                     </ol>
                                 </div>
                             </div>
@@ -327,21 +399,19 @@ header("X-Content-Type-Options: nosniff");
                     <div class="row step-indicator">
                         <div class="col-12">
                             <div class="progress" style="height: 10px;">
-                                <!-- Assuming 4 steps total -->
                                 <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">Step 2 of 4</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Welcome Message -->
-                     <div class="row">
+                    <div class="row">
                         <div class="col-12">
-                             <div class="alert alert-secondary bg-secondary text-white border-0" role="alert">
-                                Please provide details about the organization or individual nominating/sponsoring you.
+                            <div class="alert alert-secondary bg-secondary text-white border-0" role="alert">
+                                <?php echo $translations[$language]['welcome_message']; ?>
                             </div>
                         </div>
                     </div>
-
 
                     <!-- Display Messages -->
                     <?php if (!empty($errors['form'])): ?>
@@ -351,12 +421,11 @@ header("X-Content-Type-Options: nosniff");
                         </div>
                     <?php endif; ?>
                     <?php if (!empty($success)): ?>
-                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                             <i class="ri-check-line me-1"></i> <?php echo htmlspecialchars($success); ?>
-                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                         </div>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="ri-check-line me-1"></i> <?php echo htmlspecialchars($success); ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     <?php endif; ?>
-
 
                     <!-- Nominator/Sponsor Form -->
                     <div class="row">
@@ -367,25 +436,25 @@ header("X-Content-Type-Options: nosniff");
                                 <!-- Nominator Details Card -->
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="card-title mb-0"><i class="ri-shield-user-line me-1"></i>Nominator/Sponsor Information</h5>
+                                        <h5 class="card-title mb-0"><i class="ri-shield-user-line me-1"></i><?php echo $translations[$language]['nominator_information']; ?></h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
                                             <!-- Nominator Type -->
                                             <div class="col-md-6 mb-3">
-                                                <label for="nominator_type" class="form-label">Nominator/Sponsor Type <span class="text-danger">*</span></label>
+                                                <label for="nominator_type" class="form-label"><?php echo $translations[$language]['nominator_type']; ?> <span class="text-danger">*</span></label>
                                                 <select class="form-select <?php echo isset($errors['nominator_type']) ? 'is-invalid' : ''; ?>" id="nominator_type" name="nominator_type" required>
-                                                    <option value="" disabled <?php echo empty($application_data['nominator_type']) ? 'selected' : ''; ?>>-- Select Type --</option>
-                                                    <option value="Organization" <?php echo (($application_data['nominator_type'] ?? '') === 'Organization') ? 'selected' : ''; ?>>Organization / Institution</option>
-                                                    <option value="Individual" <?php echo (($application_data['nominator_type'] ?? '') === 'Individual') ? 'selected' : ''; ?>>Individual</option>
+                                                    <option value="" disabled <?php echo empty($application_data['nominator_type']) ? 'selected' : ''; ?>><?php echo $translations[$language]['select_type']; ?></option>
+                                                    <option value="Organization" <?php echo (($application_data['nominator_type'] ?? '') === 'Organization') ? 'selected' : ''; ?>><?php echo $translations[$language]['nominator_type_organization']; ?></option>
+                                                    <option value="Individual" <?php echo (($application_data['nominator_type'] ?? '') === 'Individual') ? 'selected' : ''; ?>><?php echo $translations[$language]['nominator_type_individual']; ?></option>
                                                 </select>
                                                 <?php if (isset($errors['nominator_type'])): ?><div class="invalid-feedback"><?php echo htmlspecialchars($errors['nominator_type']); ?></div><?php endif; ?>
                                             </div>
 
                                             <!-- Nominator Name -->
                                             <div class="col-md-6 mb-3">
-                                                <label for="nominator_name" class="form-label">Nominator/Sponsor Name <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control <?php echo isset($errors['nominator_name']) ? 'is-invalid' : ''; ?>" id="nominator_name" name="nominator_name" value="<?php echo htmlspecialchars($application_data['nominator_name'] ?? ''); ?>" required placeholder="Full name of person or organization">
+                                                <label for="nominator_name" class="form-label"><?php echo $translations[$language]['nominator_name']; ?> <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control <?php echo isset($errors['nominator_name']) ? 'is-invalid' : ''; ?>" id="nominator_name" name="nominator_name" value="<?php echo htmlspecialchars($application_data['nominator_name'] ?? ''); ?>" required placeholder="<?php echo $translations[$language]['nominator_name_placeholder']; ?>">
                                                 <?php if (isset($errors['nominator_name'])): ?><div class="invalid-feedback"><?php echo htmlspecialchars($errors['nominator_name']); ?></div><?php endif; ?>
                                             </div>
                                         </div>
@@ -393,13 +462,13 @@ header("X-Content-Type-Options: nosniff");
                                         <div class="row">
                                             <!-- Nominator Address -->
                                             <div class="col-md-8 mb-3">
-                                                <label for="nominator_address" class="form-label">Address</label> <!-- Optional? -->
+                                                <label for="nominator_address" class="form-label"><?php echo $translations[$language]['nominator_address']; ?></label>
                                                 <textarea class="form-control <?php echo isset($errors['nominator_address']) ? 'is-invalid' : ''; ?>" id="nominator_address" name="nominator_address" rows="2"><?php echo htmlspecialchars($application_data['nominator_address'] ?? ''); ?></textarea>
                                                 <?php if (isset($errors['nominator_address'])): ?><div class="invalid-feedback"><?php echo htmlspecialchars($errors['nominator_address']); ?></div><?php endif; ?>
                                             </div>
-                                             <!-- Nominator City -->
+                                            <!-- Nominator City -->
                                             <div class="col-md-4 mb-3">
-                                                <label for="nominator_city" class="form-label">City</label> <!-- Optional? -->
+                                                <label for="nominator_city" class="form-label"><?php echo $translations[$language]['nominator_city']; ?></label>
                                                 <input type="text" class="form-control <?php echo isset($errors['nominator_city']) ? 'is-invalid' : ''; ?>" id="nominator_city" name="nominator_city" value="<?php echo htmlspecialchars($application_data['nominator_city'] ?? ''); ?>">
                                                 <?php if (isset($errors['nominator_city'])): ?><div class="invalid-feedback"><?php echo htmlspecialchars($errors['nominator_city']); ?></div><?php endif; ?>
                                             </div>
@@ -408,9 +477,9 @@ header("X-Content-Type-Options: nosniff");
                                         <div class="row">
                                             <!-- Nominator Country -->
                                             <div class="col-md-4 mb-3">
-                                                <label for="nominator_country" class="form-label">Country</label> <!-- Optional? -->
+                                                <label for="nominator_country" class="form-label"><?php echo $translations[$language]['nominator_country']; ?></label>
                                                 <select class="form-select <?php echo isset($errors['nominator_country']) ? 'is-invalid' : ''; ?>" id="nominator_country" name="nominator_country">
-                                                    <option value="" <?php echo empty($application_data['nominator_country']) ? 'selected' : ''; ?>>-- Select Country --</option>
+                                                    <option value="" <?php echo empty($application_data['nominator_country']) ? 'selected' : ''; ?>><?php echo $translations[$language]['select_country']; ?></option>
                                                     <?php
                                                         $countries = get_countries();
                                                         $selected_n_country = $application_data['nominator_country'] ?? ($_POST['nominator_country'] ?? '');
@@ -425,49 +494,47 @@ header("X-Content-Type-Options: nosniff");
 
                                             <!-- Nominator Phone -->
                                             <div class="col-md-4 mb-3">
-                                                <label for="nominator_phone" class="form-label">Phone Number</label> <!-- Optional? -->
-                                                <input type="tel" class="form-control <?php echo isset($errors['nominator_phone']) ? 'is-invalid' : ''; ?>" id="nominator_phone" name="nominator_phone" value="<?php echo htmlspecialchars($application_data['nominator_phone'] ?? ''); ?>" placeholder="e.g., +1 212 555 1234">
+                                                <label for="nominator_phone" class="form-label"><?php echo $translations[$language]['nominator_phone']; ?></label>
+                                                <input type="tel" class="form-control <?php echo isset($errors['nominator_phone']) ? 'is-invalid' : ''; ?>" id="nominator_phone" name="nominator_phone" value="<?php echo htmlspecialchars($application_data['nominator_phone'] ?? ''); ?>" placeholder="<?php echo $translations[$language]['nominator_phone_placeholder']; ?>">
                                                 <?php if (isset($errors['nominator_phone'])): ?><div class="invalid-feedback"><?php echo htmlspecialchars($errors['nominator_phone']); ?></div><?php endif; ?>
                                             </div>
 
                                             <!-- Nominator Email -->
                                             <div class="col-md-4 mb-3">
-                                                <label for="nominator_email" class="form-label">Email Address</label> <!-- Optional? -->
-                                                <input type="email" class="form-control <?php echo isset($errors['nominator_email']) ? 'is-invalid' : ''; ?>" id="nominator_email" name="nominator_email" value="<?php echo htmlspecialchars($application_data['nominator_email'] ?? ''); ?>" placeholder="nominator@example.com">
+                                                <label for="nominator_email" class="form-label"><?php echo $translations[$language]['nominator_email']; ?></label>
+                                                <input type="email" class="form-control <?php echo isset($errors['nominator_email']) ? 'is-invalid' : ''; ?>" id="nominator_email" name="nominator_email" value="<?php echo htmlspecialchars($application_data['nominator_email'] ?? ''); ?>" placeholder="<?php echo $translations[$language]['nominator_email_placeholder']; ?>">
                                                 <?php if (isset($errors['nominator_email'])): ?><div class="invalid-feedback"><?php echo htmlspecialchars($errors['nominator_email']); ?></div><?php endif; ?>
                                             </div>
                                         </div>
 
-                                         <div class="row">
-                                             <!-- Relationship (Optional) -->
+                                        <div class="row">
+                                            <!-- Relationship (Optional) -->
                                             <div class="col-md-12 mb-3">
-                                                <label for="relationship" class="form-label">Relationship to Contestant (Optional)</label>
-                                                <input type="text" class="form-control <?php echo isset($errors['relationship']) ? 'is-invalid' : ''; ?>" id="relationship" name="relationship" value="<?php echo htmlspecialchars($application_data['relationship'] ?? ''); ?>" placeholder="e.g., Teacher, Imam, Organization Representative">
+                                                <label for="relationship" class="form-label"><?php echo $translations[$language]['relationship']; ?></label>
+                                                <input type="text" class="form-control <?php echo isset($errors['relationship']) ? 'is-invalid' : ''; ?>" id="relationship" name="relationship" value="<?php echo htmlspecialchars($application_data['relationship'] ?? ''); ?>" placeholder="<?php echo $translations[$language]['relationship_placeholder']; ?>">
                                                 <?php if (isset($errors['relationship'])): ?><div class="invalid-feedback"><?php echo htmlspecialchars($errors['relationship']); ?></div><?php endif; ?>
                                             </div>
-                                         </div>
-
+                                        </div>
                                     </div> <!-- end card-body -->
                                 </div> <!-- end card -->
 
                                 <!-- Nomination Letter Upload Card -->
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="card-title mb-0"><i class="ri-file-text-line me-1"></i>Letter of Nomination/Sponsorship</h5>
+                                        <h5 class="card-title mb-0"><i class="ri-file-text-line me-1"></i><?php echo $translations[$language]['nomination_letter']; ?></h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-12 mb-3">
-                                                <label for="nomination_letter" class="form-label">Upload Letter</label> <!-- Make required? -->
-                                                <p class="text-muted fs-13">Upload the official nomination or sponsorship letter (PDF, DOC, DOCX, JPG, PNG, max 5MB).</p>
+                                                <label for="nomination_letter" class="form-label"><?php echo $translations[$language]['upload_letter']; ?></label>
+                                                <p class="text-muted fs-13"><?php echo $translations[$language]['letter_instructions']; ?></p>
                                                 <input type="file" class="form-control <?php echo isset($errors['nomination_letter']) ? 'is-invalid' : ''; ?>" id="nomination_letter" name="nomination_letter" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                                                 <?php if (isset($errors['nomination_letter'])): ?>
                                                     <div class="invalid-feedback"><?php echo htmlspecialchars($errors['nomination_letter']); ?></div>
                                                 <?php endif; ?>
-
                                                 <?php if (!empty($application_data['nomination_letter_path']) && file_exists($application_data['nomination_letter_path'])): ?>
                                                     <div class="mt-2">
-                                                        <span class="file-upload-info">Current letter uploaded:</span>
+                                                        <span class="file-upload-info"><?php echo $translations[$language]['current_letter_uploaded']; ?></span>
                                                         <a href="<?php echo htmlspecialchars($application_data['nomination_letter_path']); ?>" target="_blank" class="existing-file-link ms-2">
                                                             <i class="ri-eye-line"></i> <?php echo htmlspecialchars(basename($application_data['nomination_letter_path'])); ?>
                                                         </a>
@@ -478,17 +545,14 @@ header("X-Content-Type-Options: nosniff");
                                     </div><!-- end card-body -->
                                 </div> <!-- end card -->
 
-
                                 <!-- Action Buttons -->
                                 <div class="d-flex justify-content-between mt-4 mb-4">
-                                    <a href="application-step1-international.php" class="btn btn-secondary"><i class="ri-arrow-left-line me-1"></i> Back to Step 1</a>
-                                    <button type="submit" class="btn btn-primary">Save and Continue to Step 3 <i class="ri-arrow-right-line ms-1"></i></button>
+                                    <a href="application-step1-international.php" class="btn btn-secondary"><i class="ri-arrow-left-line me-1"></i><?php echo $translations[$language]['back_to_step_1']; ?></a>
+                                    <button type="submit" class="btn btn-primary"><?php echo $translations[$language]['save_continue']; ?> <i class="ri-arrow-right-line ms-1"></i></button>
                                 </div>
-
                             </form>
                         </div> <!-- end col -->
                     </div> <!-- end row -->
-
 
                 </div> <!-- container-fluid -->
             </div> <!-- content -->
@@ -510,23 +574,11 @@ header("X-Content-Type-Options: nosniff");
     <!-- Page Specific Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Bootstrap tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]:not([disabled])'))
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]:not([disabled])'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
-
-            // Optional: Update file input label to show filename
-            const fileInput = document.getElementById('nomination_letter');
-            if (fileInput) {
-                fileInput.addEventListener('change', function(e) {
-                    const fileName = e.target.files[0] ? e.target.files[0].name : 'Upload Letter'; // Default text
-                    // You might need a custom file input structure in HTML to display this nicely
-                    console.log("Selected file:", fileName);
-                });
-            }
         });
     </script>
-
 </body>
 </html>

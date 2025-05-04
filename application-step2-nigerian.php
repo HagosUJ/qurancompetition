@@ -8,6 +8,9 @@ if (!is_logged_in()) {
     exit;
 }
 
+$language = $_SESSION['language'] ?? 'en'; // Default to English
+$is_rtl = ($language === 'ar');
+
 // Session timeout check
 $timeout_duration = SESSION_TIMEOUT_DURATION ?? 1800;
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
@@ -30,12 +33,73 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// --- Language-Specific Strings ---
+$translations = [
+    'en' => [
+        'page_title' => 'Application: Sponsor Information (Nigerian) | Musabaqa',
+        'page_header' => 'Application - Step 2: Sponsor/Nominator Information',
+        'dashboard' => 'Dashboard',
+        'application' => 'Application',
+        'step_2' => 'Step 2',
+        'sponsor_details' => 'Sponsor/Nominator Details',
+        'sponsor_instructions' => 'Provide the information for the person sponsoring or nominating you for the competition.',
+        'sponsor_name' => 'Full Name',
+        'sponsor_name_required' => 'Sponsor/Nominator Name is required.',
+        'sponsor_occupation' => 'Occupation',
+        'sponsor_occupation_required' => 'Sponsor/Nominator Occupation is required.',
+        'sponsor_address' => 'Address',
+        'sponsor_address_required' => 'Sponsor/Nominator Address is required.',
+        'sponsor_phone' => 'Phone Number',
+        'sponsor_phone_required' => 'Sponsor/Nominator Phone Number is required.',
+        'sponsor_phone_invalid' => 'Invalid Phone Number format.',
+        'sponsor_email' => 'Email',
+        'sponsor_email_invalid' => 'Valid Sponsor/Nominator Email is required.',
+        'sponsor_relationship' => 'Relationship to Contestant',
+        'sponsor_relationship_required' => 'Relationship to Contestant is required.',
+        'sponsor_relationship_placeholder' => 'e.g., Teacher, Parent, Guardian, Community Leader',
+        'back_to_personal_info' => 'Back to Personal Info',
+        'save_continue' => 'Save and Continue to Documents',
+        'error_invalid_submission' => 'Invalid form submission. Please try again.',
+        'error_save' => 'An error occurred while saving sponsor information. Please try again.',
+        'error_step1_incomplete' => 'Please complete Step 1 (Personal Information) before proceeding.',
+        'success_save' => 'Sponsor/Nominator information saved successfully.',
+    ],
+    'ar' => [
+        'page_title' => 'الطلب: معلومات الراعي/المرشح (نيجيري) | المسابقة',
+        'page_header' => 'الطلب - الخطوة الثانية: معلومات الراعي/المرشح',
+        'dashboard' => 'لوحة التحكم',
+        'application' => 'الطلب',
+        'step_2' => 'الخطوة الثانية',
+        'sponsor_details' => 'تفاصيل الراعي/المرشح',
+        'sponsor_instructions' => 'قدم معلومات الشخص الذي يرعاك أو يرشحك للمسابقة.',
+        'sponsor_name' => 'الاسم الكامل',
+        'sponsor_name_required' => 'اسم الراعي/المرشح مطلوب.',
+        'sponsor_occupation' => 'المهنة',
+        'sponsor_occupation_required' => 'مهنة الراعي/المرشح مطلوبة.',
+        'sponsor_address' => 'العنوان',
+        'sponsor_address_required' => 'عنوان الراعي/المرشح مطلوب.',
+        'sponsor_phone' => 'رقم الهاتف',
+        'sponsor_phone_required' => 'رقم هاتف الراعي/المرشح مطلوب.',
+        'sponsor_phone_invalid' => 'تنسيق رقم الهاتف غير صالح.',
+        'sponsor_email' => 'البريد الإلكتروني',
+        'sponsor_email_invalid' => 'البريد الإلكتروني الصالح للراعي/المرشح مطلوب.',
+        'sponsor_relationship' => 'العلاقة بالمتسابق',
+        'sponsor_relationship_required' => 'العلاقة بالمتسابق مطلوبة.',
+        'sponsor_relationship_placeholder' => 'مثال: معلم، والد، وصي، قائد مجتمع',
+        'back_to_personal_info' => 'العودة إلى المعلومات الشخصية',
+        'save_continue' => 'حفظ والمتابعة إلى الوثائق',
+        'error_invalid_submission' => 'إرسال نموذج غير صالح. يرجى المحاولة مرة أخرى.',
+        'error_save' => 'حدث خطأ أثناء حفظ معلومات الراعي. يرجى المحاولة مرة أخرى.',
+        'error_step1_incomplete' => 'يرجى إكمال الخطوة الأولى (المعلومات الشخصية) قبل المتابعة.',
+        'success_save' => 'تم حفظ معلومات الراعي/المرشح بنجاح.',
+    ]
+];
+
 // --- Application Verification ---
 global $conn;
 $application_id = null;
-$sponsor_data = []; // To store existing sponsor data
+$sponsor_data = [];
 
-// Verify that the user has a Nigerian application and is at the correct step
 $stmt_app = $conn->prepare("SELECT id, status, current_step FROM applications WHERE user_id = ? AND contestant_type = 'nigerian'");
 if ($stmt_app) {
     $stmt_app->bind_param("i", $user_id);
@@ -43,20 +107,11 @@ if ($stmt_app) {
     $result_app = $stmt_app->get_result();
     if ($app = $result_app->fetch_assoc()) {
         $application_id = $app['id'];
-        // Check if the user should be on this step
-        // Allow access if step 1 is complete OR if they are already on step 2
         if (!in_array($app['status'], ['Personal Info Complete', 'Sponsor Info Complete', 'Documents Uploaded', 'Submitted', 'Under Review', 'Approved', 'Rejected', 'Information Requested']) || ($app['status'] === 'Not Started' && $app['current_step'] !== 'step2')) {
-             // If status is 'Not Started' but step is 'step2', it might be okay if they navigated back, but generally, they should have completed step 1 first.
-             // Redirect back to step 1 if they haven't completed it.
-             redirect('application-step1-nigerian.php?error=step1_incomplete');
-             exit;
+            redirect('application-step1-nigerian.php?error=step1_incomplete');
+            exit;
         }
-         // If status is beyond this step, maybe redirect to review or dashboard? For now, allow viewing/editing.
-         // if (in_array($app['status'], ['Documents Uploaded', 'Submitted', ...])) { redirect('application-review.php'); exit; }
 
-
-        // Fetch existing sponsor details for this application step
-        // Assuming a table named 'application_sponsor_details_nigerian'
         $stmt_details = $conn->prepare("SELECT * FROM application_sponsor_details_nigerian WHERE application_id = ?");
         if ($stmt_details) {
             $stmt_details->bind_param("i", $application_id);
@@ -67,19 +122,17 @@ if ($stmt_app) {
             }
             $stmt_details->close();
         } else {
-             error_log("Failed to prepare statement for fetching Nigerian sponsor details: " . $conn->error);
-             // Handle error - maybe show a message
+            error_log("Failed to prepare statement for fetching Nigerian sponsor details: " . $conn->error);
+            $errors['form'] = $translations[$language]['error_save'];
         }
-
     } else {
-        // No application found or type mismatch
         redirect('application.php?error=app_not_found_or_mismatch');
         exit;
     }
     $stmt_app->close();
 } else {
     error_log("Failed to prepare statement for checking application: " . $conn->error);
-    die("Error verifying application status. Please try again later.");
+    die($translations[$language]['error_save']);
 }
 
 // --- Form Processing ---
@@ -87,33 +140,28 @@ $errors = [];
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Verify CSRF token
     if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-        $errors['form'] = "Invalid form submission. Please try again.";
+        $errors['form'] = $translations[$language]['error_invalid_submission'];
     } else {
-        // Sanitize and retrieve POST data
         $sponsor_name = sanitize_input($_POST['sponsor_name'] ?? '');
         $sponsor_address = sanitize_input($_POST['sponsor_address'] ?? '');
         $sponsor_phone = sanitize_input($_POST['sponsor_phone'] ?? '');
         $sponsor_email = filter_input(INPUT_POST, 'sponsor_email', FILTER_VALIDATE_EMAIL);
         $sponsor_occupation = sanitize_input($_POST['sponsor_occupation'] ?? '');
-        $sponsor_relationship = sanitize_input($_POST['sponsor_relationship'] ?? ''); // Relationship to contestant
+        $sponsor_relationship = sanitize_input($_POST['sponsor_relationship'] ?? '');
 
-        // --- Validation ---
-        if (empty($sponsor_name)) $errors['sponsor_name'] = "Sponsor/Nominator Name is required.";
-        if (empty($sponsor_address)) $errors['sponsor_address'] = "Sponsor/Nominator Address is required.";
-        if (empty($sponsor_phone)) $errors['sponsor_phone'] = "Sponsor/Nominator Phone Number is required.";
-        if (!empty($sponsor_phone) && !preg_match('/^[0-9\+\-\s]+$/', $sponsor_phone)) $errors['sponsor_phone'] = "Invalid Phone Number format.";
-        if ($sponsor_email === false) $errors['sponsor_email'] = "Valid Sponsor/Nominator Email is required.";
-        if (empty($sponsor_occupation)) $errors['sponsor_occupation'] = "Sponsor/Nominator Occupation is required.";
-        if (empty($sponsor_relationship)) $errors['sponsor_relationship'] = "Relationship to Contestant is required.";
+        if (empty($sponsor_name)) $errors['sponsor_name'] = $translations[$language]['sponsor_name_required'];
+        if (empty($sponsor_address)) $errors['sponsor_address'] = $translations[$language]['sponsor_address_required'];
+        if (empty($sponsor_phone)) $errors['sponsor_phone'] = $translations[$language]['sponsor_phone_required'];
+        if (!empty($sponsor_phone) && !preg_match('/^[0-9\+\-\s]+$/', $sponsor_phone)) $errors['sponsor_phone'] = $translations[$language]['sponsor_phone_invalid'];
+        if ($sponsor_email === false) $errors['sponsor_email'] = $translations[$language]['sponsor_email_invalid'];
+        if (empty($sponsor_occupation)) $errors['sponsor_occupation'] = $translations[$language]['sponsor_occupation_required'];
+        if (empty($sponsor_relationship)) $errors['sponsor_relationship'] = $translations[$language]['sponsor_relationship_required'];
 
-        // --- Database Operation ---
         if (empty($errors)) {
             try {
                 $conn->begin_transaction();
 
-                // Check if record exists
                 $stmt_check = $conn->prepare("SELECT id FROM application_sponsor_details_nigerian WHERE application_id = ?");
                 $stmt_check->bind_param("i", $application_id);
                 $stmt_check->execute();
@@ -122,7 +170,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt_check->close();
 
                 if ($existing_record) {
-                    // Update existing record
                     $sql = "UPDATE application_sponsor_details_nigerian SET
                                 sponsor_name = ?, sponsor_address = ?, sponsor_phone = ?, sponsor_email = ?,
                                 sponsor_occupation = ?, sponsor_relationship = ?
@@ -134,13 +181,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $sponsor_occupation, $sponsor_relationship, $application_id
                     );
                 } else {
-                    // Insert new record
                     $sql = "INSERT INTO application_sponsor_details_nigerian
                                 (application_id, sponsor_name, sponsor_address, sponsor_phone, sponsor_email,
                                  sponsor_occupation, sponsor_relationship)
                             VALUES (?, ?, ?, ?, ?, ?, ?)";
                     $stmt_save = $conn->prepare($sql);
-                     if (!$stmt_save) throw new Exception("Prepare failed (INSERT): " . $conn->error);
+                    if (!$stmt_save) throw new Exception("Prepare failed (INSERT): " . $conn->error);
                     $stmt_save->bind_param("issssss",
                         $application_id, $sponsor_name, $sponsor_address, $sponsor_phone, $sponsor_email,
                         $sponsor_occupation, $sponsor_relationship
@@ -152,8 +198,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $stmt_save->close();
 
-                // Update main application status/step only if it's currently 'Personal Info Complete'
-                // Avoid overwriting later statuses if user comes back to edit
                 $stmt_get_status = $conn->prepare("SELECT status FROM applications WHERE id = ?");
                 $stmt_get_status->bind_param("i", $application_id);
                 $stmt_get_status->execute();
@@ -162,42 +206,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($current_app_status === 'Personal Info Complete') {
                     $new_status = 'Sponsor Info Complete';
-                    $next_step = 'documents'; // Next step is document upload
+                    $next_step = 'documents';
                     $stmt_update_app = $conn->prepare("UPDATE applications SET status = ?, current_step = ?, last_updated = NOW() WHERE id = ?");
-                     if (!$stmt_update_app) throw new Exception("Prepare failed (App Update): " . $conn->error);
+                    if (!$stmt_update_app) throw new Exception("Prepare failed (App Update): " . $conn->error);
                     $stmt_update_app->bind_param("ssi", $new_status, $next_step, $application_id);
                     if (!$stmt_update_app->execute()) {
-                         throw new Exception("Execute failed (App Update): " . $stmt_update_app->error);
+                        throw new Exception("Execute failed (App Update): " . $stmt_update_app->error);
                     }
                     $stmt_update_app->close();
                 } else {
-                    // If status is already past 'Personal Info Complete', just update the timestamp
-                     $stmt_update_time = $conn->prepare("UPDATE applications SET last_updated = NOW() WHERE id = ?");
-                     if (!$stmt_update_time) throw new Exception("Prepare failed (App Time Update): " . $conn->error);
-                     $stmt_update_time->bind_param("i", $application_id);
-                     $stmt_update_time->execute();
-                     $stmt_update_time->close();
+                    $stmt_update_time = $conn->prepare("UPDATE applications SET last_updated = NOW() WHERE id = ?");
+                    if (!$stmt_update_time) throw new Exception("Prepare failed (App Time Update): " . $conn->error);
+                    $stmt_update_time->bind_param("i", $application_id);
+                    $stmt_update_time->execute();
+                    $stmt_update_time->close();
                 }
 
-
                 $conn->commit();
-                $success = "Sponsor/Nominator information saved successfully.";
+                $success = $translations[$language]['success_save'];
 
-                // Update $sponsor_data with new values for pre-filling if staying on page
-                 $sponsor_data = [
+                $sponsor_data = [
                     'sponsor_name' => $sponsor_name, 'sponsor_address' => $sponsor_address,
                     'sponsor_phone' => $sponsor_phone, 'sponsor_email' => $sponsor_email,
                     'sponsor_occupation' => $sponsor_occupation, 'sponsor_relationship' => $sponsor_relationship
-                 ];
+                ];
 
-                // Redirect to next step (documents)
                 redirect('documents.php');
                 exit;
-
             } catch (Exception $e) {
                 $conn->rollback();
                 error_log("Error saving Nigerian application step 2 for app ID {$application_id}: " . $e->getMessage());
-                $errors['form'] = "An error occurred while saving sponsor information. Please try again.";
+                $errors['form'] = $translations[$language]['error_save'];
+                if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+                    $errors['form'] .= " Details: " . htmlspecialchars($e->getMessage());
+                }
             }
         }
     }
@@ -207,15 +249,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("Referrer-Policy: strict-origin-when-cross-origin");
-// Adjust CSP if needed, especially for images if served from different origin
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;");
 header("X-XSS-Protection: 1; mode=block");
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo $language; ?>" <?php echo $is_rtl ? 'dir="rtl"' : ''; ?>>
 <head>
-    <title>Application: Sponsor Information (Nigerian) | Musabaqa</title>
+    <meta charset="utf-8" />
+    <title><?php echo $translations[$language]['page_title']; ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php include 'layouts/title-meta.php'; ?>
     <?php include 'layouts/head-css.php'; ?>
     <style>
@@ -229,7 +272,7 @@ header("X-XSS-Protection: 1; mode=block");
     <!-- Begin page -->
     <div class="wrapper">
 
-        <?php include 'layouts/menu.php'; // Include the sidebar menu ?>
+        <?php include 'layouts/menu.php'; ?>
 
         <!-- ============================================================== -->
         <!-- Start Page Content here -->
@@ -245,44 +288,42 @@ header("X-XSS-Protection: 1; mode=block");
                     <div class="row">
                         <div class="col-12">
                             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                <h4 class="page-title">Application - Step 2: Sponsor/Nominator Information</h4>
-                                <!-- Optional Breadcrumb or Actions -->
+                                <h4 class="page-title"><?php echo $translations[$language]['page_header']; ?></h4>
                                 <div class="page-title-right">
-                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="application.php">Application</a></li>
-                                        <li class="breadcrumb-item active">Step 2</li>
+                                    <ol class="breadcrumb m-0">
+                                        <li class="breadcrumb-item"><a href="index.php"><?php echo $translations[$language]['dashboard']; ?></a></li>
+                                        <li class="breadcrumb-item"><a href="application.php"><?php echo $translations[$language]['application']; ?></a></li>
+                                        <li class="breadcrumb-item active"><?php echo $translations[$language]['step_2']; ?></li>
                                     </ol>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                     <!-- Display Messages -->
+                    <!-- Display Messages -->
                     <?php if (!empty($errors['form'])): ?>
                         <div class="alert alert-danger" role="alert">
                             <i class="ri-close-circle-line me-1"></i> <?php echo htmlspecialchars($errors['form']); ?>
                         </div>
                     <?php endif; ?>
                     <?php if (!empty($success)): ?>
-                         <div class="alert alert-success" role="alert">
-                             <i class="ri-check-line me-1"></i> <?php echo htmlspecialchars($success); ?>
-                         </div>
+                        <div class="alert alert-success" role="alert">
+                            <i class="ri-check-line me-1"></i> <?php echo htmlspecialchars($success); ?>
+                        </div>
                     <?php endif; ?>
                     <?php if (isset($_GET['error']) && $_GET['error'] === 'step1_incomplete'): ?>
-                         <div class="alert alert-warning" role="alert">
-                             <i class="ri-alert-line me-1"></i> Please complete Step 1 (Personal Information) before proceeding.
-                         </div>
+                        <div class="alert alert-warning" role="alert">
+                            <i class="ri-alert-line me-1"></i> <?php echo $translations[$language]['error_step1_incomplete']; ?>
+                        </div>
                     <?php endif; ?>
-
 
                     <!-- Application Form -->
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title mb-4">Sponsor/Nominator Details</h5>
-                                    <p class="text-muted mb-4">Provide the information for the person sponsoring or nominating you for the competition.</p>
+                                    <h5 class="card-title mb-4"><?php echo $translations[$language]['sponsor_details']; ?></h5>
+                                    <p class="text-muted mb-4"><?php echo $translations[$language]['sponsor_instructions']; ?></p>
 
                                     <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" novalidate>
                                         <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
@@ -290,14 +331,14 @@ header("X-XSS-Protection: 1; mode=block");
                                         <div class="row">
                                             <!-- Sponsor Name -->
                                             <div class="col-md-6 mb-3">
-                                                <label for="sponsor_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                                <label for="sponsor_name" class="form-label"><?php echo $translations[$language]['sponsor_name']; ?> <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control <?php echo isset($errors['sponsor_name']) ? 'is-invalid' : ''; ?>" id="sponsor_name" name="sponsor_name" value="<?php echo htmlspecialchars($sponsor_data['sponsor_name'] ?? ''); ?>" required>
                                                 <?php if (isset($errors['sponsor_name'])): ?><div class="invalid-feedback"><?php echo $errors['sponsor_name']; ?></div><?php endif; ?>
                                             </div>
 
                                             <!-- Sponsor Occupation -->
                                             <div class="col-md-6 mb-3">
-                                                <label for="sponsor_occupation" class="form-label">Occupation <span class="text-danger">*</span></label>
+                                                <label for="sponsor_occupation" class="form-label"><?php echo $translations[$language]['sponsor_occupation']; ?> <span class="text-danger">*</span></label>
                                                 <input type="text" class="form-control <?php echo isset($errors['sponsor_occupation']) ? 'is-invalid' : ''; ?>" id="sponsor_occupation" name="sponsor_occupation" value="<?php echo htmlspecialchars($sponsor_data['sponsor_occupation'] ?? ''); ?>" required>
                                                 <?php if (isset($errors['sponsor_occupation'])): ?><div class="invalid-feedback"><?php echo $errors['sponsor_occupation']; ?></div><?php endif; ?>
                                             </div>
@@ -306,7 +347,7 @@ header("X-XSS-Protection: 1; mode=block");
                                         <div class="row">
                                             <!-- Sponsor Address -->
                                             <div class="col-md-12 mb-3">
-                                                <label for="sponsor_address" class="form-label">Address <span class="text-danger">*</span></label>
+                                                <label for="sponsor_address" class="form-label"><?php echo $translations[$language]['sponsor_address']; ?> <span class="text-danger">*</span></label>
                                                 <textarea class="form-control <?php echo isset($errors['sponsor_address']) ? 'is-invalid' : ''; ?>" id="sponsor_address" name="sponsor_address" rows="3" required><?php echo htmlspecialchars($sponsor_data['sponsor_address'] ?? ''); ?></textarea>
                                                 <?php if (isset($errors['sponsor_address'])): ?><div class="invalid-feedback"><?php echo $errors['sponsor_address']; ?></div><?php endif; ?>
                                             </div>
@@ -315,42 +356,31 @@ header("X-XSS-Protection: 1; mode=block");
                                         <div class="row">
                                             <!-- Sponsor Phone -->
                                             <div class="col-md-6 mb-3">
-                                                <label for="sponsor_phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
-                                                <input type="tel" class="form-control <?php echo isset($errors['sponsor_phone']) ? 'is-invalid' : ''; ?>" id="sponsor_phone" name="sponsor_phone" value="<?php echo htmlspecialchars($sponsor_data['sponsor_phone'] ?? ''); ?>" required>
+                                                <label for="sponsor_phone" class="form-label"><?php echo $translations[$language]['sponsor_phone']; ?> <span class="text-danger">*</span></label>
+                                                <input type="tel" class="form-control <?php echo isset($errors['sponsor_phone']) ? 'is-invalid' : ''; ?>" id="sponsor_phone" name="sponsor_phone" value="<?php echo htmlspecialchars($sponsor_data['sponsor_phone'] ?? ''); ?>" required placeholder="<?php echo $language === 'ar' ? 'مثال: 08012345678' : 'e.g., 08012345678'; ?>">
                                                 <?php if (isset($errors['sponsor_phone'])): ?><div class="invalid-feedback"><?php echo $errors['sponsor_phone']; ?></div><?php endif; ?>
                                             </div>
 
                                             <!-- Sponsor Email -->
                                             <div class="col-md-6 mb-3">
-                                                <label for="sponsor_email" class="form-label">Email <span class="text-danger">*</span></label>
-                                                <input type="email" class="form-control <?php echo isset($errors['sponsor_email']) ? 'is-invalid' : ''; ?>" id="sponsor_email" name="sponsor_email" value="<?php echo htmlspecialchars($sponsor_data['sponsor_email'] ?? ''); ?>" required>
+                                                <label for="sponsor_email" class="form-label"><?php echo $translations[$language]['sponsor_email']; ?> <span class="text-danger">*</span></label>
+                                                <input type="email" class="form-control <?php echo isset($errors['sponsor_email']) ? 'is-invalid' : ''; ?>" id="sponsor_email" name="sponsor_email" value="<?php echo htmlspecialchars($sponsor_data['sponsor_email'] ?? ''); ?>" required placeholder="<?php echo $language === 'ar' ? 'بريد.الراعي@مثال.com' : 'sponsor.email@example.com'; ?>">
                                                 <?php if (isset($errors['sponsor_email'])): ?><div class="invalid-feedback"><?php echo $errors['sponsor_email']; ?></div><?php endif; ?>
                                             </div>
                                         </div>
 
                                         <div class="row">
-                                             <!-- Relationship to Contestant -->
+                                            <!-- Relationship to Contestant -->
                                             <div class="col-md-6 mb-3">
-                                                <label for="sponsor_relationship" class="form-label">Relationship to Contestant <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control <?php echo isset($errors['sponsor_relationship']) ? 'is-invalid' : ''; ?>" id="sponsor_relationship" name="sponsor_relationship" value="<?php echo htmlspecialchars($sponsor_data['sponsor_relationship'] ?? ''); ?>" placeholder="e.g., Teacher, Parent, Guardian, Community Leader" required>
+                                                <label for="sponsor_relationship" class="form-label"><?php echo $translations[$language]['sponsor_relationship']; ?> <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control <?php echo isset($errors['sponsor_relationship']) ? 'is-invalid' : ''; ?>" id="sponsor_relationship" name="sponsor_relationship" value="<?php echo htmlspecialchars($sponsor_data['sponsor_relationship'] ?? ''); ?>" placeholder="<?php echo $translations[$language]['sponsor_relationship_placeholder']; ?>" required>
                                                 <?php if (isset($errors['sponsor_relationship'])): ?><div class="invalid-feedback"><?php echo $errors['sponsor_relationship']; ?></div><?php endif; ?>
                                             </div>
                                         </div>
 
-                                        <!-- TODO: Add Sponsor Signature/Letter Upload if required -->
-                                        <!-- Example:
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="sponsor_letter" class="form-label">Sponsor/Nomination Letter (Optional)</label>
-                                                <input type="file" class="form-control" id="sponsor_letter" name="sponsor_letter" accept=".pdf,.doc,.docx,.jpg,.png">
-                                                // Add logic to handle file upload and storage
-                                            </div>
-                                        </div>
-                                        -->
-
                                         <div class="mt-4 d-flex justify-content-between">
-                                            <a href="application-step1-nigerian.php" class="btn btn-secondary"><i class="ri-arrow-left-line me-1"></i> Back to Personal Info</a>
-                                            <button type="submit" class="btn btn-primary">Save and Continue to Documents <i class="ri-arrow-right-line ms-1"></i></button>
+                                            <a href="application-step1-nigerian.php" class="btn btn-secondary"><i class="ri-arrow-left-line me-1"></i><?php echo $translations[$language]['back_to_personal_info']; ?></a>
+                                            <button type="submit" class="btn btn-primary"><?php echo $translations[$language]['save_continue']; ?> <i class="ri-arrow-right-line ms-1"></i></button>
                                         </div>
 
                                     </form>
@@ -358,7 +388,6 @@ header("X-XSS-Protection: 1; mode=block");
                             </div> <!-- end card -->
                         </div> <!-- end col -->
                     </div> <!-- end row -->
-
 
                 </div> <!-- container-fluid -->
             </div> <!-- content -->
@@ -371,16 +400,11 @@ header("X-XSS-Protection: 1; mode=block");
         <!-- ============================================================== -->
 
     </div>
-  
     <!-- END wrapper -->
 
     <?php include 'layouts/right-sidebar.php'; ?>
     <?php include 'layouts/footer-scripts.php'; ?>
-    
-    <script src="assets/js/pages/demo.dashboard.js"></script> <!-- If needed for any dashboard-like elements -->
-    <script src="assets/js/app.min.js"></script> <!-- Essential for template functionality -->
-
-    <!-- Add any page-specific JS here if needed -->
+    <script src="assets/js/app.min.js"></script>
 
 </body>
 </html>
