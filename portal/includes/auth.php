@@ -290,7 +290,7 @@ function register_user(string $fullname, string $email, string $password): array
  */
 function send_verification_email(string $email, string $name, string $token): bool
 {
-    $verification_link = APP_URL . "/verify.php?token=" . $token . "&email=" . urlencode($email);
+    $verification_link = APP_URL . "/portal/verify.php?token=" . $token . "&email=" . urlencode($email);
     $subject = APP_NAME . ' - Verify Your Account';
     $body = '
         <p>Dear ' . htmlspecialchars($name) . ',</p>
@@ -358,7 +358,6 @@ function verify_activation_token(string $email, string $token): bool
     }
     return false;
 }
-
 
 // --- Login & Rate Limiting ---
 
@@ -580,7 +579,6 @@ function get_lockout_expiry(string $ip_address, string $email_identifier): int
     return 0;
 }
 
-
 // --- Remember Me Functionality ---
 
 /**
@@ -738,7 +736,6 @@ function clear_remember_me_cookies(): void
     }
 }
 
-
 // --- Password Reset ---
 
 /**
@@ -824,7 +821,7 @@ function send_password_reset_email(string $email): bool|string // Changed return
  */
 function send_actual_reset_email(string $email, string $name, string $token): bool
 {
-    $reset_link = APP_URL . "/reset-password.php?token=" . $token . "&email=" . urlencode($email);
+    $reset_link = APP_URL . "/portal/reset-password.php?token=" . $token . "&email=" . urlencode($email);
     $subject = APP_NAME . ' - Password Reset Request';
     $body = '
         <p>Dear ' . htmlspecialchars($name) . ',</p>
@@ -930,7 +927,6 @@ function clear_reset_token(int $user_id): void
         error_log("Failed to clear reset token for User ID {$user_id}: " . $e->getMessage());
     }
 }
-
 
 // --- Email Sending Utility ---
 
