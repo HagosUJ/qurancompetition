@@ -12,25 +12,138 @@
     <link rel="icon" href="img/favicon.png" sizes="32x32">
     <style>
             .register-signin-btn {
-                background-color: #007bff; /* Primary blue color */
-                color: white; /* White text */
-                text-decoration: none; /* Remove underline */
-                padding: 10px 20px; /* Add padding */
-                font-size: 16px; /* Font size */
-                border-radius: 5px; /* Rounded corners */
-                display: inline-block; /* Inline-block for proper spacing */
-                transition: background-color 0.3s, transform 0.2s; /* Smooth hover effects */
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .register-signin-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .register-signin-btn:active {
+            background-color: #003f7f;
+            transform: scale(0.95);
+        }
+        .musabaqa-banner {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecef 100%);
+            padding: 40px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        .musabaqa-banner h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 2em;
+            color: #1a3c34;
+            margin-bottom: 10px;
+        }
+        .musabaqa-banner h2.arabic {
+            font-family: 'Amiri', serif;
+            font-size: 2.2em;
+        }
+        .musabaqa-banner p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1em;
+            color: #4a5e57;
+            margin-bottom: 20px;
+        }
+        .musabaqa-banner p.arabic {
+            font-family: 'Amiri', serif;
+            font-size: 1.2em;
+        }
+        .musabaqa-banner .register-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #2e6b5e;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1em;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .musabaqa-banner .register-btn:hover {
+            background-color: #1a3c34;
+            transform: scale(1.05);
+        }
+        .musabaqa-banner .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .musabaqa-banner .countdown div {
+            background: rgba(46, 107, 94, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .musabaqa-banner .countdown .countdown-number {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1.5em;
+            color: #1a3c34;
+            display: block;
+        }
+        .musabaqa-banner .countdown .countdown-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            color: #4a5e57;
+            display: block;
+        }
+        .musabaqa-banner .countdown .countdown-label.arabic {
+            font-family: 'Amiri', serif;
+            font-size: 1em;
+        }
+        @media (max-width: 768px) {
+            .musabaqa-banner {
+                padding: 20px 15px;
             }
-        
-            .register-signin-btn:hover {
-                background-color: #0056b3; /* Darker blue on hover */
-                transform: scale(1.05); /* Slight zoom effect */
+            .musabaqa-banner h2 {
+                font-size: 1.5em;
             }
-        
-            .register-signin-btn:active {
-                background-color: #003f7f; /* Even darker blue when clicked */
-                transform: scale(0.95); /* Slight shrink effect */
+            .musabaqa-banner h2.arabic {
+                font-size: 1.7em;
             }
+            .musabaqa-banner p {
+                font-size: 1em;
+            }
+            .musabaqa-banner p.arabic {
+                font-size: 1.1em;
+            }
+            .musabaqa-banner .countdown {
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .musabaqa-banner .countdown div {
+                padding: 10px;
+                min-width: 50px;
+            }
+            .musabaqa-banner .countdown .countdown-number {
+                font-size: 1.2em;
+            }
+            .musabaqa-banner .countdown .countdown-label {
+                font-size: 0.8em;
+            }
+        }
+        @media (max-width: 480px) {
+            .musabaqa-banner .countdown div {
+                min-width: 45px;
+            }
+            .musabaqa-banner .countdown .countdown-number {
+                font-size: 1em;
+            }
+        }
         </style>
 </head>
 <body>
@@ -111,6 +224,33 @@
                             <p data-lang-en="A faith-based initiative dedicated to promoting Qur'anic excellence through memorization, recitation, and understanding." data-lang-ar="مبادرة إيمانية مكرسة لتعزيز التميز القرآني من خلال الحفظ والتلاوة والفهم.">
                                 A faith-based initiative dedicated to promoting Qur'anic excellence through memorization, recitation, and understanding.
                             </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="backlight-top">
+                <div class="musabaqa-banner bringer-block" data-appear="fade-up" data-unload="fade-down">
+                    <h2 data-lang-en="Join the 2025 International Qur'an Musabaqa" data-lang-ar="انضم إلى مسابقة القرآن العالمية 2025">Join the 2025 International Qur'an Musabaqa</h2>
+                    <p data-lang-en="Showcase your excellence in Tajweed, Hifz, and Tafsir. Register now for a chance to compete globally!" data-lang-ar="اعرض تميزك في التجويد والحفظ والتفسير. سجل الآن للحصول على فرصة التنافس عالميًا!">
+                        Showcase your excellence in Tajweed, Hifz, and Tafsir. Register now for a chance to compete globally!
+                    </p>
+                    <a href="portal/sign-up.php" class="register-btn" data-lang-en="Register Now" data-lang-ar="سجل الآن">Register Now</a>
+                    <div class="countdown" id="musabaqa-countdown" data-stagger-appear="fade-up" data-stagger-delay="100">
+                        <div>
+                            <span class="countdown-number" id="days">0</span>
+                            <span class="countdown-label" data-lang-en="Days" data-lang-ar="أيام">Days</span>
+                        </div>
+                        <div>
+                            <span class="countdown-number" id="hours">0</span>
+                            <span class="countdown-label" data-lang-en="Hours" data-lang-ar="ساعات">Hours</span>
+                        </div>
+                        <div>
+                            <span class="countdown-number" id="minutes">0</span>
+                            <span class="countdown-label" data-lang-en="Minutes" data-lang-ar="دقائق">Minutes</span>
+                        </div>
+                        <div>
+                            <span class="countdown-number" id="seconds">0</span>
+                            <span class="countdown-label" data-lang-en="Seconds" data-lang-ar="ثوان">Seconds</span>
                         </div>
                     </div>
                 </div>
@@ -342,7 +482,7 @@
     <script src="js/classes.js"></script>
     <script src="js/main.js"></script>
     <script>
-        $(document).ready(function() {
+       $(document).ready(function() {
             const elements = $('[data-lang-en]');
             const langButtons = $('.lang-btn');
 
@@ -373,7 +513,29 @@
             });
 
             switchLanguage('en');
+
+            // Countdown timer for Musabaqa
+            const eventDate = new Date('2025-07-01T00:00:00').getTime();
+            const countdown = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = eventDate - now;
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = days;
+                document.getElementById('hours').textContent = hours;
+                document.getElementById('minutes').textContent = minutes;
+                document.getElementById('seconds').textContent = seconds;
+
+                if (distance < 0) {
+                    clearInterval(countdown);
+                    document.getElementById('musabaqa-countdown').innerHTML = '<p data-lang-en="Event has started!" data-lang-ar="لقد بدأ الحدث!">Event has started!</p>';
+                }
+            }, 1000);
         });
-    </script>
+        </script>
 </body>
 </html>
