@@ -30,10 +30,12 @@ $resend_link = ($type === 'reset') ? 'enter-email.php' : 'sign-up.php';
 // Translation array for success messages
 $translations = [
     'en' => [
-        'Email sent successfully!' => 'Email sent successfully!'
+        'Email sent successfully!' => 'Email sent successfully!',
+        'Email resent successfully!' => 'Email resent successfully!'
     ],
     'ar' => [
-        'Email sent successfully!' => 'تم إرسال البريد الإلكتروني بنجاح!'
+        'Email sent successfully!' => 'تم إرسال البريد الإلكتروني بنجاح!',
+        'Email resent successfully!' => 'تم إعادة إرسال البريد الإلكترonic بنجاح!'
     ]
 ];
 
@@ -64,9 +66,19 @@ error_log("check-email.php loaded, language: $current_lang, type: $type");
 
   <!-- Custom Styles -->
   <style>
-    .success-message {
+    .success-message, .error-message {
       animation: fadeInDown 0.5s ease-in-out;
       border-left-width: 4px;
+    }
+    .success-message {
+      background-color: #d1fae5;
+      border-color: #10b981;
+      color: #065f46;
+    }
+    .error-message {
+      background-color: #fee2e2;
+      border-color: #ef4444;
+      color: #991b1b;
     }
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-10px); }
@@ -75,7 +87,7 @@ error_log("check-email.php loaded, language: $current_lang, type: $type");
     [dir="rtl"] {
       font-family: 'Amiri', serif;
     }
-    [dir="rtl"] .success-message {
+    [dir="rtl"] .success-message, [dir="rtl"] .error-message {
       border-left-width: 0;
       border-right-width: 4px;
     }
@@ -131,28 +143,31 @@ error_log("check-email.php loaded, language: $current_lang, type: $type");
       </span>
     </div>
 
-    <!-- Success Message -->
-    <?php if ($email_sent): ?>
-      <div class="success-message bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 mx-4 mt-4 rounded shadow-md" role="alert">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm font-medium">
-              <span class="lang-en"><?php echo htmlspecialchars($translations['en']['Email sent successfully!']); ?></span>
-              <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>"><?php echo htmlspecialchars($translations['ar']['Email sent successfully!']); ?></span>
-            </p>
-          </div>
-        </div>
-      </div>
-    <?php endif; ?>
-
     <!-- Flash Messages -->
     <div id="flash-message-container" class="mx-4 mt-4">
-      <?php echo get_flash_message(); ?>
+      <?php 
+      $flash = get_flash_message();
+      if ($flash):
+        $message_class = strpos($flash, 'successfully') !== false ? 'success-message' : 'error-message';
+      ?>
+        <div class="<?php echo $message_class; ?> p-4 mb-4 rounded shadow-md" role="alert">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 <?php echo strpos($flash, 'successfully') !== false ? 'text-green-500' : 'text-red-500'; ?>" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium">
+                <span class="lang-en"><?php echo htmlspecialchars($flash); ?></span>
+                <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">
+                  <?php echo htmlspecialchars(isset($translations['ar'][$flash]) ? $translations['ar'][$flash] : $flash); ?>
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      <?php endif; ?>
     </div>
 
     <div class="card-body p-10">
