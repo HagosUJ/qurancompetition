@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($success_status) {
                 // Set flash message for the next page
-                set_flash_message($message, 'success');
+                // set_flash_message($message, 'success');
 
                 // Redirect to a page indicating email verification is needed
                 redirect('check-email.php?email=' . urlencode($email) . '&type=verification');
