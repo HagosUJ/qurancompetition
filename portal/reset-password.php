@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id !== null) { // Only proces
             $error = "Both password fields are required.";
         } elseif ($password !== $confirm_password) {
             $error = "Passwords do not match.";
-        } elseif (!is_strong_password($password)) { // Use the strength check function
-            $error = "Password does not meet complexity requirements (minimum 8 characters, including uppercase, lowercase, number, and special character).";
+        } elseif (!is_strong_password($password)) { // Updated strength check
+            $error = "Password must be at least 8 characters long and include uppercase, lowercase, and a number.";
         } else {
             // Hash new password using the function from auth.php
             $hashed_password = hash_password($password);
@@ -94,10 +94,13 @@ $translations = [
         'New Password' => 'New Password',
         'Confirm New Password' => 'Confirm New Password',
         'Update Password' => 'Update Password',
-        'Min 8 chars, incl. upper, lower, number, symbol.' => 'Min 8 chars, incl. upper, lower, number, symbol.',
+        'Min 8 chars, incl. upper, lower, number.' => 'Min 8 chars, incl. upper, lower, number.',
         'Back to Sign In' => 'Back to Sign In',
         'Request Reset Link' => 'Request Reset Link',
-        'Please return to the password reset request page.' => 'Please return to the password reset request page.'
+        'Please return to the password reset request page.' => 'Please return to the password reset request page.',
+        'Weak' => 'Weak',
+        'Medium' => 'Medium',
+        'Strong' => 'Strong'
     ],
     'ar' => [
         'Reset Your Password' => 'إعادة تعيين كلمة المرور',
@@ -105,10 +108,13 @@ $translations = [
         'New Password' => 'كلمة المرور الجديدة',
         'Confirm New Password' => 'تأكيد كلمة المرور الجديدة',
         'Update Password' => 'تحديث كلمة المرور',
-        'Min 8 chars, incl. upper, lower, number, symbol.' => '8 أحرف كحد أدنى، تتضمن أحرف كبيرة، صغيرة، رقم، ورمز.',
+        'Min 8 chars, incl. upper, lower, number.' => '8 أحرف كحد أدنى، تتضمن أحرف كبيرة، صغيرة، ورقم.',
         'Back to Sign In' => 'العودة إلى تسجيل الدخول',
         'Request Reset Link' => 'طلب رابط إعادة التعيين',
-        'Please return to the password reset request page.' => 'يرجى العودة إلى صفحة طلب إعادة تعيين كلمة المرور.'
+        'Please return to the password reset request page.' => 'يرجى العودة إلى صفحة طلب إعادة تعيين كلمة المرور.',
+        'Weak' => 'ضعيف',
+        'Medium' => 'متوسط',
+        'Strong' => 'قوي'
     ]
 ];
 ?>
@@ -156,6 +162,34 @@ $translations = [
       margin-top: 0.25rem;
       animation: fadeIn 0.3s ease-in-out;
     }
+    .password-strength {
+      display: flex;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+    .strength-bar {
+      flex-grow: 1;
+      height: 6px;
+      border-radius: 3px;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .strength-weak .strength-bar {
+      width: 33%;
+      background-color: #ef4444;
+    }
+    .strength-medium .strength-bar {
+      width: 66%;
+      background-color: #f59e0b;
+    }
+    .strength-strong .strength-bar {
+      width: 100%;
+      background-color: #10b981;
+    }
+    .strength-text {
+      margin-left: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -173,6 +207,10 @@ $translations = [
     }
     [dir="rtl"] .text-center {
       text-align: center;
+    }
+    [dir="rtl"] .strength-text {
+      margin-left: 0;
+      margin-right: 0.5rem;
     }
     .lang-toggle {
       cursor: pointer;
@@ -293,12 +331,19 @@ $translations = [
               <i class="ki-filled ki-eye-slash text-gray-500 hidden toggle-password-active:block"></i>
             </button>
           </div>
+          <div class="password-strength strength-weak" id="password-strength">
+            <div class="strength-bar"></div>
+            <span class="strength-text">
+              <span class="lang-en"><?php echo $translations['en']['Weak']; ?></span>
+              <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>"><?php echo $translations['ar']['Weak']; ?></span>
+            </span>
+          </div>
           <?php if (!empty($error) && (strpos($error, 'required') !== false || strpos($error, 'match') !== false || strpos($error, 'complexity') !== false)): ?>
             <div class="field-error-text"><?php echo htmlspecialchars($error); ?></div>
           <?php endif; ?>
           <p class="text-xs text-gray-500 mt-1">
-            <span class="lang-en"><?php echo $translations['en']['Min 8 chars, incl. upper, lower, number, symbol.']; ?></span>
-            <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>"><?php echo $translations['ar']['Min 8 chars, incl. upper, lower, number, symbol.']; ?></span>
+            <span class="lang-en"><?php echo $translations['en']['Min 8 chars, incl. upper, lower, number.']; ?></span>
+            <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>"><?php echo $translations['ar']['Min 8 chars, incl. upper, lower, liczba.']; ?></span>
           </p>
         </div>
         <div class="flex flex-col gap-1 mb-5">
@@ -363,7 +408,7 @@ $translations = [
   </div>
 
   <!-- Scripts -->
-  <script src="assets/js/core.php"></script>
+  <script src="assets/js/core.bundle.js"></script>
   <script>
   document.addEventListener('DOMContentLoaded', function() {
     const htmlRoot = document.getElementById('html-root');
@@ -401,6 +446,44 @@ $translations = [
     setLanguage(savedLang);
 
     window.toggleLanguage = toggleLanguage;
+
+    // Password Strength Indicator
+    const passwordInput = document.getElementById('user_new_password');
+    const strengthContainer = document.getElementById('password-strength');
+    const strengthBar = strengthContainer.querySelector('.strength-bar');
+    const strengthTextEn = strengthContainer.querySelector('.lang-en');
+    const strengthTextAr = strengthContainer.querySelector('.lang-ar');
+
+    function updatePasswordStrength() {
+      const password = passwordInput.value;
+      let strength = 'weak';
+      let score = 0;
+
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[a-z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (password.length >= 12) score++;
+
+      if (score <= 2) {
+        strength = 'weak';
+        strengthContainer.className = 'password-strength strength-weak';
+        strengthTextEn.textContent = '<?php echo $translations['en']['Weak']; ?>';
+        strengthTextAr.textContent = '<?php echo $translations['ar']['Weak']; ?>';
+      } else if (score <= 4) {
+        strength = 'medium';
+        strengthContainer.className = 'password-strength strength-medium';
+        strengthTextEn.textContent = '<?php echo $translations['en']['Medium']; ?>';
+        strengthTextAr.textContent = '<?php echo $translations['ar']['Medium']; ?>';
+      } else {
+        strength = 'strong';
+        strengthContainer.className = 'password-strength strength-strong';
+        strengthTextEn.textContent = '<?php echo $translations['en']['Strong']; ?>';
+        strengthTextAr.textContent = '<?php echo $translations['ar']['Strong']; ?>';
+      }
+    }
+
+    passwordInput.addEventListener('input', updatePasswordStrength);
   });
   </script>
 </body>
