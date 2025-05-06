@@ -927,36 +927,7 @@ function clear_reset_token(int $user_id): void
         error_log("Failed to clear reset token for User ID {$user_id}: " . $e->getMessage());
     }
 }
-/**
- * Sets a flash message to be displayed on the next page load.
- *
- * @param string $message The message content (can be HTML).
- * @param string $type The type of message ('success', 'error', 'warning', 'info').
- */
-function set_flash_message(string $message, string $type): void
-{
-    secure_session_start();
-    $_SESSION['flash_message'] = [
-        'content' => $message,
-        'type' => $type
-    ];
-}
 
-/**
- * Retrieves and clears the flash message.
- *
- * @return array|null [string $content, string $type] or null if no message.
- */
-function get_flash_message(): ?array
-{
-    secure_session_start();
-    if (isset($_SESSION['flash_message'])) {
-        $flash = $_SESSION['flash_message'];
-        unset($_SESSION['flash_message']);
-        return $flash;
-    }
-    return null;
-}
 
 // --- Email Sending Utility ---
 
