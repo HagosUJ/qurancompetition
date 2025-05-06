@@ -215,8 +215,8 @@ error_log("check-email.php loaded, language: $current_lang, type: $type");
                     <?php if (!empty($email)): ?>
                         <a class="text-xs font-medium link"
                            href="resend-email.php?email=<?php echo urlencode($email); ?>&type=<?php echo urlencode($type); ?>&csrf_token=<?php echo urlencode($_SESSION['csrf_token']); ?>">
-                            <span class="lang-en">Resend</span>
-                            <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">إعادة إرسال</span>
+                            <!-- <span class="lang-en">Resend</span>
+                            <span class="lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">إعادة إرسال</span> -->
                         </a>
                     <?php endif; ?>
                 </div>
