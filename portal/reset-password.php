@@ -65,8 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user_id !== null) { // Only proces
                     $update_stmt->close();
                     // Password updated successfully
                     $success = "Password updated successfully. You can now sign in with your new password.";
-                    // Optionally log successful reset
-                    log_activity($user_id, 'password_reset', 'Password successfully reset.');
+                  
 
                     // Clear the validated user_id to prevent form resubmission issues
                     $user_id = null;
