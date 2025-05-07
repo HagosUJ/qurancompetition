@@ -1,0 +1,24 @@
+[2025-05-08 00:56:11] INFO: Using database: quran_competition on localhost
+[2025-05-08 00:56:11] INFO: Base URL: http://localhost/musabaqa/portal/
+[2025-05-08 00:56:11] INFO: Test email: test_user_681be50b4f306@example.com
+[2025-05-08 00:56:11] SECTION: Cleanup Previous Test Data
+[2025-05-08 00:56:11] INFO: Previous test data cleaned up
+[2025-05-08 00:56:11] SECTION: Testing User Registration
+[2025-05-08 00:56:11] FAILURE: Registration should reject invalid email
+[2025-05-08 00:56:11] SUCCESS: Registration validates password matching
+[2025-05-08 00:56:11] FAILURE: Registration failed with valid data
+[2025-05-08 00:56:11] SECTION: Testing Login
+[2025-05-08 00:56:11] SUCCESS: Login rejects wrong password
+[2025-05-08 00:56:11] FAILURE: Login failed with valid credentials
+[2025-05-08 00:56:11] FAILURE: Skipping dependent tests due to login failure
+[2025-05-08 00:56:11] SECTION: Testing Secure Area Protection
+[2025-05-08 00:56:11] SUCCESS: Secure area redirects to login
+[2025-05-08 00:56:11] SECTION: Testing Login
+[2025-05-08 00:56:11] SUCCESS: Login rejects wrong password
+[2025-05-08 00:56:11] FAILURE: Login failed with valid credentials
+[2025-05-08 00:56:11] SECTION: Testing Logout
+[2025-05-08 00:56:11] SECTION: Testing Login
+[2025-05-08 00:56:11] SUCCESS: Login rejects wrong password
+[2025-05-08 00:56:11] FAILURE: Login failed with valid credentials
+[2025-05-08 00:56:11] SUCCESS: Logout working
+[2025-05-08 00:56:11] SECTION: Test Summary

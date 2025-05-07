@@ -36,6 +36,29 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// --- Guidelines Acknowledgment Check ---
+$show_guidelines_modal = !isset($_SESSION['guidelines_acknowledged']) || !$_SESSION['guidelines_acknowledged'];
+
+// Handle Guidelines Acknowledgment Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'acknowledge_guidelines') {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $error = $translations[$language]['error_invalid_submission'];
+    } elseif (!isset($_POST['guidelines_acknowledged'])) {
+        $error = $translations[$language]['error_guidelines_not_acknowledged'] ?? 'You must acknowledge the guidelines to proceed.';
+    } else {
+        $_SESSION['guidelines_acknowledged'] = true;
+        $show_guidelines_modal = false;
+        // Optionally, save acknowledgment to database for persistence across sessions
+        global $conn;
+        $stmt_update = $conn->prepare("UPDATE users SET guidelines_acknowledged = 1 WHERE id = ?");
+        if ($stmt_update) {
+            $stmt_update->bind_param("i", $user_id);
+            $stmt_update->execute();
+            $stmt_update->close();
+        }
+    }
+}
+
 // --- Language-Specific Strings ---
 $translations = [
     'en' => [
@@ -70,6 +93,119 @@ $translations = [
         'contestant_type_nigerian' => 'Nigerian Contestant',
         'contestant_type_international' => 'International Contestant',
         'application_status_summary' => 'Your application as a %s contestant is currently %s.',
+        'guidelines_title' => 'Competition Guidelines',
+        'guidelines_acknowledge' => 'I have read and understood the competition guidelines.',
+        'guidelines_submit' => 'Proceed',
+        'error_guidelines_not_acknowledged' => 'You must acknowledge the guidelines to proceed.',
+        // Guidelines in English
+        'guidelines_content' => <<<EOT
+<p><em>In the name of Allah, the Most Gracious, the Most Merciful. Peace and blessings be upon the noble Prophet.</em></p>
+<p><em>These are simple guidelines for the <strong>Global Ahlul Qur'an Council Competition in Nigeria</strong>, the first of its kind in this blessed country (2020/1441). Prepared by the guidance committee, these instructions serve as a guide for participants and judges.</em></p>
+
+<h3>Competition Title</h3>
+<p><strong>Global Ahlul Qur'an Council Competition – Nigeria</strong></p>
+
+<h3>Competition Location</h3>
+<p><strong>Jos, Plateau State</strong></p>
+
+<h3>Branches of the Competition</h3>
+<ul>
+    <li><strong>First Branch</strong>: The Seven Qira’at (readings) with the text of "Ash-Shatibiyyah" and its explanation "Taqreeb al-Ma’ani", and the text "Fara’id al-Hisan" in counting verses. (For males only)</li>
+    <li><strong>Second Branch</strong>: Full Qur’an with the text "Al-Jazariyyah". (For females only)</li>
+</ul>
+
+<h3>Participants’ Gender</h3>
+<p><strong>Male and Female</strong></p>
+
+<h3>Prescribed Texts</h3>
+<ul>
+    <li><strong>First Branch</strong>: Ash-Shatibiyyah, Taqreeb al-Ma’ani, and Fara’id al-Hisan.</li>
+    <li><strong>Second Branch</strong>: Al-Jazariyyah.</li>
+</ul>
+
+<h3>Number of Participating Countries</h3>
+<p><strong>Twenty</strong>, including the host country Nigeria.</p>
+
+<h3>Memorization Questions</h3>
+<ul>
+    <li><strong>First Branch</strong>: 5 questions, each covering 15 lines.</li>
+    <li><strong>Second Branch</strong>: 5 questions, each covering 15 lines.</li>
+</ul>
+
+<h3>Questions from Texts</h3>
+<ul>
+    <li><strong>First Branch</strong>: 10 questions
+        <ul>
+            <li>4 on Taqreeb al-Ma’ani</li>
+            <li>2 on Ash-Shatibiyyah</li>
+            <li>3 on Fara’id al-Hisan</li>
+            <li>1 on its explanation</li>
+        </ul>
+    </li>
+    <li><strong>Second Branch</strong>: 5 questions on Al-Jazariyyah.</li>
+</ul>
+
+<h3>Scoring System</h3>
+<ul>
+    <li><strong>Memorization</strong>: 40 points</li>
+    <li><strong>Performance</strong>: 20 points</li>
+    <li><strong>Application</strong>: 20 points</li>
+    <li><strong>Texts</strong>: 20 points for both branches</li>
+</ul>
+
+<h3>Deductions for Mistakes</h3>
+<ul>
+    <li>Contestant corrects without prompt: <strong>0.5 point</strong> deducted</li>
+    <li>Corrected after first prompt: <strong>1 point</strong> deducted</li>
+    <li>Corrected after second prompt: <strong>2 points</strong> deducted</li>
+    <li>Not corrected: <strong>3 points</strong> deducted</li>
+    <li>Application mistakes: <strong>0.5 point</strong> per mistake</li>
+    <li>Incorrect answers from texts: <strong>2 points</strong> deducted</li>
+    <li>Half answers from texts: <strong>1 point</strong> deducted</li>
+</ul>
+
+<h3>Qualification Conditions</h3>
+<ul>
+    <li>Must be <strong>Nigerian</strong> (for preliminary round)</li>
+    <li>Submit completed application on time</li>
+    <li>Among the <strong>top 5</strong> in Branch 1 or <strong>top 3</strong> in Branch 3 of the Usman Fodio National Competition</li>
+</ul>
+
+<h3>General Requirements</h3>
+<ul>
+    <li>Hold citizenship of the country represented</li>
+    <li>Not have represented another country in past international Qur'an competitions in the same branch</li>
+    <li><strong>Age</strong>:
+        <ul>
+            <li>Branch 1: 18 or younger</li>
+            <li>Branch 2: 18 to 30 years</li>
+        </ul>
+    </li>
+    <li>Memorize required text and apply <strong>tajweed</strong> rules</li>
+    <li>Pass a test via electronic communication</li>
+    <li>Wear official <strong>national dress</strong> during events</li>
+    <li>Exhibit <strong>Islamic etiquette</strong></li>
+    <li>Stay seated during the competition</li>
+    <li>Cannot compete in more than one branch</li>
+    <li>No involvement in legal/security issues</li>
+    <li>Free from contagious diseases (with medical certificate)</li>
+    <li>Non-Nigerians must obtain visa/entry permit</li>
+    <li>Cannot re-enter if previously participated</li>
+</ul>
+
+<h3>Judges' Conditions</h3>
+<ul>
+    <li><strong>Age</strong>: 18 to 70 years</li>
+    <li>Know the <strong>ten minor Qira’at</strong></li>
+    <li>Physically and visually sound</li>
+    <li>Just and fair</li>
+    <li>Experienced in national or international competitions</li>
+    <li>Wear <strong>national dress</strong> during the event</li>
+</ul>
+
+<h3>Awards</h3>
+<p>Only the <strong>top 5</strong> participants in each branch will receive special prizes.</p>
+EOT
     ],
     'ar' => [
         'page_title' => 'طلبي | المسابقة',
@@ -103,6 +239,119 @@ $translations = [
         'contestant_type_nigerian' => 'متسابق نيجيري',
         'contestant_type_international' => 'متسابق دولي',
         'application_status_summary' => 'طلبك كمتسابق %s في حالة %s حاليًا.',
+        'guidelines_title' => 'إرشادات المسابقة',
+        'guidelines_acknowledge' => 'لقد قرأت وفهمت إرشادات المسابقة.',
+        'guidelines_submit' => 'متابعة',
+        'error_guidelines_not_acknowledged' => 'يجب عليك الموافقة على الإرشادات للمتابعة.',
+        // Guidelines in Arabic
+        'guidelines_content' => <<<EOT
+<p><em>بسم الله الرحمن الرحيم. والصلاة والسلام على النبي الكريم.</em></p>
+<p><em>هذه إرشادات بسيطة لمسابقة <strong>مجلس أهل القرآن العالمي في نيجيريا</strong>، وهي الأولى من نوعها في هذا البلد المبارك (2020/1441). تم إعداد هذه التعليمات من قبل لجنة الإرشاد لتكون دليلاً للمشاركين والحكام.</em></p>
+
+<h3>عنوان المسابقة</h3>
+<p><strong>مسابقة مجلس أهل القرآن العالمي – نيجيريا</strong></p>
+
+<h3>مكان المسابقة</h3>
+<p><strong>جوس، ولاية بلاتو</strong></p>
+
+<h3>فروع المسابقة</h3>
+<ul>
+    <li><strong>الفرع الأول</strong>: القراءات السبع مع نص "الشاطبية" وشرحها "تقريب المعاني"، ونص "فرائد الحسن" في عد الآيات. (للذكور فقط)</li>
+    <li><strong>الفرع الثاني</strong>: القرآن الكريم كاملاً مع نص "الجزرية". (للإناث فقط)</li>
+</ul>
+
+<h3>جنس المشاركين</h3>
+<p><strong>ذكور وإناث</strong></p>
+
+<h3>النصوص المقررة</h3>
+<ul>
+    <li><strong>الفرع الأول</strong>: الشاطبية، تقريب المعاني، وفرائد الحسن.</li>
+    <li><strong>الفرع الثاني</strong>: الجزرية.</li>
+</ul>
+
+<h3>عدد الدول المشاركة</h3>
+<p><strong>عشرون</strong>، بما في ذلك الدولة المضيفة نيجيريا.</p>
+
+<h3>أسئلة الحفظ</h3>
+<ul>
+    <li><strong>الفرع الأول</strong>: 5 أسئلة، كل سؤال يغطي 15 سطرًا.</li>
+    <li><strong>الفرع الثاني</strong>: 5 أسئلة، كل سؤال يغطي 15 سطرًا.</li>
+</ul>
+
+<h3>أسئلة من النصوص</h3>
+<ul>
+    <li><strong>الفرع الأول</strong>: 10 أسئلة
+        <ul>
+            <li>4 عن تقريب المعاني</li>
+            <li>2 عن الشاطبية</li>
+            <li>3 عن فرائد الحسن</li>
+            <li>1 عن شرحها</li>
+        </ul>
+    </li>
+    <li><strong>الفرع الثاني</strong>: 5 أسئلة عن الجزرية.</li>
+</ul>
+
+<h3>نظام الدرجات</h3>
+<ul>
+    <li><strong>الحفظ</strong>: 40 درجة</li>
+    <li><strong>الأداء</strong>: 20 درجة</li>
+    <li><strong>التطبيق</strong>: 20 درجة</li>
+    <li><strong>النصوص</strong>: 20 درجة لكلا الفرعين</li>
+</ul>
+
+<h3>خصومات الأخطاء</h3>
+<ul>
+    <li>تصحيح المتسابق دون تنبيه: خصم <strong>0.5 درجة</strong></li>
+    <li>تصحيح بعد التنبيه الأول: خصم <strong>درجة واحدة</strong></li>
+    <li>تصحيح بعد التنبيه الثاني: خصم <strong>درجتان</strong></li>
+    <li>عدم التصحيح: خصم <strong>3 درجات</strong></li>
+    <li>أخطاء التطبيق: خصم <strong>0.5 درجة</strong> لكل خطأ</li>
+    <li>إجابات غير صحيحة من النصوص: خصم <strong>درجتان</strong></li>
+    <li>إجابات ناقصة من النصوص: خصم <strong>درجة واحدة</strong></li>
+</ul>
+
+<h3>شروط التأهيل</h3>
+<ul>
+    <li>يجب أن يكون <strong>نيجيريًا</strong> (للجولة التمهيدية)</li>
+    <li>تقديم طلب مكتمل في الوقت المحدد</li>
+    <li>من بين <strong>أول 5</strong> في الفرع الأول أو <strong>أول 3</strong> في الفرع الثالث في مسابقة عثمان فوديو الوطنية</li>
+</ul>
+
+<h3>المتطلبات العامة</h3>
+<ul>
+    <li>يجب أن يحمل جنسية الدولة التي يمثلها</li>
+    <li>عدم تمثيل دولة أخرى في مسابقات القرآن الدولية السابقة في نفس الفرع</li>
+    <li><strong>العمر</strong>:
+        <ul>
+            <li>الفرع الأول: 18 عامًا أو أقل</li>
+            <li>الفرع الثاني: من 18 إلى 30 عامًا</li>
+        </ul>
+    </li>
+    <li>حفظ النصوص المطلوبة وتطبيق قواعد <strong>التجويد</strong></li>
+    <li>اجتياز اختبار عبر التواصل الإلكتروني</li>
+    <li>ارتداء <strong>الزي الوطني الرسمي</strong> خلال الفعاليات</li>
+    <li>إظهار <strong>الأخلاق الإسلامية</strong></li>
+    <li>البقاء جالسًا أثناء المسابقة</li>
+    <li>عدم التنافس في أكثر من فرع</li>
+    <li>عدم التورط في قضايا قانونية/أمنية</li>
+    <li>خالٍ من الأمراض المعدية (بشهادة طبية)</li>
+    <li>على غير النيجيريين الحصول على تأشيرة/تصريح دخول</li>
+    <li>لا يمكن إعادة المشاركة إذا شارك سابقًا</li>
+</ul>
+
+<h3>شروط الحكام</h3>
+<ul>
+    <li><strong>العمر</strong>: من 18 إلى 70 عامًا</li>
+    <li>معرفة <strong>القراءات العشر الصغرى</strong></li>
+    <li>سليم بدنيًا وبصريًا</li>
+    <li>عادل ومنصف</li>
+    <li>ذو خبرة في المسابقات الوطنية أو الدولية</li>
+    <li>ارتداء <strong>الزي الوطني</strong> خلال الفعالية</li>
+</ul>
+
+<h3>الجوائز</h3>
+<p>سيحصل فقط <strong>أول 5 مشاركين</strong> في كل فرع على جوائز خاصة.</p>
+EOT
     ]
 ];
 
@@ -125,7 +374,7 @@ if ($stmt_check) {
 
 // --- Handle Type Selection (POST Request) ---
 $error = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($application)) { // Only process if no application exists yet
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($application) && (!isset($_POST['action']) || $_POST['action'] !== 'acknowledge_guidelines')) { // Only process if no application exists yet and not guidelines acknowledgment
     // Verify CSRF token
     if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         $error = $translations[$language]['error_invalid_submission'];
@@ -271,6 +520,47 @@ header("X-XSS-Protection: 1; mode=block");
         .selection-card { cursor: pointer; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
         .selection-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         .icon-lg { font-size: 3rem; }
+        #guidelinesModal .modal-body { max-height: 60vh; overflow-y: auto; }
+        #guidelinesModal .modal-body h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1a252f;
+        }
+        #guidelinesModal .modal-body p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        #guidelinesModal .modal-body em {
+            font-style: italic;
+            color: #555;
+        }
+        #guidelinesModal .modal-body ul {
+            padding-left: <?php echo $is_rtl ? '0' : '1.5rem'; ?>;
+            padding-right: <?php echo $is_rtl ? '1.5rem' : '0'; ?>;
+            margin-bottom: 1rem;
+        }
+        #guidelinesModal .modal-body ul li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+        #guidelinesModal .modal-body ul ul {
+            padding-left: <?php echo $is_rtl ? '0' : '1.5rem'; ?>;
+            padding-right: <?php echo $is_rtl ? '1.5rem' : '0'; ?>;
+            margin-top: 0.5rem;
+        }
+        #guidelinesModal .modal-body strong {
+            color: #1a252f;
+        }
+        <?php if ($is_rtl): ?>
+        #guidelinesModal .modal-body {
+            text-align: right;
+        }
+        #guidelinesModal .modal-body ul {
+            list-style-position: inside;
+        }
+        <?php endif; ?>
     </style>
 </head>
 
@@ -461,50 +751,93 @@ header("X-XSS-Protection: 1; mode=block");
         </div>
     </div>
 
+    <!-- Guidelines Modal -->
+    <div class="modal fade" id="guidelinesModal" tabindex="-1" aria-labelledby="guidelinesModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="guidelinesModalLabel"><?php echo $translations[$language]['guidelines_title']; ?></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" disabled></button>
+                </div>
+                <div class="modal-body">
+                    <?php echo $translations[$language]['guidelines_content']; ?>
+                    <form id="guidelinesForm" method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                        <input type="hidden" name="action" value="acknowledge_guidelines">
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" name="guidelines_acknowledged" id="guidelinesAcknowledged" required>
+                            <label class="form-check-label" for="guidelinesAcknowledged">
+                                <?php echo $translations[$language]['guidelines_acknowledge']; ?>
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" form="guidelinesForm"><?php echo $translations[$language]['guidelines_submit']; ?></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include 'layouts/right-sidebar.php'; ?>
     <?php include 'layouts/footer-scripts.php'; ?>
 
     <!-- Removed redundant dashboard script -->
     <script src="assets/js/app.min.js"></script>
 
-    <?php if ($page_content === 'selection'): ?>
     <script>
-        let selectedContestantType = null;
-        const confirmationModalElement = document.getElementById('confirmationModal');
-        const confirmationModal = confirmationModalElement ? new bootstrap.Modal(confirmationModalElement) : null;
-        const selectedTypeDisplay = document.getElementById('selectedTypeDisplay');
-        const confirmBtn = document.getElementById('confirmSelectionBtn');
-        const typeInput = document.getElementById('contestant_type_input');
-        const typeForm = document.getElementById('typeSelectionForm');
-
-        function showConfirmationModal(type) {
-            if (!confirmationModal || !selectedTypeDisplay || !typeInput || !typeForm) {
-                console.error("Modal or form elements not found.");
-                alert("<?php echo $translations[$language]['error_internal']; ?>");
-                return;
-            }
-
-            selectedContestantType = type;
-            selectedTypeDisplay.textContent = (type === 'nigerian' ? '<?php echo $translations[$language]['contestant_type_nigerian']; ?>' : '<?php echo $translations[$language]['contestant_type_international']; ?>');
-            confirmationModal.show();
-        }
-
-        if (confirmBtn) {
-            confirmBtn.addEventListener('click', function() {
-                if (selectedContestantType && typeInput && typeForm) {
-                    typeInput.value = selectedContestantType;
-                    typeForm.submit();
-                } else {
-                    console.error("Selected type or form elements missing on confirm.");
-                    alert("<?php echo $translations[$language]['error_internal']; ?>");
-                    confirmationModal.hide();
+        // Guidelines Modal Handling
+        <?php if ($show_guidelines_modal): ?>
+            document.addEventListener('DOMContentLoaded', function() {
+                const guidelinesModalElement = document.getElementById('guidelinesModal');
+                if (guidelinesModalElement) {
+                    const guidelinesModal = new bootstrap.Modal(guidelinesModalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    guidelinesModal.show();
                 }
             });
-        } else {
-            console.error("Confirmation button not found.");
-        }
+        <?php endif; ?>
+
+        // Type Selection Modal Handling
+        <?php if ($page_content === 'selection'): ?>
+            let selectedContestantType = null;
+            const confirmationModalElement = document.getElementById('confirmationModal');
+            const confirmationModal = confirmationModalElement ? new bootstrap.Modal(confirmationModalElement) : null;
+            const selectedTypeDisplay = document.getElementById('selectedTypeDisplay');
+            const confirmBtn = document.getElementById('confirmSelectionBtn');
+            const typeInput = document.getElementById('contestant_type_input');
+            const typeForm = document.getElementById('typeSelectionForm');
+
+            function showConfirmationModal(type) {
+                if (!confirmationModal || !selectedTypeDisplay || !typeInput || !typeForm) {
+                    console.error("Modal or form elements not found.");
+                    alert("<?php echo addslashes($translations[$language]['error_internal']); ?>");
+                    return;
+                }
+
+                selectedContestantType = type;
+                selectedTypeDisplay.textContent = (type === 'nigerian' ? '<?php echo addslashes($translations[$language]['contestant_type_nigerian']); ?>' : '<?php echo addslashes($translations[$language]['contestant_type_international']); ?>');
+                confirmationModal.show();
+            }
+
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function() {
+                    if (selectedContestantType && typeInput && typeForm) {
+                        typeInput.value = selectedContestantType;
+                        typeForm.submit();
+                    } else {
+                        console.error("Selected type or form elements missing on confirm.");
+                        alert("<?php echo addslashes($translations[$language]['error_internal']); ?>");
+                        confirmationModal.hide();
+                    }
+                });
+            } else {
+                console.error("Confirmation button not found.");
+            }
+        <?php endif; ?>
     </script>
-    <?php endif; ?>
 
 </body>
 </html>
