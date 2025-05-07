@@ -133,8 +133,10 @@
 
         .lang-selector {
             display: inline-block;
-            position: relative; /* Added for z-index context */
-            z-index: 1000;      /* Ensure it's generally above other content, adjust if needed */
+            position: relative;
+            /* Added for z-index context */
+            z-index: 1000;
+            /* Ensure it's generally above other content, adjust if needed */
             margin-left: 10px;
         }
 
@@ -158,11 +160,13 @@
             min-width: 80px;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
-            
+
             /* Explicitly ensure pointer events are enabled */
-            pointer-events: auto !important; 
-            position: relative; /* For stacking context if needed */
-            z-index: 1; /* Relative to its .lang-selector container */
+            pointer-events: auto !important;
+            position: relative;
+            /* For stacking context if needed */
+            z-index: 1;
+            /* Relative to its .lang-selector container */
         }
 
         .lang-select:focus {
@@ -173,7 +177,7 @@
         .lang-select option {
             font-family: 'Inter', sans-serif;
             /* Ensure options are visible if there are global color/background issues */
-            color: #000000; 
+            color: #000000;
             background-color: #ffffff;
         }
 
@@ -318,11 +322,12 @@
             }
 
             [dir="rtl"] .lang-selector {
-            margin-right: 5px;
-            margin-left: 0;
-            z-index: 1050; /* Ensure high z-index in mobile header */
+                margin-right: 5px;
+                margin-left: 0;
+                z-index: 1050;
+                /* Ensure high z-index in mobile header */
+            }
         }
-    }
 
         @media (max-width: 480px) {
             .musabaqa-banner .countdown div {
@@ -376,7 +381,8 @@
             </div>
             <div class="bringer-header-rp">
                 <div class="auth-buttons" style="display: flex; align-items: center;">
-                    <a href="portal/" class="register-signin-btn" data-lang-en="Register/Sign-In" data-lang-ar="التسجيل/تسجيل الدخول">Register/Sign-In</a>
+                    <a href="portal/" class="register-signin-btn" data-lang-en="Register/Sign-In"
+                        data-lang-ar="التسجيل/تسجيل الدخول">Register/Sign-In</a>
                     <div class="lang-selector">
                         <select id="lang-select" class="lang-select">
                             <option value="en" selected>English</option>
@@ -454,12 +460,11 @@
                 </div>
             </section>
             <section class="backlight-top">
-                <div class="musabaqa-banner bringer-block"
-                     data-appear="fade-up"
-                     data-unload="fade-down"
-                     style="background-image: url('portal/assets/images/bg-2.jpg'); background-size: cover; background-position: center;">
-                    <h2 data-lang-en="Join the 2025 International Qur'an Musabaqa"
-                        data-lang-ar="انضم إلى مسابقة القرآن العالمية 2025">Join the 2025 International Qur'an Musabaqa
+                <div class="musabaqa-banner bringer-block" data-appear="fade-up" data-unload="fade-down"
+                    style="background-image: url('portal/assets/images/bg-2.jpg'); background-size: cover; background-position: center;">
+                    <h2 data-lang-en="Global Ahlul Qur'an Council Competiton - Nigeria"
+                        data-lang-ar="انضم إلى مسابقة القرآن العالمية 2025">Global Ahlul Qur'an Council Competiton -
+                        Nigeria
                     </h2>
                     <p data-lang-en="Showcase your excellence in Tajweed, Hifz, and Tafsir. Register now for a chance to compete globally!"
                         data-lang-ar="اعرض تميزك في التجويد والحفظ والتفسير. سجل الآن للحصول على فرصة التنافس عالميًا!">
@@ -793,7 +798,7 @@
             }
 
             function switchLanguage(lang) {
-                if (currentLanguage === lang && $('html').attr('lang') === lang) return; 
+                if (currentLanguage === lang && $('html').attr('lang') === lang) return;
                 currentLanguage = lang;
 
                 elements.each(function () {
@@ -809,7 +814,7 @@
                     }
                 });
 
-                $('.countdown-number').each(function() {
+                $('.countdown-number').each(function () {
                     if (lang === 'ar') {
                         $(this).addClass('arabic');
                     } else {
@@ -838,7 +843,7 @@
             });
 
             langSelectMobile.on('change', function () {
-                console.log('Mobile language select (jQuery) changed to: ' + $(this).val()); 
+                console.log('Mobile language select (jQuery) changed to: ' + $(this).val());
                 const lang = $(this).val();
                 switchLanguage(lang);
             });
