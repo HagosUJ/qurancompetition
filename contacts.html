@@ -1,15 +1,133 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Majlisu Ahlil Qur'an | Contact Us</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title data-lang-en="Majlisu Ahlil Qur'an | Contact Us" data-lang-ar="مجلس أهل القرآن | اتصل بنا">Majlisu Ahlil Qur'an | Contact Us</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="css/config.css">
     <link type="text/css" rel="stylesheet" href="css/libs.css">
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/responsive.css">
     <link rel="icon" href="img/favicon.png" sizes="32x32">
+    <style>
+        .register-signin-btn {
+            background-color: #2e6b5e;
+            color: #fff8dc; /* Whitish gold */
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .register-signin-btn:hover {
+            background-color: #B19246;
+            transform: scale(1.05);
+        }
+        .lang-selector {
+            display: inline-block;
+            position: relative;
+            z-index: 1000;
+            margin-left: 10px;
+        }
+        .lang-select {
+            background: none;
+            color: #4a5e57;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%234a5e57" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 30px;
+            min-width: 80px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 1;
+        }
+        .lang-select:focus {
+            outline: none;
+            border-color: #2e6b5e;
+        }
+        .lang-select option {
+            font-family: 'Inter', sans-serif;
+            color: #000000;
+            background-color: #ffffff;
+        }
+        .lang-select option[value="ar"] {
+            font-family: 'Amiri', serif;
+            font-size: 16px;
+        }
+        body.arabic-lang, .arabic {
+            font-family: 'Amiri', serif !important;
+        }
+        [dir="rtl"] .bringer-header-inner,
+        [dir="rtl"] .bringer-nav ul,
+        [dir="rtl"] .bringer-mobile-header-inner,
+        [dir="rtl"] .stg-row,
+        [dir="rtl"] .bringer-lwp-roster .bringer-lwp-item,
+        [dir="rtl"] .bringer-footer-widgets .stg-row,
+        [dir="rtl"] .bringer-socials-list,
+        [dir="rtl"] .bringer-cta-form-content .stg-row {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .bringer-header-lp { margin-left: auto; margin-right: 0; }
+        [dir="rtl"] .bringer-header-rp { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .bringer-mobile-header-inner .bringer-logo { margin-left: auto; margin-right: 0; }
+        [dir="rtl"] .bringer-mobile-header-inner .lang-selector { margin-left: 0; margin-right: 15px; }
+        [dir="rtl"] .bringer-mobile-menu-toggler { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .align-right { text-align: left; }
+        [dir="rtl"] .align-left { text-align: right; }
+        [dir="rtl"] .bringer-lwp-item-content,
+        [dir="rtl"] .bringer-info-widget,
+        [dir="rtl"] .bringer-menu-widget ul,
+        [dir="rtl"] .bringer-contact-form label,
+        [dir="rtl"] .bringer-cta-form-content,
+        [dir="rtl"] .bringer-cta-form-title,
+        [dir="rtl"] .bringer-cta-text .bringer-large-text { text-align: right; }
+        [dir="rtl"] .bringer-info-widget .bringer-socials-list { justify-content: flex-start; }
+        [dir="rtl"] .bringer-menu-widget ul { padding-right: 0; }
+        [dir="rtl"] .bringer-masked-content.at-bottom-right { right: auto; left: var(--masked-content-offset, 30px); }
+        [dir="rtl"] .bringer-icon-link { flex-direction: row-reverse; }
+        [dir="rtl"] .bringer-icon-link .bringer-icon-wrap { margin-left: 0; margin-right: 20px;}
+        [dir="rtl"] .bringer-icon-link .bringer-icon-link-content { text-align: right; }
+        [dir="rtl"] .bringer-offset-image { /* Assuming this might need adjustment */ }
+        [dir="rtl"] .stg-offset-1 { margin-right: auto; margin-left: 8.33333%;} /* Example for offset */
+        [dir="rtl"] .stg-tp-offset-3 { margin-right: auto; margin-left: 25%;}
+        [dir="rtl"] .stg-m-offset-2 { margin-right: auto; margin-left: 16.66667%;}
+        [dir="rtl"] .stg-m-offset-1 { margin-right: auto; margin-left: 8.33333%;}
+
+
+        @media (max-width: 991px) { /* Ensure mobile lang selector is positioned correctly */
+            [dir="rtl"] .bringer-mobile-header-inner .lang-selector {
+                margin-left: 0;
+                margin-right: 10px; /* Adjust as needed */
+            }
+        }
+        @media (max-width: 768px) {
+            .lang-selector { margin-left: 5px; }
+            [dir="rtl"] .lang-selector { margin-right: 5px; margin-left: 0; z-index: 1050; }
+        }
+        @media (max-width: 480px) {
+            .lang-select {
+                font-size: 12px;
+                padding: 3px 8px;
+                padding-right: 25px; /* Adjust for smaller arrow */
+                background-position: right 5px center;
+                min-width: 70px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header id="bringer-header" class="is-frosted is-sticky" data-appear="fade-down" data-unload="fade-up">
@@ -23,31 +141,45 @@
                 <nav class="bringer-nav">
                     <ul class="main-menu" data-stagger-appear="fade-down" data-stagger-delay="75">
                         <li>
-                            <a href="index.html">Home</a>
+                            <a href="index.html" data-lang-en="Home" data-lang-ar="الرئيسية">Home</a>
                         </li>
                         <li>
-                            <a href="about-us.html">About Us</a>
+                            <a href="about-us.html" data-lang-en="About Us" data-lang-ar="نبذة عنا">About Us</a>
                         </li>
                         <li>
-                            <a href="programs.html">Programs</a>
+                            <a href="programs.html" data-lang-en="Programs" data-lang-ar="البرامج">Programs</a>
                         </li>
                         <li>
-                            <a href="competitions.html">Competitions</a>
+                            <a href="competitions.html" data-lang-en="Competitions" data-lang-ar="المسابقات">Competitions</a>
                         </li>
                         <li class="current-menu-item">
-                            <a href="contacts.html">Contact</a>
+                            <a href="contacts.html" data-lang-en="Contact" data-lang-ar="اتصل بنا">Contact</a>
                         </li>
                     </ul>
                 </nav>
             </div>
             <div class="bringer-header-rp">
-                <a href="/portal" class="bringer-button">Get Involved</a>
+                <div class="auth-buttons" style="display: flex; align-items: center;">
+                    <a href="portal/" class="register-signin-btn" data-lang-en="Register/Sign-In" data-lang-ar="التسجيل/تسجيل الدخول">Register/Sign-In</a>
+                    <div class="lang-selector">
+                        <select id="lang-select" class="lang-select">
+                            <option value="en" selected>English</option>
+                            <option value="ar">العربية</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="bringer-mobile-header-inner">
             <a href="./" class="bringer-logo">
                 <img src="img/logo.png" alt="Majlisu Ahlil Qur'an" width="88" height="24">
             </a>
+            <div class="lang-selector">
+                <select id="lang-select-mobile" class="lang-select">
+                    <option value="en" selected>English</option>
+                    <option value="ar">العربية</option>
+                </select>
+            </div>
             <a href="#" class="bringer-mobile-menu-toggler">
                 <i class="bringer-menu-toggler-icon">
                     <span></span>
@@ -63,8 +195,8 @@
             <section class="backlight-bottom">
                 <div class="stg-row stg-bottom-gap-l">
                     <div class="stg-col-6 stg-offset-3 align-center">
-                        <h1 class="bringer-page-title" data-appear="fade-up" data-unload="fade-up">Contact Us</h1>
-                        <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up">Join us in our mission to spread the light of the Holy Qur'an. Connect with us today.</p>
+                        <h1 class="bringer-page-title" data-appear="fade-up" data-unload="fade-up" data-lang-en="Contact Us" data-lang-ar="اتصل بنا">Contact Us</h1>
+                        <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up" data-lang-en="Join us in our mission to spread the light of the Holy Qur'an. Connect with us today." data-lang-ar="انضم إلينا في مهمتنا لنشر نور القرآن الكريم. تواصل معنا اليوم.">Join us in our mission to spread the light of the Holy Qur'an. Connect with us today.</p>
                     </div>
                 </div>
                 <div class="bringer-parallax-media" data-parallax-speed="20" data-appear="fade-up" data-delay="200" data-unload="fade-up">
@@ -72,42 +204,40 @@
                 </div>
             </section>
 
-          
-
             <section class="backlight-top divider-bottom">
                 <div class="stg-row bringer-section-title">
                     <div class="stg-col-8 stg-offset-2">
                         <div class="align-center">
-                            <h2 data-appear="fade-up" data-unload="fade-up">Let's Connect</h2>
-                            <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up">Here's how you can reach the Majlisu Ahlil Qur'an team:</p>
+                            <h2 data-appear="fade-up" data-unload="fade-up" data-lang-en="Let's Connect" data-lang-ar="دعنا نتواصل">Let's Connect</h2>
+                            <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up" data-lang-en="Here's how you can reach the Majlisu Ahlil Qur'an team:" data-lang-ar="إليك كيفية الوصول إلى فريق مجلس أهل القرآن:">Here's how you can reach the Majlisu Ahlil Qur'an team:</p>
                         </div>
                     </div>
                 </div>
                 <div class="stg-row" data-stagger-appear="fade-up" data-delay="200" data-stagger-unload="fade-up">
                     <div class="stg-col-4 stg-tp-col-6 stg-tp-bottom-gap">
                         <div class="bringer-block stg-aspect-square stg-vertical-space-between">
-                            <a href="tel:+971555123456" class="bringer-grid-item-link"></a>
+                            <a href="tel:+2348036578353" class="bringer-grid-item-link"></a>
                             <div>
-                                <h5>Phone<span class="bringer-accent">.</span></h5>
+                                <h5 data-lang-en="Phone" data-lang-ar="الهاتف">Phone<span class="bringer-accent">.</span></h5>
                                 <h6>+234 803 657 8353</h6>
                             </div>
-                            <p>Contact our team directly for inquiries about programs, events, or partnerships.</p>
+                            <p data-lang-en="Contact our team directly for inquiries about programs, events, or partnerships." data-lang-ar="اتصل بفريقنا مباشرة للاستفسارات حول البرامج أو الفعاليات أو الشراكات.">Contact our team directly for inquiries about programs, events, or partnerships.</p>
                         </div>
                     </div>
                     <div class="stg-col-4 stg-tp-col-6 stg-tp-bottom-gap">
                         <div class="bringer-block stg-aspect-square stg-vertical-space-between">
-                            <a href="mailto:info@majlisuquran.org" class="bringer-grid-item-link"></a>
+                            <a href="mailto:majlisahlilquran@gmail.com" class="bringer-grid-item-link"></a>
                             <div>
-                                <h5>Email<span class="bringer-accent">.</span></h5>
+                                <h5 data-lang-en="Email" data-lang-ar="البريد الإلكتروني">Email<span class="bringer-accent">.</span></h5>
                                 <h6>majlisahlilquran@gmail.com</h6>
                             </div>
-                            <p>Send us your questions or feedback, and we'll respond promptly to discuss your needs.</p>
+                            <p data-lang-en="Send us your questions or feedback, and we'll respond promptly to discuss your needs." data-lang-ar="أرسل لنا أسئلتك أو ملاحظاتك، وسنرد عليك على الفور لمناقشة احتياجاتك.">Send us your questions or feedback, and we'll respond promptly to discuss your needs.</p>
                         </div>
                     </div>
                     <div class="stg-col-4 stg-tp-col-12">
                         <div class="bringer-block stg-aspect-square stg-tp-aspect-rectangle stg-vertical-space-between">
                             <div>
-                                <h5>Social Media<span class="bringer-accent">.</span></h5>
+                                <h5 data-lang-en="Social Media" data-lang-ar="وسائل التواصل الاجتماعي">Social Media<span class="bringer-accent">.</span></h5>
                                 <ul class="bringer-socials-list stg-small-gap" data-stagger-appear="fade-up" data-stagger-delay="75">
                                     <li>
                                         <a href="#" target="_blank" class="bringer-socials-facebook"><i></i></a>
@@ -120,7 +250,7 @@
                                     </li>
                                 </ul>
                             </div>
-                            <p>Follow us for updates on events, competitions, and Qur'anic initiatives.</p>
+                            <p data-lang-en="Follow us for updates on events, competitions, and Qur'anic initiatives." data-lang-ar="تابعنا للحصول على تحديثات حول الفعاليات والمسابقات والمبادرات القرآنية.">Follow us for updates on events, competitions, and Qur'anic initiatives.</p>
                         </div>
                     </div>
                 </div>
@@ -130,20 +260,20 @@
                 <div class="stg-row bringer-section-title">
                     <div class="stg-col-8 stg-offset-2">
                         <div class="align-center">
-                            <h2 data-appear="fade-up" data-unload="fade-up">Visit Our Office</h2>
-                            <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up">We welcome you to our headquarters to discuss how we can collaborate on spreading Qur'anic knowledge.</p>
+                            <h2 data-appear="fade-up" data-unload="fade-up" data-lang-en="Visit Our Office" data-lang-ar="قم بزيارة مكتبنا">Visit Our Office</h2>
+                            <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up" data-lang-en="We welcome you to our headquarters to discuss how we can collaborate on spreading Qur'anic knowledge." data-lang-ar="نرحب بكم في مقرنا لمناقشة كيف يمكننا التعاون في نشر المعرفة القرآنية.">We welcome you to our headquarters to discuss how we can collaborate on spreading Qur'anic knowledge.</p>
                         </div>
                     </div>
                 </div>
                 <div class="stg-row">
                     <div class="stg-col-4 stg-tp-col-6 stg-m-bottom-gap" data-appear="fade-right" data-delay="100" data-unload="fade-left">
                         <div class="bringer-block stg-aspect-square stg-vertical-space-between">
-                            <a href="https://maps.app.goo.gl/xyz" class="bringer-grid-item-link"></a>
+                            <a href="https://maps.app.goo.gl/xyz" class="bringer-grid-item-link" target="_blank"></a>
                             <div>
-                                <h5>Address<span class="bringer-accent">.</span></h5>
-                                <h6>34 Masallacin jumma'a Street, Jos North, Plateau State, Nigeria</h6>
+                                <h5 data-lang-en="Address" data-lang-ar="العنوان">Address<span class="bringer-accent">.</span></h5>
+                                <h6 data-lang-en="34 Masallacin jumma'a Street, Jos North, Plateau State, Nigeria" data-lang-ar="34 شارع مسجد الجمعة، جوس الشمالية، ولاية بلاتو، نيجيريا">34 Masallacin jumma'a Street, Jos North, Plateau State, Nigeria</h6>
                             </div>
-                            <p>Schedule a visit to our office to explore partnership opportunities and learn more about our mission.</p>
+                            <p data-lang-en="Schedule a visit to our office to explore partnership opportunities and learn more about our mission." data-lang-ar="حدد موعدًا لزيارة مكتبنا لاستكشاف فرص الشراكة ومعرفة المزيد عن مهمتنا.">Schedule a visit to our office to explore partnership opportunities and learn more about our mission.</p>
                         </div>
                     </div>
                     <div class="stg-col-8 stg-tp-col-6" data-appear="fade-left" data-delay="200" data-unload="fade-right">
@@ -158,13 +288,13 @@
                         <div class="bringer-offset-image" data-bg-src="img/quran-cta-bg.jpg" data-appear="fade-up" data-threshold="0.25"></div>
                         <form action="mail.php" method="post" class="bringer-contact-form bringer-block" data-fill-error="Please, fill out the contact form." data-appear="fade-right" data-threshold="0.25">
                             <div class="bringer-form-content">
-                                <label for="name">Your Name</label>
-                                <input type="text" id="name" name="name" placeholder="Your Name" required>
-                                <label for="email">Your Email</label>
-                                <input type="email" id="email" name="email" placeholder="email@example.com" required>
-                                <label for="message">Your Message</label>
-                                <textarea id="message" name="message" placeholder="Your Message" required></textarea>
-                                <button type="submit" value="Send Message">Send Message</button>
+                                <label for="name" data-lang-en="Your Name" data-lang-ar="اسمك">Your Name</label>
+                                <input type="text" id="name" name="name" placeholder="Your Name" data-lang-en-placeholder="Your Name" data-lang-ar-placeholder="اسمك" required>
+                                <label for="email" data-lang-en="Your Email" data-lang-ar="بريدك الإلكتروني">Your Email</label>
+                                <input type="email" id="email" name="email" placeholder="email@example.com" data-lang-en-placeholder="email@example.com" data-lang-ar-placeholder="email@example.com" required>
+                                <label for="message" data-lang-en="Your Message" data-lang-ar="رسالتك">Your Message</label>
+                                <textarea id="message" name="message" placeholder="Your Message" data-lang-en-placeholder="Your Message" data-lang-ar-placeholder="رسالتك" required></textarea>
+                                <button type="submit" value="Send Message" data-lang-en="Send Message" data-lang-ar="إرسال الرسالة">Send Message</button>
                                 <div class="bringer-contact-form__response"></div>
                             </div>
                             <span class="bringer-form-spinner"></span>
@@ -172,7 +302,7 @@
                     </div>
                     <div class="stg-col-6 stg-offset-1" data-unload="fade-right">
                         <div class="bringer-cta-form-content">
-                            <div class="bringer-cta-form-title" data-split-appear="fade-up" data-split-delay="100" data-split-by="line">
+                            <div class="bringer-cta-form-title" data-split-appear="fade-up" data-split-delay="100" data-split-by="line" data-lang-en="Join our mission to spread Qur'anic knowledge." data-lang-ar="انضم إلى مهمتنا لنشر المعرفة القرآنية.">
                                 Join our mission to spread Qur'anic knowledge.
                             </div>
                             <div class="bringer-cta-text">
@@ -181,22 +311,22 @@
                                         <i class="bringer-cta-icon"></i>
                                     </div>
                                     <div class="stg-col-8 stg-tp-col-7 stg-m-col-8 stg-m-offset-1" data-appear="fade-left">
-                                        <p class="bringer-large-text">We welcome volunteers, partners, and supporters to help us promote Qur'anic excellence worldwide.</p>
+                                        <p class="bringer-large-text" data-lang-en="We welcome volunteers, partners, and supporters to help us promote Qur'anic excellence worldwide." data-lang-ar="نرحب بالمتطوعين والشركاء والداعمين لمساعدتنا في تعزيز التميز القرآني في جميع أنحاء العالم.">We welcome volunteers, partners, and supporters to help us promote Qur'anic excellence worldwide.</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="bringer-cta-counters bringer-grid-3cols bringer-m-grid-3cols" data-stagger-appear="fade-up" data-stagger-delay="100">
                                 <div class="bringer-counter bringer-small-counter" data-delay="3000">
                                     <div class="bringer-counter-number">10</div>
-                                    <div class="bringer-counter-label">Competitions Hosted</div>
+                                    <div class="bringer-counter-label" data-lang-en="Competitions Hosted" data-lang-ar="المسابقات المستضافة">Competitions Hosted</div>
                                 </div>
                                 <div class="bringer-counter bringer-small-counter" data-delay="3000">
                                     <div class="bringer-counter-number" data-suffix="+">500</div>
-                                    <div class="bringer-counter-label">Memorizers Awarded</div>
+                                    <div class="bringer-counter-label" data-lang-en="Memorizers Awarded" data-lang-ar="الحفظة المكرمون">Memorizers Awarded</div>
                                 </div>
                                 <div class="bringer-counter bringer-small-counter" data-delay="3000">
                                     <div class="bringer-counter-number" data-suffix="+">15</div>
-                                    <div class="bringer-counter-label">Years of Service</div>
+                                    <div class="bringer-counter-label" data-lang-en="Years of Service" data-lang-ar="سنوات الخدمة">Years of Service</div>
                                 </div>
                             </div>
                         </div>
@@ -214,8 +344,8 @@
                                 <a href="./" class="bringer-logo footer-logo">
                                     <img src="img/logo.png" alt="Majlisu Ahlil Qur'an" width="88" height="24">
                                 </a>
-                                <div class="bringer-info-description">Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally.</div>
-                                <span class="bringer-label">Follow us:</span>
+                                <div class="bringer-info-description" data-lang-en="Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally." data-lang-ar="مبادرة مجلس أهل القرآن مكرسة لتعزيز حب وفهم القرآن الكريم عالميًا.">Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally.</div>
+                                <span class="bringer-label" data-lang-en="Follow us:" data-lang-ar="تابعنا:">Follow us:</span>
                                 <ul class="bringer-socials-list" data-stagger-appear="fade-up" data-stagger-delay="75">
                                     <li>
                                         <a href="#" target="_blank" class="bringer-socials-facebook"><i></i></a>
@@ -231,39 +361,39 @@
                         </div>
                         <div class="stg-col-2 stg-offset-1 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>Programs</h6>
+                                <h6 data-lang-en="Programs" data-lang-ar="البرامج">Programs</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="program-details.html">Qur'an Competition</a></li>
-                                        <li><a href="program-details.html">Qur'anic Camps</a></li>
-                                        <li><a href="program-details.html">Women Empowerment</a></li>
-                                        <li><a href="program-details.html">Digital Platforms</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Qur'an Competition" data-lang-ar="مسابقة القرآن">Qur'an Competition</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Qur'anic Camps" data-lang-ar="المعسكرات القرآنية">Qur'anic Camps</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Women Empowerment" data-lang-ar="تمكين المرأة">Women Empowerment</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Digital Platforms" data-lang-ar="المنصات الرقمية">Digital Platforms</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="stg-col-2 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>About Us</h6>
+                                <h6 data-lang-en="About Us" data-lang-ar="نبذة عنا">About Us</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="about-us.html">Our Mission</a></li>
-                                        <li><a href="team.html">Our Team</a></li>
-                                        <li><a href="partners.html">Partners</a></li>
-                                        <li><a href="contacts.html">Contact Us</a></li>
+                                        <li><a href="about-us.html" data-lang-en="Our Mission" data-lang-ar="مهمتنا">Our Mission</a></li>
+                                        <li><a href="team.html" data-lang-en="Our Team" data-lang-ar="فريقنا">Our Team</a></li>
+                                        <li><a href="partners.html" data-lang-en="Partners" data-lang-ar="الشركاء">Partners</a></li>
+                                        <li><a href="contacts.html" data-lang-en="Contact Us" data-lang-ar="اتصل بنا">Contact Us</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="stg-col-2 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>Resources</h6>
+                                <h6 data-lang-en="Resources" data-lang-ar="الموارد">Resources</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="faq.html">FAQ</a></li>
-                                        <li><a href="events.html">Events</a></li>
-                                        <li><a href="terms.html">Terms of Use</a></li>
-                                        <li><a href="privacy.html">Privacy Policy</a></li>
+                                        <li><a href="faq.html" data-lang-en="FAQ" data-lang-ar="الأسئلة الشائعة">FAQ</a></li>
+                                        <li><a href="events.html" data-lang-en="Events" data-lang-ar="الفعاليات">Events</a></li>
+                                        <li><a href="terms.html" data-lang-en="Terms of Use" data-lang-ar="شروط الاستخدام">Terms of Use</a></li>
+                                        <li><a href="privacy.html" data-lang-en="Privacy Policy" data-lang-ar="سياسة الخصوصية">Privacy Policy</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -272,7 +402,7 @@
                 </div>
             </div>
             <div class="bringer-footer-line stg-container">
-                <div class="align-center">
+                <div class="align-center" data-lang-en="Copyright © 2025. All Rights Reserved." data-lang-ar="حقوق النشر © 2025. جميع الحقوق محفوظة.">
                     Copyright © 2025. All Rights Reserved.
                 </div>
             </div>
@@ -282,7 +412,7 @@
     <div class="bringer-rcp-wrap">
         <div class="bringer-rcp-overlay"></div>
         <div class="bringer-rcp-container">
-            <h2>The context menu is not allowed on this page.</h2>
+            <h2 data-lang-en="The context menu is not allowed on this page." data-lang-ar="قائمة السياق غير مسموح بها في هذه الصفحة.">The context menu is not allowed on this page.</h2>
         </div>
     </div>
 
@@ -294,5 +424,85 @@
     <script src="js/st-core.js"></script>
     <script src="js/classes.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const langSelectDesktop = document.getElementById('lang-select');
+            const langSelectMobile = document.getElementById('lang-select-mobile');
+            const htmlTag = document.documentElement;
+            const bodyTag = document.body;
+
+            function updateTextDirection(lang) {
+                if (lang === 'ar') {
+                    htmlTag.setAttribute('dir', 'rtl');
+                    htmlTag.setAttribute('lang', 'ar');
+                    bodyTag.classList.add('arabic-lang');
+                } else {
+                    htmlTag.setAttribute('dir', 'ltr');
+                    htmlTag.setAttribute('lang', 'en');
+                    bodyTag.classList.remove('arabic-lang');
+                }
+            }
+
+            function updateContent(lang) {
+                document.querySelectorAll('[data-lang-en], [data-lang-ar]').forEach(el => {
+                    const text = el.getAttribute(lang === 'ar' ? 'data-lang-ar' : 'data-lang-en');
+                    if (text) {
+                        if (el.tagName === 'TITLE') {
+                            document.title = text;
+                        } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                            const placeholderAttr = lang === 'ar' ? 'data-lang-ar-placeholder' : 'data-lang-en-placeholder';
+                            const placeholderText = el.getAttribute(placeholderAttr) || text; // Fallback to main text if specific placeholder not set
+                            if (el.placeholder !== undefined) el.placeholder = placeholderText;
+                            // Avoid overwriting user input for value, only set if it's a button or similar non-input field
+                            if (el.type === 'submit' || el.type === 'button') {
+                                el.value = text;
+                            }
+                        } else {
+                             // For elements like h6 that might contain <br>, use innerHTML
+                            if (el.innerHTML.includes('<br>') || el.tagName.toLowerCase() === 'h6' || el.tagName.toLowerCase() === 'h5') {
+                                el.innerHTML = text;
+                            } else {
+                                el.textContent = text;
+                            }
+                        }
+                    }
+                });
+            }
+
+            function setLanguage(lang, storePreference = true) {
+                if (langSelectDesktop.value !== lang) langSelectDesktop.value = lang;
+                if (langSelectMobile.value !== lang) langSelectMobile.value = lang;
+                
+                if (storePreference) {
+                    try {
+                        localStorage.setItem('selectedLanguage', lang);
+                    } catch (e) {
+                        console.error("Could not save language preference to localStorage:", e);
+                    }
+                }
+                updateTextDirection(lang);
+                updateContent(lang);
+            }
+
+            langSelectDesktop.addEventListener('change', function() {
+                setLanguage(this.value);
+            });
+
+            langSelectMobile.addEventListener('change', function() {
+                setLanguage(this.value);
+            });
+
+            let preferredLang = 'en'; 
+            try {
+                const savedLang = localStorage.getItem('selectedLanguage');
+                if (savedLang) {
+                    preferredLang = savedLang;
+                }
+            } catch (e) {
+                console.error("Could not read language preference from localStorage:", e);
+            }
+            setLanguage(preferredLang, false); // Initialize without re-storing
+        });
+    </script>
 </body>
 </html>
