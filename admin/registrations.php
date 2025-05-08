@@ -62,7 +62,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>User Management | JCDA Admin Portal</title>
+    <title>Registration Management | Admin Portal</title>
     <?php include 'layouts/title-meta.php'; ?>
     <?php include 'layouts/head-css.php'; ?>
 </head>
@@ -89,10 +89,10 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
                                         <li class="breadcrumb-item"><a href="dashboard.php">Dashboard</a></li>
-                                        <li class="breadcrumb-item active">User Management</li>
+                                        <li class="breadcrumb-item active">Registration Management</li>
                                     </ol>
                                 </div>
-                                <h4 class="page-title">User Management</h4>
+                                <h4 class="page-title">Registration Management</h4>
                             </div>
                         </div>
                     </div>
@@ -127,14 +127,14 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <input type="text" name="search" class="form-control me-2" 
                                                        placeholder="Search by username or email" 
                                                        value="<?php echo htmlspecialchars($search); ?>">
-                                                 <button type="submit" style="width: 30%;" class="btn btn-primary">
+                                                <button type="submit" style="width: 30%;" class="btn btn-primary">
                                                     <i class="ri-search-line"></i> Search
                                                 </button>
                                             </form>
                                         </div>
                                         <div class="col-md-6 text-md-end mt-3 mt-md-0">
                                             <a href="reports.php?export=users" class="btn btn-info">
-                                                <i class="ri-file-download-line"></i> Export Users
+                                                <i class="ri-file-download-line"></i> Export
                                             </a>
                                         </div>
                                     </div>
@@ -148,7 +148,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="header-title">User List</h4>
+                                    <h4 class="header-title">Registration List</h4>
                                     <p class="text-muted mb-0">
                                         Showing <?php echo min($total_users, $per_page); ?> of <?php echo $total_users; ?> users
                                     </p>
@@ -158,7 +158,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <table class="table table-centered table-striped table-hover dt-responsive nowrap w-100">
                                             <thead>
                                                 <tr>
-                                                    <th>S/N</th>
+                                                    <th>ID</th>
                                                     <th>Full Name</th>
                                                     <th>Email</th>
                                                     <th>Date Registered</th>
@@ -169,13 +169,13 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <tbody>
                                                 <?php foreach ($users as $user): ?>
                                                 <tr>
-                                                    <td><?php echo ($offset + array_search($user, $users) + 1); ?></td>
+                                                    <td><?php echo htmlspecialchars($user['id']); ?></td>
                                                     <td><?php echo htmlspecialchars($user['fullname']); ?></td>
                                                     <td><?php echo htmlspecialchars($user['email']); ?></td>
                                                     <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
                                                     <td>
                                                         <?php if(strtolower($user['status']) == 'active'): ?>
-                                                            <span class="badge bg-success">Verified</span>
+                                                            <span class="badge bg-success">Active</span>
                                                         <?php elseif(strtolower($user['status']) == 'pending'): ?>
                                                             <span class="badge bg-warning">Pending</span>
                                                         <?php elseif(strtolower($user['status']) == 'suspended'): ?>

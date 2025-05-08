@@ -1,5 +1,4 @@
 <?php
-// filepath: /Applications/XAMPP/xamppfiles/htdocs/musabaqa/sign-in.php
 require_once 'includes/auth.php';
 
 // Enable error reporting for debugging (disable in production)
@@ -186,6 +185,15 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
         .lang-toggle:hover {
             color: #3b82f6;
         }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
     </style>
 </head>
 <body class="antialiased flex h-full text-base text-gray-700">
@@ -244,6 +252,11 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="card-body flex flex-col gap-5 p-10" id="sign_in_form" method="post" novalidate>
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
             <input type="hidden" name="language" id="language-input" value="<?php echo htmlspecialchars($_SESSION['language'] ?? 'en'); ?>">
+
+            <!-- Logo -->
+            <div class="logo-container">
+                <img src="assets/images/logo.png" alt="Majlisu Ahlil Qur'an Logo" class="logo">
+            </div>
 
             <div class="text-center mb-2.5">
                 <h3 class="text-lg font-medium text-gray-900 leading-none mb-2.5">

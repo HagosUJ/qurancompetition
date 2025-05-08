@@ -1,15 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Majlisu Ahlil Qur'an | About Us</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title data-lang-en="Majlisu Ahlil Qur'an | About Us" data-lang-ar="مجلس أهل القرآن | نبذة عنا">Majlisu Ahlil Qur'an | About Us</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="css/config.css">
     <link type="text/css" rel="stylesheet" href="css/libs.css">
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/responsive.css">
     <link rel="icon" href="img/favicon.png" sizes="32x32">
+    <style>
+        .register-signin-btn {
+            background-color: #2e6b5e;
+            color: #fff8dc; /* Whitish gold */
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .register-signin-btn:hover {
+            background-color: #B19246;
+            transform: scale(1.05);
+        }
+        .lang-selector {
+            display: inline-block;
+            position: relative;
+            z-index: 1000;
+            margin-left: 10px;
+        }
+        .lang-select {
+            background: none;
+            color: #4a5e57;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%234a5e57" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 30px;
+            min-width: 80px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 1;
+        }
+        .lang-select:focus {
+            outline: none;
+            border-color: #2e6b5e;
+        }
+        .lang-select option {
+            font-family: 'Inter', sans-serif;
+            color: #000000;
+            background-color: #ffffff;
+        }
+        .lang-select option[value="ar"] {
+            font-family: 'Amiri', serif;
+            font-size: 16px;
+        }
+        body.arabic-lang, .arabic {
+            font-family: 'Amiri', serif !important;
+        }
+        [dir="rtl"] .bringer-header-inner,
+        [dir="rtl"] .bringer-nav ul,
+        [dir="rtl"] .bringer-mobile-header-inner,
+        [dir="rtl"] .stg-row,
+        [dir="rtl"] .bringer-lwp-roster .bringer-lwp-item,
+        [dir="rtl"] .bringer-footer-widgets .stg-row,
+        [dir="rtl"] .bringer-socials-list {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .bringer-header-lp { margin-left: auto; margin-right: 0; }
+        [dir="rtl"] .bringer-header-rp { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .bringer-mobile-header-inner .bringer-logo { margin-left: auto; margin-right: 0; }
+        [dir="rtl"] .bringer-mobile-header-inner .lang-selector { margin-left: 0; margin-right: 15px; }
+        [dir="rtl"] .bringer-mobile-menu-toggler { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .align-right { text-align: left; }
+        [dir="rtl"] .align-left { text-align: right; }
+        [dir="rtl"] .bringer-lwp-item-content,
+        [dir="rtl"] .bringer-info-widget,
+        [dir="rtl"] .bringer-menu-widget ul { text-align: right; }
+        [dir="rtl"] .bringer-info-widget .bringer-socials-list { justify-content: flex-start; }
+        [dir="rtl"] .bringer-menu-widget ul { padding-right: 0; }
+        [dir="rtl"] .bringer-masked-content.at-bottom-right { right: auto; left: var(--masked-content-offset, 30px); }
+        [dir="rtl"] .bringer-icon-link { flex-direction: row-reverse; }
+        [dir="rtl"] .bringer-icon-link .bringer-icon-wrap { margin-left: 0; margin-right: 20px;}
+        [dir="rtl"] .bringer-icon-link .bringer-icon-link-content { text-align: right; }
+
+
+        @media (max-width: 768px) {
+            .lang-selector { margin-left: 5px; }
+            [dir="rtl"] .lang-selector { margin-right: 5px; margin-left: 0; z-index: 1050; }
+        }
+        @media (max-width: 480px) {
+            .lang-select {
+                font-size: 12px;
+                padding: 3px 8px;
+                padding-right: 25px; /* Adjust for smaller arrow */
+                background-position: right 5px center;
+                min-width: 70px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header id="bringer-header" class="is-frosted is-sticky" data-appear="fade-down" data-unload="fade-up">
@@ -23,31 +124,45 @@
                 <nav class="bringer-nav">
                     <ul class="main-menu" data-stagger-appear="fade-down" data-stagger-delay="75">
                         <li>
-                            <a href="index.html">Home</a>
+                            <a href="index.html" data-lang-en="Home" data-lang-ar="الرئيسية">Home</a>
                         </li>
                         <li class="current-menu-item">
-                            <a href="about-us.html">About Us</a>
+                            <a href="about-us.html" data-lang-en="About Us" data-lang-ar="نبذة عنا">About Us</a>
                         </li>
                         <li>
-                            <a href="programs.html">Programs</a>
+                            <a href="programs.html" data-lang-en="Programs" data-lang-ar="البرامج">Programs</a>
                         </li>
                         <li>
-                            <a href="competitions.html">Competitions</a>
+                            <a href="competitions.html" data-lang-en="Competitions" data-lang-ar="المسابقات">Competitions</a>
                         </li>
                         <li>
-                            <a href="contacts.html">Contact</a>
+                            <a href="contacts.html" data-lang-en="Contact" data-lang-ar="اتصل بنا">Contact</a>
                         </li>
                     </ul>
                 </nav>
             </div>
             <div class="bringer-header-rp">
-                <a href="/portal" class="bringer-button">Get Involved</a>
+                <div class="auth-buttons" style="display: flex; align-items: center;">
+                    <a href="portal/" class="register-signin-btn" data-lang-en="Register/Sign-In" data-lang-ar="التسجيل/تسجيل الدخول">Register/Sign-In</a>
+                    <div class="lang-selector">
+                        <select id="lang-select" class="lang-select">
+                            <option value="en" selected>English</option>
+                            <option value="ar">العربية</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="bringer-mobile-header-inner">
             <a href="./" class="bringer-logo">
                 <img src="img/logo.png" alt="Majlisu Ahlil Qur'an" width="88" height="24">
             </a>
+            <div class="lang-selector">
+                <select id="lang-select-mobile" class="lang-select">
+                    <option value="en" selected>English</option>
+                    <option value="ar">العربية</option>
+                </select>
+            </div>
             <a href="#" class="bringer-mobile-menu-toggler">
                 <i class="bringer-menu-toggler-icon">
                     <span></span>
@@ -63,8 +178,8 @@
             <section class="backlight-bottom">
                 <div class="stg-row">
                     <div class="stg-col-6 stg-offset-3 align-center stg-tp-col-10 stg-tp-offset-1">
-                        <h1 class="bringer-page-title" data-appear="fade-up" data-unload="fade-up">About Majlisu Ahlil Qur'an</h1>
-                        <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100">A faith-based initiative dedicated to fostering the love, memorization, and understanding of the Holy Qur'an.</p>
+                        <h1 class="bringer-page-title" data-appear="fade-up" data-unload="fade-up" data-lang-en="About Majlisu Ahlil Qur'an" data-lang-ar="عن مجلس أهل القرآن">About Majlisu Ahlil Qur'an</h1>
+                        <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100" data-lang-en="A faith-based initiative dedicated to fostering the love, memorization, and understanding of the Holy Qur'an." data-lang-ar="مبادرة إيمانية مكرسة لتعزيز حب القرآن الكريم وحفظه وفهمه.">A faith-based initiative dedicated to fostering the love, memorization, and understanding of the Holy Qur'an.</p>
                     </div>
                 </div>
             </section>
@@ -75,16 +190,16 @@
                 </div>
                 <div class="stg-row stg-large-gap stg-tp-normal-gap">
                     <div class="stg-col-6 stg-vertical-space-between stg-tp-bottom-gap-l" data-unload="fade-left">
-                        <h2 data-split-appear="fade-up">Empowering generations through the Qur'an.</h2>
+                        <h2 data-split-appear="fade-up" data-lang-en="Empowering generations through the Qur'an." data-lang-ar="تمكين الأجيال من خلال القرآن.">Empowering generations through the Qur'an.</h2>
                         <div class="align-right" data-appear="fade-right">
                             <a href="programs.html" class="bringer-icon-link">
                                 <div class="bringer-icon-link-content">
-                                    <h6>
+                                    <h6 data-lang-en="Discover our<br>Programs" data-lang-ar="اكتشف<br>برامجنا">
                                         Discover our
                                         <br>
                                         Programs
                                     </h6>
-                                    <span class="bringer-label">Explore our work</span>
+                                    <span class="bringer-label" data-lang-en="Explore our work" data-lang-ar="استكشف عملنا">Explore our work</span>
                                 </div>
                                 <div class="bringer-icon-wrap">
                                     <i class="bringer-icon bringer-icon-explore"></i>
@@ -93,10 +208,10 @@
                         </div>
                     </div>
                     <div class="stg-col-6" data-appear="fade-left" data-unload="fade-right" data-delay="100">
-                        <p class="bringer-large-text">Majlisu Ahlil Qur'an Initiative is committed to preserving the Qur'anic tradition globally.</p>
-                        <p>We are a non-profit organization rooted in Islamic principles, striving to promote Qur'anic literacy, memorization, and understanding across communities. Our mission is to empower individuals by connecting them with the light and guidance of the Holy Qur'an through innovative programs and global engagement.</p>
-                        <p>By organizing competitions, camps, and digital platforms, we aim to mentor Qur'anic scholars, recognize excellence, and build a global network of Qur'an lovers. Our work bridges traditional Islamic knowledge with modern technology to make Qur'anic learning accessible to all.</p>
-                        <p>With sincerity, excellence, and service at our core, we serve the Ummah with humility, fostering unity and spreading beneficial knowledge.</p>
+                        <p class="bringer-large-text" data-lang-en="Majlisu Ahlil Qur'an Initiative is committed to preserving the Qur'anic tradition globally." data-lang-ar="مبادرة مجلس أهل القرآن ملتزمة بالحفاظ على التقليد القرآني عالميًا.">Majlisu Ahlil Qur'an Initiative is committed to preserving the Qur'anic tradition globally.</p>
+                        <p data-lang-en="We are a non-profit organization rooted in Islamic principles, striving to promote Qur'anic literacy, memorization, and understanding across communities. Our mission is to empower individuals by connecting them with the light and guidance of the Holy Qur'an through innovative programs and global engagement." data-lang-ar="نحن منظمة غير ربحية متجذرة في المبادئ الإسلامية، نسعى جاهدين لتعزيز محو الأمية القرآنية والحفظ والفهم عبر المجتمعات. مهمتنا هي تمكين الأفراد من خلال ربطهم بنور وهداية القرآن الكريم من خلال برامج مبتكرة ومشاركة عالمية.">We are a non-profit organization rooted in Islamic principles, striving to promote Qur'anic literacy, memorization, and understanding across communities. Our mission is to empower individuals by connecting them with the light and guidance of the Holy Qur'an through innovative programs and global engagement.</p>
+                        <p data-lang-en="By organizing competitions, camps, and digital platforms, we aim to mentor Qur'anic scholars, recognize excellence, and build a global network of Qur'an lovers. Our work bridges traditional Islamic knowledge with modern technology to make Qur'anic learning accessible to all." data-lang-ar="من خلال تنظيم المسابقات والمعسكرات والمنصات الرقمية، نهدف إلى توجيه علماء القرآن، والاعتراف بالتميز، وبناء شبكة عالمية من محبي القرآن. يربط عملنا بين المعرفة الإسلامية التقليدية والتكنولوجيا الحديثة لجعل تعلم القرآن متاحًا للجميع.">By organizing competitions, camps, and digital platforms, we aim to mentor Qur'anic scholars, recognize excellence, and build a global network of Qur'an lovers. Our work bridges traditional Islamic knowledge with modern technology to make Qur'anic learning accessible to all.</p>
+                        <p data-lang-en="With sincerity, excellence, and service at our core, we serve the Ummah with humility, fostering unity and spreading beneficial knowledge." data-lang-ar="مع الإخلاص والتميز والخدمة في جوهرنا، نخدم الأمة بتواضع، ونعزز الوحدة وننشر المعرفة النافعة.">With sincerity, excellence, and service at our core, we serve the Ummah with humility, fostering unity and spreading beneficial knowledge.</p>
                     </div>
                 </div>
             </section>
@@ -105,8 +220,8 @@
                 <div class="stg-row bringer-section-title">
                     <div class="stg-col-8 stg-offset-2 stg-tp-col-10 stg-tp-offset-1">
                         <div class="align-center">
-                            <h2 data-appear="fade-up" data-unload="fade-up">Our Leadership</h2>
-                            <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100">Meet the dedicated team guiding our mission to promote Qur'anic excellence.</p>
+                            <h2 data-appear="fade-up" data-unload="fade-up" data-lang-en="Our Leadership" data-lang-ar="قيادتنا">Our Leadership</h2>
+                            <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100" data-lang-en="Meet the dedicated team guiding our mission to promote Qur'anic excellence." data-lang-ar="تعرف على الفريق المتفاني الذي يوجه مهمتنا لتعزيز التميز القرآني.">Meet the dedicated team guiding our mission to promote Qur'anic excellence.</p>
                         </div>
                     </div>
                 </div>
@@ -118,8 +233,8 @@
                             </div>
                             <div class="bringer-carousel-card-footer">
                                 <div class="bringer-carousel-card-title">
-                                    <span class="bringer-meta">Chairman</span>
-                                    <h6>Gwani Muhammad Alkali</h6>
+                                    <span class="bringer-meta" data-lang-en="Chairman" data-lang-ar="الرئيس">Chairman</span>
+                                    <h6 data-lang-en="Gwani Muhammad Alkali" data-lang-ar="غواني محمد القلي">Gwani Muhammad Alkali</h6>
                                 </div>
                                 <span class="bringer-icon bringer-icon-explore"></span>
                             </div>
@@ -131,8 +246,8 @@
                             </div>
                             <div class="bringer-carousel-card-footer">
                                 <div class="bringer-carousel-card-title">
-                                    <span class="bringer-meta">Vice Chairman</span>
-                                    <h6></h6>
+                                    <span class="bringer-meta" data-lang-en="Vice Chairman" data-lang-ar="نائب الرئيس">Vice Chairman</span>
+                                    <h6 data-lang-en="Fatima Ibrahim" data-lang-ar="فاطمة ابراهيم">(Placeholder Name)</h6>
                                 </div>
                                 <span class="bringer-icon bringer-icon-explore"></span>
                             </div>
@@ -144,8 +259,8 @@
                             </div>
                             <div class="bringer-carousel-card-footer">
                                 <div class="bringer-carousel-card-title">
-                                    <span class="bringer-meta">General Secretary</span>
-                                    <h6></h6>
+                                    <span class="bringer-meta" data-lang-en="General Secretary" data-lang-ar="الأمين العام">General Secretary</span>
+                                    <h6 data-lang-en="Khalid Omar" data-lang-ar="خالد عمر">(Placeholder Name)</h6>
                                 </div>
                                 <span class="bringer-icon bringer-icon-explore"></span>
                             </div>
@@ -153,12 +268,12 @@
                         </div>
                         <div class="bringer-block bringer-carousel-card swiper-slide">
                             <div class="bringer-carousel-card-image">
-                                <img class="bringer-lazy" src="img/8.png" data-src="img/8.png" alt="Fatima Ibrahim" width="600" height="900">
+                                <img class="bringer-lazy" src="img/8.png" data-src="img/8.png" alt="Aisha Bello" width="600" height="900">
                             </div>
                             <div class="bringer-carousel-card-footer">
                                 <div class="bringer-carousel-card-title">
-                                    <span class="bringer-meta">Co-ordinator</span>
-                                    <h6></h6>
+                                    <span class="bringer-meta" data-lang-en="Co-ordinator" data-lang-ar="المنسق">Co-ordinator</span>
+                                    <h6 data-lang-en="Aisha Bello" data-lang-ar="عائشة بيلو">(Placeholder Name)</h6>
                                 </div>
                                 <span class="bringer-icon bringer-icon-explore"></span>
                             </div>
@@ -178,21 +293,21 @@
                     </div>
                     <div class="stg-col-6 stg-vertical-space-between" data-appear="fade-left" data-unload="fade-right">
                         <div>
-                            <h2>From Vision to Global Impact</h2>
-                            <p class="bringer-large-text">Majlisu Ahlil Qur'an began with a simple vision: to make the Qur'an a living part of every heart.</p>
-                            <p>Founded by a group of dedicated scholars and community leaders, our initiative grew from local Qur'anic circles to an international platform. Today, we host global competitions, develop digital learning tools, and empower communities worldwide, all while staying true to our core values of sincerity, excellence, and service.</p>
+                            <h2 data-lang-en="From Vision to Global Impact" data-lang-ar="من الرؤية إلى التأثير العالمي">From Vision to Global Impact</h2>
+                            <p class="bringer-large-text" data-lang-en="Majlisu Ahlil Qur'an began with a simple vision: to make the Qur'an a living part of every heart." data-lang-ar="بدأ مجلس أهل القرآن برؤية بسيطة: جعل القرآن جزءًا حيًا من كل قلب.">Majlisu Ahlil Qur'an began with a simple vision: to make the Qur'an a living part of every heart.</p>
+                            <p data-lang-en="Founded by a group of dedicated scholars and community leaders, our initiative grew from local Qur'anic circles to an international platform. Today, we host global competitions, develop digital learning tools, and empower communities worldwide, all while staying true to our core values of sincerity, excellence, and service." data-lang-ar="تأسست مبادرتنا على يد مجموعة من العلماء المتفانين وقادة المجتمع، ونمت من حلقات قرآنية محلية إلى منصة دولية. اليوم، نستضيف مسابقات عالمية، ونطور أدوات تعلم رقمية، ونمكّن المجتمعات في جميع أنحاء العالم، كل ذلك مع الحفاظ على قيمنا الأساسية المتمثلة في الإخلاص والتميز والخدمة.">Founded by a group of dedicated scholars and community leaders, our initiative grew from local Qur'anic circles to an international platform. Today, we host global competitions, develop digital learning tools, and empower communities worldwide, all while staying true to our core values of sincerity, excellence, and service.</p>
                         </div>
                         <a href="contacts.html" class="bringer-icon-link">
                             <div class="bringer-icon-wrap">
                                 <i class="bringer-icon bringer-icon-explore"></i>
                             </div>
                             <div class="bringer-icon-link-content">
-                                <h6>
+                                <h6 data-lang-en="Join Our<br>Mission" data-lang-ar="انضم إلى<br>مهمتنا">
                                     Join Our
                                     <br>
                                     Mission
                                 </h6>
-                                <span class="bringer-label">Get involved</span>
+                                <span class="bringer-label" data-lang-en="Get involved" data-lang-ar="شارك معنا">Get involved</span>
                             </div>
                         </a>
                     </div>
@@ -202,21 +317,21 @@
             <section class="backlight-bottom divider-top">
                 <div class="stg-row stg-large-gap stg-bottom-gap-l">
                     <div class="stg-col-6 stg-tp-col-8 stg-tp-bottom-gap-l" data-unload="fade-left">
-                        <h2 data-split-appear="fade-up">Our Key Initiatives</h2>
+                        <h2 data-split-appear="fade-up" data-lang-en="Our Key Initiatives" data-lang-ar="مبادراتنا الرئيسية">Our Key Initiatives</h2>
                     </div>
                     <div class="stg-col-6 stg-tp-col-9 stg-tp-offset-3" data-unload="fade-right">
-                        <p class="bringer-large-text" data-split-appear="fade-up" data-delay="100">We offer a range of programs to promote Qur'anic engagement and excellence.</p>
-                        <p data-appear="fade-up" data-delay="200">Our initiatives are designed to inspire and empower learners of all ages. From international competitions to digital platforms, we provide opportunities for individuals to connect with the Qur'an in meaningful ways. Our key programs include:</p>
+                        <p class="bringer-large-text" data-split-appear="fade-up" data-delay="100" data-lang-en="We offer a range of programs to promote Qur'anic engagement and excellence." data-lang-ar="نقدم مجموعة من البرامج لتعزيز المشاركة والتميز القرآني.">We offer a range of programs to promote Qur'anic engagement and excellence.</p>
+                        <p data-appear="fade-up" data-delay="200" data-lang-en="Our initiatives are designed to inspire and empower learners of all ages. From international competitions to digital platforms, we provide opportunities for individuals to connect with the Qur'an in meaningful ways. Our key programs include:" data-lang-ar="تم تصميم مبادراتنا لإلهام وتمكين المتعلمين من جميع الأعمار. من المسابقات الدولية إلى المنصات الرقمية، نوفر فرصًا للأفراد للتواصل مع القرآن بطرق هادفة. تشمل برامجنا الرئيسية:">Our initiatives are designed to inspire and empower learners of all ages. From international competitions to digital platforms, we provide opportunities for individuals to connect with the Qur'an in meaningful ways. Our key programs include:</p>
                     </div>
                 </div>
                 <div class="bringer-detailed-list-wrap" data-appear="fade-up" data-unload="fade-up">
                     <ul class="bringer-detailed-list">
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Qur'an Competition<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Qur'an Competition" data-lang-ar="مسابقة القرآن">Qur'an Competition<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Our annual International Qur'an Competition showcases excellence in Tajweed, Hifz, and Tafsir, bringing together young memorizers and reciters from around the world.</p>
+                                <p data-lang-en="Our annual International Qur'an Competition showcases excellence in Tajweed, Hifz, and Tafsir, bringing together young memorizers and reciters from around the world." data-lang-ar="تعرض مسابقتنا القرآنية الدولية السنوية التميز في التجويد والحفظ والتفسير، وتجمع بين الحفظة والقراء الشباب من جميع أنحاء العالم.">Our annual International Qur'an Competition showcases excellence in Tajweed, Hifz, and Tafsir, bringing together young memorizers and reciters from around the world.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -225,10 +340,10 @@
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Qur'anic Camps<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Qur'anic Camps" data-lang-ar="المعسكرات القرآنية">Qur'anic Camps<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>We organize camps and retreats to spiritually uplift participants through intensive Qur'anic learning and reflection, fostering a deeper connection with the Qur'an.</p>
+                                <p data-lang-en="We organize camps and retreats to spiritually uplift participants through intensive Qur'anic learning and reflection, fostering a deeper connection with the Qur'an." data-lang-ar="ننظم معسكرات وخلوات لرفع مستوى المشاركين روحيًا من خلال التعلم القرآني المكثف والتأمل، مما يعزز ارتباطًا أعمق بالقرآن.">We organize camps and retreats to spiritually uplift participants through intensive Qur'anic learning and reflection, fostering a deeper connection with the Qur'an.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -237,10 +352,10 @@
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Women & Children Programs<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Women & Children Programs" data-lang-ar="برامج النساء والأطفال">Women & Children Programs<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Special initiatives focus on empowering female memorizers and young learners, providing tailored support to nurture their Qur'anic journey.</p>
+                                <p data-lang-en="Special initiatives focus on empowering female memorizers and young learners, providing tailored support to nurture their Qur'anic journey." data-lang-ar="تركز المبادرات الخاصة على تمكين الحافظات والمتعلمين الصغار، وتوفير دعم مخصص لرعاية رحلتهم القرآنية.">Special initiatives focus on empowering female memorizers and young learners, providing tailored support to nurture their Qur'anic journey.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -249,10 +364,10 @@
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Digital Platforms<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Digital Platforms" data-lang-ar="المنصات الرقمية">Digital Platforms<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>We develop apps and websites to make Qur'anic resources accessible, enabling learners worldwide to engage with the Qur'an anytime, anywhere.</p>
+                                <p data-lang-en="We develop apps and websites to make Qur'anic resources accessible, enabling learners worldwide to engage with the Qur'an anytime, anywhere." data-lang-ar="نقوم بتطوير تطبيقات ومواقع ويب لجعل الموارد القرآنية متاحة، مما يمكّن المتعلمين في جميع أنحاء العالم من التفاعل مع القرآن في أي وقت وفي أي مكان.">We develop apps and websites to make Qur'anic resources accessible, enabling learners worldwide to engage with the Qur'an anytime, anywhere.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -261,10 +376,10 @@
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Teacher Development<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Teacher Development" data-lang-ar="تطوير المعلمين">Teacher Development<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Our workshops train Qur'an instructors to enhance teaching quality, ensuring effective and impactful learning experiences for students.</p>
+                                <p data-lang-en="Our workshops train Qur'an instructors to enhance teaching quality, ensuring effective and impactful learning experiences for students." data-lang-ar="تدرب ورش عملنا معلمي القرآن لتعزيز جودة التدريس، مما يضمن تجارب تعلم فعالة ومؤثرة للطلاب.">Our workshops train Qur'an instructors to enhance teaching quality, ensuring effective and impactful learning experiences for students.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -274,40 +389,40 @@
                     </ul>
                 </div>
                 <div class="align-center stg-top-gap-l" data-appear="fade-up" data-unload="fade-up">
-                    <a href="programs.html" class="bringer-button">Explore All Programs</a>
+                    <a href="programs.html" class="bringer-button" data-lang-en="Explore All Programs" data-lang-ar="استكشف جميع البرامج">Explore All Programs</a>
                 </div>
             </section>
 
             <section>
                 <div class="align-center stg-bottom-gap-l">
-                    <h2 data-split-appear="fade-up" data-unload="fade-up">Our Core Values</h2>
-                    <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up">At Majlisu Ahlil Qur'an, we are driven by:</p>
+                    <h2 data-split-appear="fade-up" data-unload="fade-up" data-lang-en="Our Core Values" data-lang-ar="قيمنا الأساسية">Our Core Values</h2>
+                    <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up" data-lang-en="At Majlisu Ahlil Qur'an, we are driven by:" data-lang-ar="في مجلس أهل القرآن، نحن مدفوعون بـ:">At Majlisu Ahlil Qur'an, we are driven by:</p>
                 </div>
                 <div class="bringer-grid-2cols" data-stagger-appear="zoom-in" data-delay="150" data-unload="fade-up">
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Ikhlas (Sincerity)<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Acting solely for the sake of Allah in all our endeavors.</p>
+                        <h4 data-lang-en="Ikhlas (Sincerity)" data-lang-ar="الإخلاص">Ikhlas (Sincerity)<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Acting solely for the sake of Allah in all our endeavors." data-lang-ar="العمل خالصًا لوجه الله في جميع مساعينا.">Acting solely for the sake of Allah in all our endeavors.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-heart"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Ihsan (Excellence)<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Upholding high standards in every activity we undertake.</p>
+                        <h4 data-lang-en="Ihsan (Excellence)" data-lang-ar="الإحسان">Ihsan (Excellence)<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Upholding high standards in every activity we undertake." data-lang-ar="الالتزام بمعايير عالية في كل نشاط نقوم به.">Upholding high standards in every activity we undertake.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-star"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Wahda (Unity)<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Promoting Islamic brotherhood and togetherness.</p>
+                        <h4 data-lang-en="Wahda (Unity)" data-lang-ar="الوحدة">Wahda (Unity)<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Promoting Islamic brotherhood and togetherness." data-lang-ar="تعزيز الأخوة الإسلامية والتكاتف.">Promoting Islamic brotherhood and togetherness.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-unity"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Khidmah (Service)<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Serving the Ummah with humility and care.</p>
+                        <h4 data-lang-en="Khidmah (Service)" data-lang-ar="الخدمة">Khidmah (Service)<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Serving the Ummah with humility and care." data-lang-ar="خدمة الأمة بتواضع ورعاية.">Serving the Ummah with humility and care.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-service"></i>
                         </div>
@@ -319,14 +434,14 @@
                 <div class="bringer-bento-grid bringer-grid-cta">
                     <div class="is-large bringer-masked-block" data-appear="fade-right" data-unload="fade-left">
                         <div class="bringer-grid-cta-media bringer-masked-media" data-bg-src="img/quran-cta-background.jpg">
-                            <div class="bringer-grid-cta-heading">Ready to join our mission?</div>
+                            <div class="bringer-grid-cta-heading" data-lang-en="Ready to join our mission?" data-lang-ar="هل أنت مستعد للانضمام إلى مهمتنا؟">Ready to join our mission?</div>
                         </div>
                         <div class="bringer-masked-content at-bottom-right">
-                            <p class="bringer-large-text" data-appear="fade-right" data-delay="100">Let's connect and make a difference →</p>
+                            <p class="bringer-large-text" data-appear="fade-right" data-delay="100" data-lang-en="Let's connect and make a difference →" data-lang-ar="دعنا نتواصل ونحدث فرقًا →">Let's connect and make a difference →</p>
                         </div>
                     </div>
                     <div class="is-medium bringer-block" data-appear="fade-down" data-unload="fade-right">
-                        <h3>Support our efforts to spread Qur'anic knowledge</h3>
+                        <h3 data-lang-en="Support our efforts to spread Qur'anic knowledge" data-lang-ar="ادعم جهودنا لنشر المعرفة القرآنية">Support our efforts to spread Qur'anic knowledge</h3>
                     </div>
                     <div class="is-small" data-appear="zoom-out" data-delay="100" data-unload="zoom-out">
                         <a href="contacts.html" class="bringer-square-button">
@@ -349,8 +464,8 @@
                                 <a href="./" class="bringer-logo footer-logo">
                                     <img src="img/logo.png" alt="Majlisu Ahlil Qur'an" width="88" height="24">
                                 </a>
-                                <div class="bringer-info-description">Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally.</div>
-                                <span class="bringer-label">Follow us:</span>
+                                <div class="bringer-info-description" data-lang-en="Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally." data-lang-ar="مبادرة مجلس أهل القرآن مكرسة لتعزيز حب وفهم القرآن الكريم عالميًا.">Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally.</div>
+                                <span class="bringer-label" data-lang-en="Follow us:" data-lang-ar="تابعنا:">Follow us:</span>
                                 <ul class="bringer-socials-list" data-stagger-appear="fade-up" data-stagger-delay="75">
                                     <li>
                                         <a href="#" target="_blank" class="bringer-socials-facebook"><i></i></a>
@@ -366,39 +481,39 @@
                         </div>
                         <div class="stg-col-2 stg-offset-1 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>Programs</h6>
+                                <h6 data-lang-en="Programs" data-lang-ar="البرامج">Programs</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="program-details.html">Qur'an Competition</a></li>
-                                        <li><a href="program-details.html">Qur'anic Camps</a></li>
-                                        <li><a href="program-details.html">Women Empowerment</a></li>
-                                        <li><a href="program-details.html">Digital Platforms</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Qur'an Competition" data-lang-ar="مسابقة القرآن">Qur'an Competition</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Qur'anic Camps" data-lang-ar="المعسكرات القرآنية">Qur'anic Camps</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Women Empowerment" data-lang-ar="تمكين المرأة">Women Empowerment</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Digital Platforms" data-lang-ar="المنصات الرقمية">Digital Platforms</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="stg-col-2 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>About Us</h6>
+                                <h6 data-lang-en="About Us" data-lang-ar="نبذة عنا">About Us</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="about-us.html">Our Mission</a></li>
-                                        <li><a href="team.html">Our Team</a></li>
-                                        <li><a href="partners.html">Partners</a></li>
-                                        <li><a href="contacts.html">Contact Us</a></li>
+                                        <li><a href="about-us.html" data-lang-en="Our Mission" data-lang-ar="مهمتنا">Our Mission</a></li>
+                                        <li><a href="team.html" data-lang-en="Our Team" data-lang-ar="فريقنا">Our Team</a></li>
+                                        <li><a href="partners.html" data-lang-en="Partners" data-lang-ar="الشركاء">Partners</a></li>
+                                        <li><a href="contacts.html" data-lang-en="Contact Us" data-lang-ar="اتصل بنا">Contact Us</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="stg-col-2 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>Resources</h6>
+                                <h6 data-lang-en="Resources" data-lang-ar="الموارد">Resources</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="faq.html">FAQ</a></li>
-                                        <li><a href="events.html">Events</a></li>
-                                        <li><a href="terms.html">Terms of Use</a></li>
-                                        <li><a href="privacy.html">Privacy Policy</a></li>
+                                        <li><a href="faq.html" data-lang-en="FAQ" data-lang-ar="الأسئلة الشائعة">FAQ</a></li>
+                                        <li><a href="events.html" data-lang-en="Events" data-lang-ar="الفعاليات">Events</a></li>
+                                        <li><a href="terms.html" data-lang-en="Terms of Use" data-lang-ar="شروط الاستخدام">Terms of Use</a></li>
+                                        <li><a href="privacy.html" data-lang-en="Privacy Policy" data-lang-ar="سياسة الخصوصية">Privacy Policy</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -407,7 +522,7 @@
                 </div>
             </div>
             <div class="bringer-footer-line stg-container">
-                <div class="align-center">
+                <div class="align-center" data-lang-en="Copyright © 2025. All Rights Reserved." data-lang-ar="حقوق الطبع والنشر © 2025. جميع الحقوق محفوظة.">
                     Copyright © 2025. All Rights Reserved.
                 </div>
             </div>
@@ -422,5 +537,81 @@
     <script src="js/st-core.js"></script>
     <script src="js/classes.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        $(document).ready(function () {
+            const elements = $('[data-lang-en]');
+            const langSelectDesktop = $('#lang-select');
+            const langSelectMobile = $('#lang-select-mobile');
+            const pageTitleElement = $('title'); // For translating the page title
+
+            function switchLanguage(lang, storePreference = true) {
+                elements.each(function () {
+                    const $this = $(this);
+                    const text = $this.data(`lang-${lang}`);
+                    if (text !== undefined) {
+                        // For elements that might contain HTML (like the h6 with <br>), use .html()
+                        if ($this.is('h6') && text.includes('<br>')) {
+                             $this.html(text);
+                        } else {
+                             $this.text(text);
+                        }
+                    }
+                    if (lang === 'ar') {
+                        $this.addClass('arabic');
+                    } else {
+                        $this.removeClass('arabic');
+                    }
+                });
+
+                // Translate page title
+                const titleText = pageTitleElement.data(`lang-${lang}`);
+                if (titleText) {
+                    pageTitleElement.text(titleText);
+                }
+
+
+                langSelectDesktop.val(lang);
+                langSelectMobile.val(lang);
+
+                if (lang === 'ar') {
+                    $('html').attr('lang', 'ar').attr('dir', 'rtl');
+                    $('body').addClass('arabic-lang'); // Add class for global font styles if needed
+                } else {
+                    $('html').attr('lang', 'en').attr('dir', 'ltr');
+                    $('body').removeClass('arabic-lang');
+                }
+
+                if (storePreference) {
+                    try {
+                        localStorage.setItem('selectedLanguage', lang);
+                    } catch (e) {
+                        console.error("Could not save language preference to localStorage:", e);
+                    }
+                }
+            }
+
+            langSelectDesktop.on('change', function () {
+                const lang = $(this).val();
+                switchLanguage(lang);
+            });
+
+            langSelectMobile.on('change', function () {
+                const lang = $(this).val();
+                switchLanguage(lang);
+            });
+
+            // Load saved language preference
+            let preferredLang = 'en'; // Default language
+            try {
+                const savedLang = localStorage.getItem('selectedLanguage');
+                if (savedLang) {
+                    preferredLang = savedLang;
+                }
+            } catch (e) {
+                console.error("Could not read language preference from localStorage:", e);
+            }
+            switchLanguage(preferredLang, false); // false to avoid re-saving on initial load
+        });
+    </script>
 </body>
 </html>

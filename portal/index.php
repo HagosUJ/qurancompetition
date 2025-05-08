@@ -30,9 +30,27 @@ $_SESSION['last_activity'] = time();
 
 // Get user details
 $user_id = $_SESSION['user_id'] ?? null;
-$user_fullname = $_SESSION['user_fullname'] ?? 'Participant';
+$_SESSION['fullname'] = $_SESSION['user_fullname'] ?? null; // Align with topbar.php
+$user_fullname = $_SESSION['fullname'] ?? ($language === 'ar' ? 'مشارك' : 'Participant');
 $user_role = $_SESSION['user_role'] ?? 'user';
 $profile_picture = $_SESSION['user_profile_pic'] ?? 'assets/media/avatars/blank.png';
+
+// If fullname is not set, fetch from database
+if (empty($_SESSION['fullname'])) {
+    global $conn;
+    $stmt = $conn->prepare("SELECT fullname FROM users WHERE id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $_SESSION['fullname'] = $row['fullname'];
+        $user_fullname = $row['fullname'];
+    } else {
+        $_SESSION['fullname'] = $language === 'ar' ? 'مشارك' : 'Participant';
+        $user_fullname = $_SESSION['fullname'];
+    }
+    $stmt->close();
+}
 
 if (!$user_id) {
     error_log("User ID missing from session for logged-in user on index.php.");
@@ -263,7 +281,7 @@ header("X-XSS-Protection: 1; mode=block");
     <?php include 'layouts/head-css.php'; ?>
     <style>
         .progress-bar { background-color: #e9ecef; border-radius: .25rem; overflow: hidden; height: 10px; }
-        .progress-bar-inner { background-color: #0d6efd; height: 100%; transition: width .6s ease; }
+        .progress-bar-inner { background-color: #2e6b5e; height: 100%; transition: width .6s ease; }
         .status-approved { color: #198754; }
         .status-rejected { color: #dc3545; }
         .status-under-review, .status-submitted { color: #ffc107; }
@@ -275,7 +293,7 @@ header("X-XSS-Protection: 1; mode=block");
         .cta-box .fs-20 { font-size: 36px !important; opacity: 0.6; }
         .btn-custom-blue {
             display: inline-block;
-            background-color: #3b82f6;
+            background-color: #2e6b5e;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -284,7 +302,7 @@ header("X-XSS-Protection: 1; mode=block");
             transition: background-color 0.2s ease-in-out;
         }
         .btn-custom-blue:hover {
-            background-color: #2563eb;
+            background-color: #2e6b5e;
             color: white;
             text-decoration: none;
         }
@@ -497,27 +515,30 @@ header("X-XSS-Protection: 1; mode=block");
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const countdownElement = document.getElementById('countdown');
-            const targetTimestamp = <?php echo $countdown_target_timestamp ? $countdown_target_timestamp * 1000 : 'null'; ?>;
-
-            if (countdownElement && targetTimestamp) {
+            
+            // Set a fixed 10-day countdown from the current date
+            const now = new Date().getTime();
+            const targetTimestamp = now + (10 * 24 * 60 * 60 * 1000); // 10 days in milliseconds
+            
+            if (countdownElement) {
                 function updateCountdown() {
-                    const now = new Date().getTime();
-                    const distance = targetTimestamp - now;
-
+                    const currentTime = new Date().getTime();
+                    const distance = targetTimestamp - currentTime;
+        
                     if (distance < 0) {
                         countdownElement.innerHTML = "<?php echo $translations[$language]['deadline_passed']; ?>";
                         if (countdownInterval) clearInterval(countdownInterval);
                         return;
                     }
-
+        
                     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
+        
                     countdownElement.innerHTML = `<span>${days}</span>d <span>${hours}</span>h <span>${minutes}</span>m <span>${seconds}</span>s remaining`;
                 }
-
+        
                 updateCountdown();
                 const countdownInterval = setInterval(updateCountdown, 1000);
             }

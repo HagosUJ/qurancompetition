@@ -24,10 +24,10 @@ error_log("Sidebar loaded with language: $current_lang");
   <!-- Brand Logo Light -->
   <a href="index.php" class="logo logo-light">
     <span class="logo-lg" style="text-align: start;">
-      <img src="assets/images/musabaqa-logo-light.png" alt="Musabaqa Logo" style="height: 40px;">
+      <img src="assets/images/logo.png" alt="Musabaqa Logo" style="height: 40px;">
     </span>
     <span class="logo-sm">
-      <img src="assets/images/musabaqa-logo-sm-light.png" alt="Musabaqa Logo" style="height: 30px;" />
+      <img src="assets/images/logo.png" alt="Musabaqa Logo" style="height: 30px;" />
     </span>
   </a>
 

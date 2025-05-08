@@ -27,42 +27,6 @@ if ($user_id === 0) {
     header("Location: users.php");
     exit;
 }
-
-// Fetch user information
-try {
-    // Basic user information
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->execute([$user_id]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$user) {
-        // User not found
-        $_SESSION['error'] = "User not found";
-        header("Location: users.php");
-        exit;
-    }
-    
-    // Get profile information if exists
-    $profile_query = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
-    $profile_query->execute([$user_id]);
-    $profile = $profile_query->fetch(PDO::FETCH_ASSOC);
-    
-    // Get payment history
-    $payment_query = $pdo->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_date DESC LIMIT 5");
-    $payment_query->execute([$user_id]);
-    $payments = $payment_query->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Get login history
-    $login_query = $pdo->prepare("SELECT * FROM user_logs WHERE user_id = ? AND action = 'Login' ORDER BY created_at DESC LIMIT 5");
-    $login_query->execute([$user_id]);
-    $logins = $login_query->fetchAll(PDO::FETCH_ASSOC);
-    
-} catch (PDOException $e) {
-    $_SESSION['error'] = "Error retrieving user data";
-    error_log("User view error: " . $e->getMessage());
-    header("Location: users.php");
-    exit;
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1255,7 +1255,7 @@ jQuery(function ($) {
     // Init Template
     $(document).ready(function() {
         // General UI
-        RightClickProtection( '.bringer-rcp-wrap' );
+        // RightClickProtection( '.bringer-rcp-wrap' ); 
         MainMenuInit();
         CircleLinks();
 

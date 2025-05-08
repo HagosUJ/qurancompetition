@@ -1,0 +1,1 @@
+[08-May-2025 00:56:11 Europe/Berlin] PHP Warning:  touch(): Unable to create file /var/folders/8j/bwsjpy451qnb9217h878gn6w0000gn/T/musabaqa_test_cookies_681be50b4f318.txt because Permission denied in /Applications/XAMPP/xamppfiles/htdocs/musabaqa/portal/tests/automated_tests.php on line 72

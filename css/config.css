@@ -29,13 +29,13 @@
     --bringer-s-text: #4A4E57;
 
     /* A background color for accents, like buttons, highlighted blocks, etc. */
-    --bringer-s-accent: #3F6EE9;
+    --bringer-s-accent: #2e6b5e;
 
     /* A hovered button background color */
-    --bringer-button-hover-bg: #3F6EE9D0;
+    --bringer-button-hover-bg: #2e6b5e;
 
     /* Used as a color for text accents */
-    --bringer-s-text-accent: #2A5BD6;
+    --bringer-s-text-accent: #2e6b5e;
 
     /* Used as a text color for accented blocks */
     --bringer-s-accented-text: var(--bringer-s-heading);
@@ -53,7 +53,7 @@
     --bringer-s-border-highlight: #07090D20;
 
     /* Used as a color for a backlight effect */
-    --bringer-s-backlight: #07090D08;
+    --bringer-s-backlight: #fff8dc;
 
     /* Used as a color for block shadow */
     --bringer-s-box-shadow: #07090D05;

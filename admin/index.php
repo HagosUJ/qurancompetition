@@ -21,6 +21,22 @@ if (empty($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true
     exit;
 }
 
+// Fetch recent users (top 5)
+$recent_users_query = "SELECT id, fullname, email, created_at, status 
+                       FROM users 
+                       WHERE role = 'user' 
+                       ORDER BY created_at DESC 
+                       LIMIT 5";
+$stmt = $pdo->prepare($recent_users_query);
+$stmt->execute();
+$recent_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch total user count
+$user_count_query = "SELECT COUNT(*) AS total_users FROM users WHERE role = 'user'";
+$stmt = $pdo->prepare($user_count_query);
+$stmt->execute();
+$user_count = $stmt->fetch(PDO::FETCH_ASSOC)['total_users'];
+
 if (isset($_GET['state']) && $_GET['state'] === 'logout') {
     // Unset all session variables
     $_SESSION = array();
@@ -33,46 +49,6 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
     exit;
 }
 
-// Get basic statistics
-try {
-    // User statistics
-    $user_count = $pdo->query("SELECT COUNT(*) as count FROM users")->fetchColumn();
-    $new_users = $pdo->query("SELECT COUNT(*) as count FROM users WHERE registration_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetchColumn();
-    $completed_profiles = $pdo->query("SELECT COUNT(*) as count FROM profiles WHERE updated = 1")->fetchColumn();
-    
-    // Payment statistics
-    $total_payments = $pdo->query("SELECT SUM(amount) as total FROM payments WHERE payment_status = 'completed'")->fetchColumn() ?? 0;
-    
-    // Registration trend data
-    $months_query = $pdo->query("SELECT 
-        DATE_FORMAT(registration_date, '%b %Y') as month,
-        COUNT(*) as count 
-        FROM users 
-        WHERE registration_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-        GROUP BY DATE_FORMAT(registration_date, '%Y-%m')
-        ORDER BY registration_date");
-    
-    $months = [];
-    $user_counts = [];
-    while ($row = $months_query->fetch(PDO::FETCH_ASSOC)) {
-        $months[] = $row['month'];
-        $user_counts[] = $row['count'];
-    }
-    
-    // Recent users
-    $recent_users = $pdo->query("SELECT * FROM users ORDER BY registration_date DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
-    
-} catch (PDOException $e) {
-    error_log("Dashboard data error: " . $e->getMessage());
-    // Set defaults in case of database error
-    $user_count = 0;
-    $new_users = 0; 
-    $completed_profiles = 0;
-    $total_payments = 0;
-    $months = [];
-    $user_counts = [];
-    $recent_users = [];
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -184,7 +160,7 @@ try {
                         </div>
                     </div>
 
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-xl-6">
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -224,7 +200,7 @@ try {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Recent Users Table -->
                     <div class="row">
@@ -239,24 +215,30 @@ try {
                                         <table class="table table-striped table-sm table-centered mb-0">
                                             <thead>
                                                 <tr>
-                                                    <th>ID</th>
+                                                    <th>S/N</th>
                                                     <th>Username</th>
                                                     <th>Email</th>
                                                     <th>Registration Date</th>
-                                                    <th>Actions</th>
+                                                    <th>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php foreach($recent_users as $user): ?>
+                                                <?php foreach($recent_users as $index => $user): ?>
                                                 <tr>
-                                                    <td><?php echo $user['id']; ?></td>
-                                                    <td><?php echo htmlspecialchars($user['username']); ?></td>
+                                                    <td><?php echo $index + 1; ?></td>
+                                                    <td><?php echo htmlspecialchars($user['fullname']); ?></td>
                                                     <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                                    <td><?php echo $user['registration_date']; ?></td>
-                                                    <td class="table-action">
-                                                        <a href="user_edit.php?id=<?php echo $user['id']; ?>" class="action-icon"> <i class="ri-pencil-fill"></i></a>
-                                                        <a href="user_view.php?id=<?php echo $user['id']; ?>" class="action-icon"> <i class="ri-eye-fill"></i></a>
-                                                        <a href="javascript:void(0);" class="action-icon" onclick="confirmDelete(<?php echo $user['id']; ?>)"> <i class="ri-delete-bin-fill"></i></a>
+                                                    <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
+                                                    <td>
+                                                        <?php if(strtolower($user['status']) == 'active'): ?>
+                                                            <span class="badge bg-success">Active</span>
+                                                        <?php elseif(strtolower($user['status']) == 'pending'): ?>
+                                                            <span class="badge bg-warning">Pending</span>
+                                                        <?php elseif(strtolower($user['status']) == 'suspended'): ?>
+                                                            <span class="badge bg-danger">Suspended</span>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-secondary"><?php echo ucfirst(htmlspecialchars($user['status'])); ?></span>
+                                                        <?php endif; ?>
                                                     </td>
                                                 </tr>
                                                 <?php endforeach; ?>

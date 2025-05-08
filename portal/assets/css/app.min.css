@@ -135,7 +135,7 @@ html[data-bs-theme=dark][data-topbar-color=light] {
     --ct-danger: #f15776;
     --ct-light: #f2f2f7;
     --ct-dark: #212529;
-    --ct-primary-rgb: 62, 96, 213;
+    --ct-primary-rgb: #2e6b5e;
     --ct-secondary-rgb: 108, 117, 125;
     --ct-success-rgb: 71, 173, 119;
     --ct-info-rgb: 22, 167, 233;

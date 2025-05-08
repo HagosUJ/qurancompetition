@@ -1,15 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Majlisu Ahlil Qur'an | Our Programs</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title data-lang-en="Majlisu Ahlil Qur'an | Our Programs" data-lang-ar="مجلس أهل القرآن | برامجنا">Majlisu Ahlil Qur'an | Our Programs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="css/config.css">
     <link type="text/css" rel="stylesheet" href="css/libs.css">
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/responsive.css">
     <link rel="icon" href="img/favicon.png" sizes="32x32">
+    <style>
+        .register-signin-btn {
+            background-color: #2e6b5e;
+            color: #fff8dc; /* Whitish gold */
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .register-signin-btn:hover {
+            background-color: #B19246;
+            transform: scale(1.05);
+        }
+        .lang-selector {
+            display: inline-block;
+            position: relative;
+            z-index: 1000;
+            margin-left: 10px;
+        }
+        .lang-select {
+            background: none;
+            color: #4a5e57;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%234a5e57" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 30px;
+            min-width: 80px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 1;
+        }
+        .lang-select:focus {
+            outline: none;
+            border-color: #2e6b5e;
+        }
+        .lang-select option {
+            font-family: 'Inter', sans-serif;
+            color: #000000;
+            background-color: #ffffff;
+        }
+        .lang-select option[value="ar"] {
+            font-family: 'Amiri', serif;
+            font-size: 16px;
+        }
+        body.arabic-lang, .arabic {
+            font-family: 'Amiri', serif !important;
+        }
+        [dir="rtl"] .bringer-header-inner,
+        [dir="rtl"] .bringer-nav ul,
+        [dir="rtl"] .bringer-mobile-header-inner,
+        [dir="rtl"] .stg-row,
+        [dir="rtl"] .bringer-lwp-roster .bringer-lwp-item,
+        [dir="rtl"] .bringer-footer-widgets .stg-row,
+        [dir="rtl"] .bringer-socials-list {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .bringer-header-lp { margin-left: auto; margin-right: 0; }
+        [dir="rtl"] .bringer-header-rp { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .bringer-mobile-header-inner .bringer-logo { margin-left: auto; margin-right: 0; }
+        [dir="rtl"] .bringer-mobile-header-inner .lang-selector { margin-left: 0; margin-right: 15px; }
+        [dir="rtl"] .bringer-mobile-menu-toggler { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .align-right { text-align: left; }
+        [dir="rtl"] .align-left { text-align: right; }
+        [dir="rtl"] .bringer-lwp-item-content,
+        [dir="rtl"] .bringer-info-widget,
+        [dir="rtl"] .bringer-menu-widget ul { text-align: right; }
+        [dir="rtl"] .bringer-info-widget .bringer-socials-list { justify-content: flex-start; }
+        [dir="rtl"] .bringer-menu-widget ul { padding-right: 0; }
+        [dir="rtl"] .bringer-masked-content.at-bottom-right { right: auto; left: var(--masked-content-offset, 30px); }
+        [dir="rtl"] .bringer-icon-link { flex-direction: row-reverse; }
+        [dir="rtl"] .bringer-icon-link .bringer-icon-wrap { margin-left: 0; margin-right: 20px;}
+        [dir="rtl"] .bringer-icon-link .bringer-icon-link-content { text-align: right; }
+
+        @media (max-width: 991px) { /* Ensure mobile lang selector is positioned correctly */
+            [dir="rtl"] .bringer-mobile-header-inner .lang-selector {
+                margin-left: 0;
+                margin-right: 10px; /* Adjust as needed */
+            }
+        }
+        @media (max-width: 768px) {
+            .lang-selector { margin-left: 5px; }
+            [dir="rtl"] .lang-selector { margin-right: 5px; margin-left: 0; z-index: 1050; }
+        }
+        @media (max-width: 480px) {
+            .lang-select {
+                font-size: 12px;
+                padding: 3px 8px;
+                padding-right: 25px; /* Adjust for smaller arrow */
+                background-position: right 5px center;
+                min-width: 70px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header id="bringer-header" class="is-frosted is-sticky" data-appear="fade-down" data-unload="fade-up">
@@ -23,31 +129,45 @@
                 <nav class="bringer-nav">
                     <ul class="main-menu" data-stagger-appear="fade-down" data-stagger-delay="75">
                         <li>
-                            <a href="index.html">Home</a>
+                            <a href="index.html" data-lang-en="Home" data-lang-ar="الرئيسية">Home</a>
                         </li>
                         <li>
-                            <a href="about-us.html">About Us</a>
+                            <a href="about-us.html" data-lang-en="About Us" data-lang-ar="نبذة عنا">About Us</a>
                         </li>
                         <li class="current-menu-item">
-                            <a href="programs.html">Programs</a>
+                            <a href="programs.html" data-lang-en="Programs" data-lang-ar="البرامج">Programs</a>
                         </li>
                         <li>
-                            <a href="competitions.html">Competitions</a>
+                            <a href="competitions.html" data-lang-en="Competitions" data-lang-ar="المسابقات">Competitions</a>
                         </li>
                         <li>
-                            <a href="contacts.html">Contact</a>
+                            <a href="contacts.html" data-lang-en="Contact" data-lang-ar="اتصل بنا">Contact</a>
                         </li>
                     </ul>
                 </nav>
             </div>
             <div class="bringer-header-rp">
-                <a href="contacts.html" class="bringer-button">Get Involved</a>
+                <div class="auth-buttons" style="display: flex; align-items: center;">
+                    <a href="portal/" class="register-signin-btn" data-lang-en="Register/Sign-In" data-lang-ar="التسجيل/تسجيل الدخول">Register/Sign-In</a>
+                    <div class="lang-selector">
+                        <select id="lang-select" class="lang-select">
+                            <option value="en" selected>English</option>
+                            <option value="ar">العربية</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="bringer-mobile-header-inner">
             <a href="./" class="bringer-logo">
                 <img src="img/logo.png" alt="Majlisu Ahlil Qur'an" width="88" height="24">
             </a>
+            <div class="lang-selector">
+                <select id="lang-select-mobile" class="lang-select">
+                    <option value="en" selected>English</option>
+                    <option value="ar">العربية</option>
+                </select>
+            </div>
             <a href="#" class="bringer-mobile-menu-toggler">
                 <i class="bringer-menu-toggler-icon">
                     <span></span>
@@ -63,8 +183,8 @@
             <section class="backlight-bottom">
                 <div class="stg-row">
                     <div class="stg-col-6 stg-offset-3 align-center stg-tp-col-10 stg-tp-offset-1">
-                        <h1 class="bringer-page-title" data-appear="fade-up" data-unload="fade-up">Our Programs</h1>
-                        <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100">Explore our initiatives to promote Qur'anic learning and engagement.</p>
+                        <h1 class="bringer-page-title" data-appear="fade-up" data-unload="fade-up" data-lang-en="Our Programs" data-lang-ar="برامجنا">Our Programs</h1>
+                        <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100" data-lang-en="Explore our initiatives to promote Qur'anic learning and engagement." data-lang-ar="اكتشف مبادراتنا لتعزيز تعلم القرآن والمشاركة فيه.">Explore our initiatives to promote Qur'anic learning and engagement.</p>
                     </div>
                 </div>
             </section>
@@ -75,16 +195,16 @@
                 </div>
                 <div class="stg-row stg-large-gap stg-tp-normal-gap">
                     <div class="stg-col-6 stg-vertical-space-between stg-tp-bottom-gap-l" data-unload="fade-left">
-                        <h2 data-split-appear="fade-up">Empowering through knowledge</h2>
+                        <h2 data-split-appear="fade-up" data-lang-en="Empowering through knowledge" data-lang-ar="التمكين من خلال المعرفة">Empowering through knowledge</h2>
                         <div class="align-right" data-appear="fade-right">
                             <a href="competitions.html" class="bringer-icon-link">
                                 <div class="bringer-icon-link-content">
-                                    <h6>
+                                    <h6 data-lang-en="Join our<br>Competitions" data-lang-ar="انضم إلى<br>مسابقاتنا">
                                         Join our
                                         <br>
                                         Competitions
                                     </h6>
-                                    <span class="bringer-label">Discover events</span>
+                                    <span class="bringer-label" data-lang-en="Discover events" data-lang-ar="اكتشف الفعاليات">Discover events</span>
                                 </div>
                                 <div class="bringer-icon-wrap">
                                     <i class="bringer-icon bringer-icon-explore"></i>
@@ -93,9 +213,9 @@
                         </div>
                     </div>
                     <div class="stg-col-6" data-appear="fade-left" data-unload="fade-right" data-delay="100">
-                        <p class="bringer-large-text">Our programs are designed to foster a deep connection with the Qur'an.</p>
-                        <p>From international competitions to digital learning platforms, we offer diverse opportunities for learners and scholars to engage with the Holy Qur'an. Our initiatives aim to enhance Qur'anic literacy, discover talent, and build a global community of Qur'an lovers.</p>
-                        <p>We are committed to bridging traditional Islamic knowledge with modern technology, making Qur'anic education accessible to all, regardless of age or location.</p>
+                        <p class="bringer-large-text" data-lang-en="Our programs are designed to foster a deep connection with the Qur'an." data-lang-ar="برامجنا مصممة لتعزيز ارتباط عميق بالقرآن.">Our programs are designed to foster a deep connection with the Qur'an.</p>
+                        <p data-lang-en="From international competitions to digital learning platforms, we offer diverse opportunities for learners and scholars to engage with the Holy Qur'an. Our initiatives aim to enhance Qur'anic literacy, discover talent, and build a global community of Qur'an lovers." data-lang-ar="من المسابقات الدولية إلى منصات التعلم الرقمية، نقدم فرصًا متنوعة للمتعلمين والعلماء للتفاعل مع القرآن الكريم. تهدف مبادراتنا إلى تعزيز محو الأمية القرآنية، واكتشاف المواهب، وبناء مجتمع عالمي من محبي القرآن.">From international competitions to digital learning platforms, we offer diverse opportunities for learners and scholars to engage with the Holy Qur'an. Our initiatives aim to enhance Qur'anic literacy, discover talent, and build a global community of Qur'an lovers.</p>
+                        <p data-lang-en="We are committed to bridging traditional Islamic knowledge with modern technology, making Qur'anic education accessible to all, regardless of age or location." data-lang-ar="نحن ملتزمون بربط المعرفة الإسلامية التقليدية بالتكنولوجيا الحديثة، مما يجعل تعليم القرآن متاحًا للجميع، بغض النظر عن العمر أو الموقع.">We are committed to bridging traditional Islamic knowledge with modern technology, making Qur'anic education accessible to all, regardless of age or location.</p>
                     </div>
                 </div>
             </section>
@@ -103,21 +223,21 @@
             <section class="backlight-top">
                 <div class="stg-row stg-large-gap stg-bottom-gap-l">
                     <div class="stg-col-6 stg-tp-col-8 stg-tp-bottom-gap-l" data-unload="fade-left">
-                        <h2 data-split-appear="fade-up">Key Programs</h2>
+                        <h2 data-split-appear="fade-up" data-lang-en="Key Programs" data-lang-ar="البرامج الرئيسية">Key Programs</h2>
                     </div>
                     <div class="stg-col-6 stg-tp-col-9 stg-tp-offset-3" data-unload="fade-right">
-                        <p class="bringer-large-text" data-split-appear="fade-up" data-delay="100">Our core initiatives to promote Qur'anic excellence.</p>
-                        <p data-appear="fade-up" data-delay="200">We offer a range of programs designed to inspire and educate, from global competitions to accessible digital resources.</p>
+                        <p class="bringer-large-text" data-split-appear="fade-up" data-delay="100" data-lang-en="Our core initiatives to promote Qur'anic excellence." data-lang-ar="مبادراتنا الأساسية لتعزيز التميز القرآني.">Our core initiatives to promote Qur'anic excellence.</p>
+                        <p data-appear="fade-up" data-delay="200" data-lang-en="We offer a range of programs designed to inspire and educate, from global competitions to accessible digital resources." data-lang-ar="نقدم مجموعة من البرامج المصممة للإلهام والتثقيف، من المسابقات العالمية إلى الموارد الرقمية المتاحة.">We offer a range of programs designed to inspire and educate, from global competitions to accessible digital resources.</p>
                     </div>
                 </div>
                 <div class="bringer-detailed-list-wrap" data-appear="fade-up" data-unload="fade-up">
                     <ul class="bringer-detailed-list">
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Annual International Qur'an Competition<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Annual International Qur'an Competition" data-lang-ar="مسابقة القرآن الدولية السنوية">Annual International Qur'an Competition<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>A prestigious gathering of young memorizers and reciters showcasing excellence in Tajweed, Hifz, and Tafsir, fostering global unity and competition.</p>
+                                <p data-lang-en="A prestigious gathering of young memorizers and reciters showcasing excellence in Tajweed, Hifz, and Tafsir, fostering global unity and competition." data-lang-ar="تجمع مرموق للحفظة والقراء الشباب يعرضون التميز في التجويد والحفظ والتفسير، مما يعزز الوحدة والمنافسة العالمية.">A prestigious gathering of young memorizers and reciters showcasing excellence in Tajweed, Hifz, and Tafsir, fostering global unity and competition.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -126,10 +246,10 @@
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Qur'anic Camps & Retreats<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Qur'anic Camps & Retreats" data-lang-ar="المعسكرات والخلوات القرآنية">Qur'anic Camps & Retreats<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Organized retreats to spiritually uplift participants through intensive learning, reflection, and community bonding.</p>
+                                <p data-lang-en="Organized retreats to spiritually uplift participants through intensive learning, reflection, and community bonding." data-lang-ar="خلوات منظمة لرفع مستوى المشاركين روحيًا من خلال التعلم المكثف والتأمل والترابط المجتمعي.">Organized retreats to spiritually uplift participants through intensive learning, reflection, and community bonding.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -138,10 +258,10 @@
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Women & Children Qur'an Empowerment<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Women & Children Qur'an Empowerment" data-lang-ar="تمكين النساء والأطفال في القرآن">Women & Children Qur'an Empowerment<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Special programs focused on supporting female memorizers and young learners with tailored educational resources.</p>
+                                <p data-lang-en="Special programs focused on supporting female memorizers and young learners with tailored educational resources." data-lang-ar="برامج خاصة تركز على دعم الحافظات والمتعلمين الصغار بموارد تعليمية مخصصة.">Special programs focused on supporting female memorizers and young learners with tailored educational resources.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -150,10 +270,10 @@
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Teacher Development & Certification<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Teacher Development & Certification" data-lang-ar="تطوير وتأهيل المعلمين">Teacher Development & Certification<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Training workshops to enhance the skills of Qur'an instructors, ensuring high-quality teaching standards.</p>
+                                <p data-lang-en="Training workshops to enhance the skills of Qur'an instructors, ensuring high-quality teaching standards." data-lang-ar="ورش عمل تدريبية لتعزيز مهارات معلمي القرآن، وضمان معايير تعليم عالية الجودة.">Training workshops to enhance the skills of Qur'an instructors, ensuring high-quality teaching standards.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -162,10 +282,10 @@
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Mobile & Online Platforms<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Mobile & Online Platforms" data-lang-ar="المنصات المتنقلة وعبر الإنترنت">Mobile & Online Platforms<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Development of apps and websites to provide accessible Qur'anic resources for learners worldwide.</p>
+                                <p data-lang-en="Development of apps and websites to provide accessible Qur'anic resources for learners worldwide." data-lang-ar="تطوير تطبيقات ومواقع ويب لتوفير موارد قرآنية متاحة للمتعلمين في جميع أنحاء العالم.">Development of apps and websites to provide accessible Qur'anic resources for learners worldwide.</p>
                             </div>
                             <div class="bringer-detailed-list-button">
                                 <span class="bringer-icon bringer-icon-explore"></span>
@@ -175,40 +295,40 @@
                     </ul>
                 </div>
                 <div class="align-center stg-top-gap-l" data-appear="fade-up" data-unload="fade-up">
-                    <a href="contacts.html" class="bringer-button">Get Involved</a>
+                    <a href="contacts.html" class="bringer-button" data-lang-en="Get Involved" data-lang-ar="شارك معنا">Get Involved</a>
                 </div>
             </section>
 
             <section>
                 <div class="align-center stg-bottom-gap-l">
-                    <h2 data-split-appear="fade-up" data-unload="fade-up">Program Impact</h2>
-                    <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up">Our initiatives have made a global difference.</p>
+                    <h2 data-split-appear="fade-up" data-unload="fade-up" data-lang-en="Program Impact" data-lang-ar="أثر البرنامج">Program Impact</h2>
+                    <p class="bringer-large-text" data-appear="fade-up" data-delay="100" data-unload="fade-up" data-lang-en="Our initiatives have made a global difference." data-lang-ar="مبادراتنا أحدثت فرقًا عالميًا.">Our initiatives have made a global difference.</p>
                 </div>
                 <div class="bringer-grid-2cols" data-stagger-appear="zoom-in" data-delay="150" data-unload="fade-up">
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Global Reach<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Connecting Qur'an lovers across 20+ countries.</p>
+                        <h4 data-lang-en="Global Reach" data-lang-ar="الوصول العالمي">Global Reach<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Connecting Qur'an lovers across 20+ countries." data-lang-ar="ربط محبي القرآن عبر أكثر من 20 دولة.">Connecting Qur'an lovers across 20+ countries.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-global"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Talent Recognition<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Awarding over 500 memorizers for excellence.</p>
+                        <h4 data-lang-en="Talent Recognition" data-lang-ar="تقدير المواهب">Talent Recognition<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Awarding over 500 memorizers for excellence." data-lang-ar="تكريم أكثر من 500 حافظ للتميز.">Awarding over 500 memorizers for excellence.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-award"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Digital Access<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Providing resources through innovative platforms.</p>
+                        <h4 data-lang-en="Digital Access" data-lang-ar="الوصول الرقمي">Digital Access<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Providing resources through innovative platforms." data-lang-ar="توفير الموارد من خلال منصات مبتكرة.">Providing resources through innovative platforms.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-digital"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Community Building<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Fostering unity through shared love for the Qur'an.</p>
+                        <h4 data-lang-en="Community Building" data-lang-ar="بناء المجتمع">Community Building<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Fostering unity through shared love for the Qur'an." data-lang-ar="تعزيز الوحدة من خلال الحب المشترك للقرآن.">Fostering unity through shared love for the Qur'an.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-community"></i>
                         </div>
@@ -220,14 +340,14 @@
                 <div class="bringer-bento-grid bringer-grid-cta">
                     <div class="is-large bringer-masked-block" data-appear="fade-right" data-unload="fade-left">
                         <div class="bringer-grid-cta-media bringer-masked-media" data-bg-src="img/quran-cta-background.jpg">
-                            <div class="bringer-grid-cta-heading">Ready to join our programs?</div>
+                            <div class="bringer-grid-cta-heading" data-lang-en="Ready to join our programs?" data-lang-ar="هل أنت مستعد للانضمام إلى برامجنا؟">Ready to join our programs?</div>
                         </div>
                         <div class="bringer-masked-content at-bottom-right">
-                            <p class="bringer-large-text" data-appear="fade-right" data-delay="100">Let's connect and inspire →</p>
+                            <p class="bringer-large-text" data-appear="fade-right" data-delay="100" data-lang-en="Let's connect and inspire →" data-lang-ar="دعنا نتواصل ونلهم →">Let's connect and inspire →</p>
                         </div>
                     </div>
                     <div class="is-medium bringer-block" data-appear="fade-down" data-unload="fade-right">
-                        <h3>Be part of our mission to spread Qur'anic knowledge</h3>
+                        <h3 data-lang-en="Be part of our mission to spread Qur'anic knowledge" data-lang-ar="كن جزءًا من مهمتنا لنشر المعرفة القرآنية">Be part of our mission to spread Qur'anic knowledge</h3>
                     </div>
                     <div class="is-small" data-appear="zoom-out" data-delay="100" data-unload="zoom-out">
                         <a href="contacts.html" class="bringer-square-button">
@@ -250,8 +370,8 @@
                                 <a href="./" class="bringer-logo footer-logo">
                                     <img src="img/logo.png" alt="Majlisu Ahlil Qur'an" width="88" height="24">
                                 </a>
-                                <div class="bringer-info-description">Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally.</div>
-                                <span class="bringer-label">Follow us:</span>
+                                <div class="bringer-info-description" data-lang-en="Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally." data-lang-ar="مبادرة مجلس أهل القرآن مكرسة لتعزيز حب وفهم القرآن الكريم عالميًا.">Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally.</div>
+                                <span class="bringer-label" data-lang-en="Follow us:" data-lang-ar="تابعنا:">Follow us:</span>
                                 <ul class="bringer-socials-list" data-stagger-appear="fade-up" data-stagger-delay="75">
                                     <li>
                                         <a href="#" target="_blank" class="bringer-socials-facebook"><i></i></a>
@@ -267,39 +387,39 @@
                         </div>
                         <div class="stg-col-2 stg-offset-1 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>Programs</h6>
+                                <h6 data-lang-en="Programs" data-lang-ar="البرامج">Programs</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="program-details.html">Qur'an Competition</a></li>
-                                        <li><a href="program-details.html">Qur'anic Camps</a></li>
-                                        <li><a href="program-details.html">Women Empowerment</a></li>
-                                        <li><a href="program-details.html">Digital Platforms</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Qur'an Competition" data-lang-ar="مسابقة القرآن">Qur'an Competition</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Qur'anic Camps" data-lang-ar="المعسكرات القرآنية">Qur'anic Camps</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Women Empowerment" data-lang-ar="تمكين المرأة">Women Empowerment</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Digital Platforms" data-lang-ar="المنصات الرقمية">Digital Platforms</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="stg-col-2 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>About Us</h6>
+                                <h6 data-lang-en="About Us" data-lang-ar="نبذة عنا">About Us</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="about-us.html">Our Mission</a></li>
-                                        <li><a href="team.html">Our Team</a></li>
-                                        <li><a href="partners.html">Partners</a></li>
-                                        <li><a href="contacts.html">Contact Us</a></li>
+                                        <li><a href="about-us.html" data-lang-en="Our Mission" data-lang-ar="مهمتنا">Our Mission</a></li>
+                                        <li><a href="team.html" data-lang-en="Our Team" data-lang-ar="فريقنا">Our Team</a></li>
+                                        <li><a href="partners.html" data-lang-en="Partners" data-lang-ar="الشركاء">Partners</a></li>
+                                        <li><a href="contacts.html" data-lang-en="Contact Us" data-lang-ar="اتصل بنا">Contact Us</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="stg-col-2 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>Resources</h6>
+                                <h6 data-lang-en="Resources" data-lang-ar="الموارد">Resources</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="faq.html">FAQ</a></li>
-                                        <li><a href="events.html">Events</a></li>
-                                        <li><a href="terms.html">Terms of Use</a></li>
-                                        <li><a href="privacy.html">Privacy Policy</a></li>
+                                        <li><a href="faq.html" data-lang-en="FAQ" data-lang-ar="الأسئلة الشائعة">FAQ</a></li>
+                                        <li><a href="events.html" data-lang-en="Events" data-lang-ar="الفعاليات">Events</a></li>
+                                        <li><a href="terms.html" data-lang-en="Terms of Use" data-lang-ar="شروط الاستخدام">Terms of Use</a></li>
+                                        <li><a href="privacy.html" data-lang-en="Privacy Policy" data-lang-ar="سياسة الخصوصية">Privacy Policy</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -308,7 +428,7 @@
                 </div>
             </div>
             <div class="bringer-footer-line stg-container">
-                <div class="align-center">
+                <div class="align-center" data-lang-en="Copyright © 2025. All Rights Reserved." data-lang-ar="حقوق النشر © 2025. جميع الحقوق محفوظة.">
                     Copyright © 2025. All Rights Reserved.
                 </div>
             </div>
@@ -318,7 +438,7 @@
     <div class="bringer-rcp-wrap">
         <div class="bringer-rcp-overlay"></div>
         <div class="bringer-rcp-container">
-            <h2>The context menu is not allowed on this page.</h2>
+            <h2 data-lang-en="The context menu is not allowed on this page." data-lang-ar="قائمة السياق غير مسموح بها في هذه الصفحة.">The context menu is not allowed on this page.</h2>
         </div>
     </div>
 
@@ -330,5 +450,59 @@
     <script src="js/st-core.js"></script>
     <script src="js/classes.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const langSelect = document.getElementById('lang-select');
+            const langSelectMobile = document.getElementById('lang-select-mobile');
+            const htmlTag = document.documentElement;
+            const bodyTag = document.body;
+
+            function updateTextDirection(lang) {
+                if (lang === 'ar') {
+                    htmlTag.setAttribute('dir', 'rtl');
+                    bodyTag.classList.add('arabic-lang');
+                } else {
+                    htmlTag.setAttribute('dir', 'ltr');
+                    bodyTag.classList.remove('arabic-lang');
+                }
+            }
+
+            function updateContent(lang) {
+                document.querySelectorAll('[data-lang-en], [data-lang-ar]').forEach(el => {
+                    const text = el.getAttribute(lang === 'ar' ? 'data-lang-ar' : 'data-lang-en');
+                    if (text) {
+                        if (el.tagName === 'TITLE') {
+                            document.title = text;
+                        } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                            if (el.placeholder) el.placeholder = text;
+                            if (el.value && !el.dataset.dynamicValue) el.value = text; // Avoid overwriting user input
+                        } else {
+                            el.innerHTML = text; // Use innerHTML to render <br> tags etc.
+                        }
+                    }
+                });
+            }
+
+            function setLanguage(lang) {
+                if (langSelect.value !== lang) langSelect.value = lang;
+                if (langSelectMobile.value !== lang) langSelectMobile.value = lang;
+                localStorage.setItem('preferredLang', lang);
+                updateTextDirection(lang);
+                updateContent(lang);
+            }
+
+            langSelect.addEventListener('change', function() {
+                setLanguage(this.value);
+            });
+
+            langSelectMobile.addEventListener('change', function() {
+                setLanguage(this.value);
+            });
+
+            // Load preferred language
+            const preferredLang = localStorage.getItem('preferredLang') || 'en';
+            setLanguage(preferredLang);
+        });
+    </script>
 </body>
 </html>

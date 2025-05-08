@@ -1,15 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Majlisu Ahlil Qur'an | International Qur'anic Competition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title data-lang-en="Majlisu Ahlil Qur'an | International Qur'anic Competition" data-lang-ar="مجلس أهل القرآن | مسابقة القرآن الدولية">Majlisu Ahlil Qur'an | International Qur'anic Competition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="css/config.css">
     <link type="text/css" rel="stylesheet" href="css/libs.css">
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/responsive.css">
     <link rel="icon" href="img/favicon.png" sizes="32x32">
+    <style>
+        .register-signin-btn {
+            background-color: #2e6b5e;
+            color: #fff8dc; /* Whitish gold */
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .register-signin-btn:hover {
+            background-color: #B19246;
+            transform: scale(1.05);
+        }
+        .lang-selector {
+            display: inline-block;
+            position: relative;
+            z-index: 1000;
+            margin-left: 10px;
+        }
+        .lang-select {
+            background: none;
+            color: #4a5e57;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%234a5e57" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 30px;
+            min-width: 80px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 1;
+        }
+        .lang-select:focus {
+            outline: none;
+            border-color: #2e6b5e;
+        }
+        .lang-select option {
+            font-family: 'Inter', sans-serif;
+            color: #000000;
+            background-color: #ffffff;
+        }
+        .lang-select option[value="ar"] {
+            font-family: 'Amiri', serif;
+            font-size: 16px;
+        }
+        body.arabic-lang, .arabic {
+            font-family: 'Amiri', serif !important;
+        }
+        [dir="rtl"] .bringer-header-inner,
+        [dir="rtl"] .bringer-nav ul,
+        [dir="rtl"] .bringer-mobile-header-inner,
+        [dir="rtl"] .stg-row,
+        [dir="rtl"] .bringer-lwp-roster .bringer-lwp-item,
+        [dir="rtl"] .bringer-footer-widgets .stg-row,
+        [dir="rtl"] .bringer-socials-list {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .bringer-header-lp { margin-left: auto; margin-right: 0; }
+        [dir="rtl"] .bringer-header-rp { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .bringer-mobile-header-inner .bringer-logo { margin-left: auto; margin-right: 0; }
+        [dir="rtl"] .bringer-mobile-header-inner .lang-selector { margin-left: 0; margin-right: 15px; }
+        [dir="rtl"] .bringer-mobile-menu-toggler { margin-right: auto; margin-left: 0; }
+        [dir="rtl"] .align-right { text-align: left; }
+        [dir="rtl"] .align-left { text-align: right; }
+        [dir="rtl"] .bringer-lwp-item-content,
+        [dir="rtl"] .bringer-info-widget,
+        [dir="rtl"] .bringer-menu-widget ul { text-align: right; }
+        [dir="rtl"] .bringer-info-widget .bringer-socials-list { justify-content: flex-start; }
+        [dir="rtl"] .bringer-menu-widget ul { padding-right: 0; }
+        [dir="rtl"] .bringer-masked-content.at-bottom-right { right: auto; left: var(--masked-content-offset, 30px); }
+        [dir="rtl"] .bringer-icon-link { flex-direction: row-reverse; }
+        [dir="rtl"] .bringer-icon-link .bringer-icon-wrap { margin-left: 0; margin-right: 20px;}
+        [dir="rtl"] .bringer-icon-link .bringer-icon-link-content { text-align: right; }
+
+        @media (max-width: 768px) {
+            .lang-selector { margin-left: 5px; }
+            [dir="rtl"] .lang-selector { margin-right: 5px; margin-left: 0; z-index: 1050; }
+        }
+        @media (max-width: 480px) {
+            .lang-select {
+                font-size: 12px;
+                padding: 3px 8px;
+                padding-right: 25px; /* Adjust for smaller arrow */
+                background-position: right 5px center;
+                min-width: 70px;
+            }
+        }
+    </style>
 </head>
 <body>
     <header id="bringer-header" class="is-frosted is-sticky" data-appear="fade-down" data-unload="fade-up">
@@ -23,31 +123,45 @@
                 <nav class="bringer-nav">
                     <ul class="main-menu" data-stagger-appear="fade-down" data-stagger-delay="75">
                         <li>
-                            <a href="index.html">Home</a>
+                            <a href="index.html" data-lang-en="Home" data-lang-ar="الرئيسية">Home</a>
                         </li>
                         <li>
-                            <a href="about-us.html">About Us</a>
+                            <a href="about-us.html" data-lang-en="About Us" data-lang-ar="نبذة عنا">About Us</a>
                         </li>
                         <li>
-                            <a href="programs.html">Programs</a>
+                            <a href="programs.html" data-lang-en="Programs" data-lang-ar="البرامج">Programs</a>
                         </li>
                         <li class="current-menu-item">
-                            <a href="competitions.html">Competitions</a>
+                            <a href="competitions.html" data-lang-en="Competitions" data-lang-ar="المسابقات">Competitions</a>
                         </li>
                         <li>
-                            <a href="contacts.html">Contact</a>
+                            <a href="contacts.html" data-lang-en="Contact" data-lang-ar="اتصل بنا">Contact</a>
                         </li>
                     </ul>
                 </nav>
             </div>
             <div class="bringer-header-rp">
-                <a href="/portal" class="bringer-button">Get Involved</a>
+                <div class="auth-buttons" style="display: flex; align-items: center;">
+                    <a href="portal/" class="register-signin-btn" data-lang-en="Register/Sign-In" data-lang-ar="التسجيل/تسجيل الدخول">Register/Sign-In</a>
+                    <div class="lang-selector">
+                        <select id="lang-select" class="lang-select">
+                            <option value="en" selected>English</option>
+                            <option value="ar">العربية</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="bringer-mobile-header-inner">
             <a href="./" class="bringer-logo">
                 <img src="img/logo.png" alt="Majlisu Ahlil Qur'an" width="88" height="24">
             </a>
+            <div class="lang-selector">
+                <select id="lang-select-mobile" class="lang-select">
+                    <option value="en" selected>English</option>
+                    <option value="ar">العربية</option>
+                </select>
+            </div>
             <a href="#" class="bringer-mobile-menu-toggler">
                 <i class="bringer-menu-toggler-icon">
                     <span></span>
@@ -63,8 +177,8 @@
             <section class="backlight-bottom">
                 <div class="stg-row">
                     <div class="stg-col-6 stg-offset-3 align-center stg-tp-col-10 stg-tp-offset-1">
-                        <h1 class="bringer-page-title" data-appear="fade-up" data-unload="fade-up">International Qur'anic Competition 2025</h1>
-                        <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100">Join us for Nigeria's maiden International Qur'anic Recitation Competition, uniting 44 participants from 20 countries to celebrate the Holy Qur'an.</p>
+                                               <h1 class="bringer-page-title" data-appear="fade-up" data-unload="fade-up" data-lang-en="Global Ahlul Qur'an Council Competition - Nigeria" data-lang-ar="مسابقة القرآن الدولية 2025">Global Ahlul Qur'an Council Competition - Nigeria</h1>
+                        <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100" data-lang-en="Join us for Nigeria's maiden International Qur'anic Recitation Competition, uniting 44 participants from 20 countries to celebrate the Holy Qur'an." data-lang-ar="انضم إلينا في أول مسابقة دولية لتلاوة القرآن الكريم في نيجيريا، والتي تجمع 44 مشاركًا من 20 دولة للاحتفال بالقرآن الكريم.">Join us for Nigeria's maiden International Qur'anic Recitation Competition, uniting 44 participants from 20 countries to celebrate the Holy Qur'an.</p>
                     </div>
                 </div>
             </section>
@@ -75,16 +189,16 @@
                 </div>
                 <div class="stg-row stg-large-gap stg-tp-normal-gap">
                     <div class="stg-col-6 stg-vertical-space-between stg-tp-bottom-gap-l" data-unload="fade-left">
-                        <h2 data-split-appear="fade-up">A Global Celebration of Qur'anic Excellence</h2>
+                        <h2 data-split-appear="fade-up" data-lang-en="A Global Celebration of Qur'anic Excellence" data-lang-ar="احتفال عالمي بالتميز القرآني">A Global Celebration of Qur'anic Excellence</h2>
                         <div class="align-right" data-appear="fade-right">
                             <a href="#schedule" class="bringer-icon-link">
                                 <div class="bringer-icon-link-content">
-                                    <h6>
+                                    <h6 data-lang-en="Explore the<br>Event Schedule" data-lang-ar="اكتشف<br>جدول الفعاليات">
                                         Explore the
                                         <br>
                                         Event Schedule
                                     </h6>
-                                    <span class="bringer-label">View details</span>
+                                    <span class="bringer-label" data-lang-en="View details" data-lang-ar="عرض التفاصيل">View details</span>
                                 </div>
                                 <div class="bringer-icon-wrap">
                                     <i class="bringer-icon bringer-icon-explore"></i>
@@ -93,9 +207,9 @@
                         </div>
                     </div>
                     <div class="stg-col-6" data-appear="fade-left" data-unload="fade-right" data-delay="100">
-                        <p class="bringer-large-text">Nigeria hosts its first-ever International Qur'anic Recitation Competition in August 2025.</p>
-                        <p>Spearheaded by Hon. Muhammad Adam Alkali and supported by the Centre for Islamic Studies at Usman Danfodio University, Sokoto, this landmark event will feature 44 male and female participants from 20 countries, including Cameroon, Ghana, Chad, Senegal, and Saudi Arabia. The competition aims to promote Islamic values, foster unity, and showcase excellence in Qur'anic recitation, memorization, and understanding.</p>
-                        <p>Starting in Jos, Plateau State, and concluding in Abuja, the event will bring together global Islamic communities under the guidance of six esteemed judges, celebrating the Holy Qur'an as the ultimate guide for a meaningful life.</p>
+                        <p class="bringer-large-text" data-lang-en="Nigeria hosts its first-ever International Qur'anic Recitation Competition in August 2025." data-lang-ar="تستضيف نيجيريا أول مسابقة دولية لتلاوة القرآن الكريم في أغسطس 2025.">Nigeria hosts its first-ever International Qur'anic Recitation Competition in August 2025.</p>
+                        <p data-lang-en="Spearheaded by Hon. Muhammad Adam Alkali and supported by the Centre for Islamic Studies at Usman Danfodio University, Sokoto, this landmark event will feature 44 male and female participants from 20 countries, including Cameroon, Ghana, Chad, Senegal, and Saudi Arabia. The competition aims to promote Islamic values, foster unity, and showcase excellence in Qur'anic recitation, memorization, and understanding." data-lang-ar="بقيادة سعادة محمد آدم القلي وبدعم من مركز الدراسات الإسلامية بجامعة عثمان دانفوديو، سوكوتو، سيضم هذا الحدث التاريخي 44 مشاركًا ومشاركة من 20 دولة، بما في ذلك الكاميرون وغانا وتشاد والسنغال والمملكة العربية السعودية. تهدف المسابقة إلى تعزيز القيم الإسلامية، وتعزيز الوحدة، وعرض التميز في تلاوة القرآن وحفظه وفهمه.">Spearheaded by Hon. Muhammad Adam Alkali and supported by the Centre for Islamic Studies at Usman Danfodio University, Sokoto, this landmark event will feature 44 male and female participants from 20 countries, including Cameroon, Ghana, Chad, Senegal, and Saudi Arabia. The competition aims to promote Islamic values, foster unity, and showcase excellence in Qur'anic recitation, memorization, and understanding.</p>
+                        <p data-lang-en="Starting in Jos, Plateau State, and concluding in Abuja, the event will bring together global Islamic communities under the guidance of six esteemed judges, celebrating the Holy Qur'an as the ultimate guide for a meaningful life." data-lang-ar="بدءًا من جوس بولاية بلاتو، واختتامًا في أبوجا، سيجمع الحدث المجتمعات الإسلامية العالمية تحت إشراف ستة حكام مرموقين، احتفالًا بالقرآن الكريم كدليل نهائي لحياة ذات معنى.">Starting in Jos, Plateau State, and concluding in Abuja, the event will bring together global Islamic communities under the guidance of six esteemed judges, celebrating the Holy Qur'an as the ultimate guide for a meaningful life.</p>
                     </div>
                 </div>
             </section>
@@ -104,8 +218,8 @@
                 <div class="stg-row bringer-section-title">
                     <div class="stg-col-8 stg-offset-2 stg-tp-col-10 stg-tp-offset-1">
                         <div class="align-center">
-                            <h2 data-appear="fade-up" data-unload="fade-up">Event Schedule</h2>
-                            <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100">Mark your calendars for this historic Qur'anic recitation competition.</p>
+                            <h2 data-appear="fade-up" data-unload="fade-up" data-lang-en="Event Schedule" data-lang-ar="جدول الفعاليات">Event Schedule</h2>
+                            <p class="bringer-large-text" data-split-appear="fade-up" data-split-unload="fade-up" data-delay="100" data-lang-en="Mark your calendars for this historic Qur'anic recitation competition." data-lang-ar="ضعوا علامة في تقاويمكم لهذه المسابقة التاريخية لتلاوة القرآن الكريم.">Mark your calendars for this historic Qur'anic recitation competition.</p>
                         </div>
                     </div>
                 </div>
@@ -113,58 +227,58 @@
                     <ul class="bringer-detailed-list">
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Arrival in Abuja<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Arrival in Abuja" data-lang-ar="الوصول إلى أبوجا">Arrival in Abuja<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>International participants and officials arrive in Abuja on August 20th and 21st, 2025.</p>
+                                <p data-lang-en="International participants and officials arrive in Abuja on August 20th and 21st, 2025." data-lang-ar="يصل المشاركون والمسؤولون الدوليون إلى أبوجا يومي 20 و 21 أغسطس 2025.">International participants and officials arrive in Abuja on August 20th and 21st, 2025.</p>
                             </div>
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Abuja Committee Setup<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Abuja Committee Setup" data-lang-ar="إعداد لجنة أبوجا">Abuja Committee Setup<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Reception arrangements begin with the arrival of the Abuja Committee on August 20th, 2025.</p>
+                                <p data-lang-en="Reception arrangements begin with the arrival of the Abuja Committee on August 20th, 2025." data-lang-ar="تبدأ ترتيبات الاستقبال بوصول لجنة أبوجا في 20 أغسطس 2025.">Reception arrangements begin with the arrival of the Abuja Committee on August 20th, 2025.</p>
                             </div>
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Travel to Jos<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Travel to Jos" data-lang-ar="السفر إلى جوس">Travel to Jos<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Participants depart from Abuja to Jos on August 22nd, 2025.</p>
+                                <p data-lang-en="Participants depart from Abuja to Jos on August 22nd, 2025." data-lang-ar="يغادر المشاركون من أبوجا إلى جوس في 22 أغسطس 2025.">Participants depart from Abuja to Jos on August 22nd, 2025.</p>
                             </div>
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Opening of Musabaqa<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Opening of Musabaqa" data-lang-ar="افتتاح المسابقة">Opening of Musabaqa<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>The competition runs from August 23rd to 26th, 2025 (29th Safar, 1446), in Jos, featuring recitations and evaluations by six judges.</p>
+                                <p data-lang-en="The competition runs from August 23rd to 26th, 2025 (29th Safar, 1446), in Jos, featuring recitations and evaluations by six judges." data-lang-ar="تقام المسابقة من 23 إلى 26 أغسطس 2025 (29 صفر 1446) في جوس، وتتضمن تلاوات وتقييمات من قبل ستة حكام.">The competition runs from August 23rd to 26th, 2025 (29th Safar, 1446), in Jos, featuring recitations and evaluations by six judges.</p>
                             </div>
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Return to Abuja<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Return to Abuja" data-lang-ar="العودة إلى أبوجا">Return to Abuja<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>Participants travel back to Abuja on August 27th, 2025.</p>
+                                <p data-lang-en="Participants travel back to Abuja on August 27th, 2025." data-lang-ar="يسافر المشاركون عائدين إلى أبوجا في 27 أغسطس 2025.">Participants travel back to Abuja on August 27th, 2025.</p>
                             </div>
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Closing Ceremony<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Closing Ceremony" data-lang-ar="الحفل الختامي">Closing Ceremony<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>The grand finale and prize distribution take place in Abuja on August 30th, 2025.</p>
+                                <p data-lang-en="The grand finale and prize distribution take place in Abuja on August 30th, 2025." data-lang-ar="يقام الحفل الختامي وتوزيع الجوائز في أبوجا في 30 أغسطس 2025.">The grand finale and prize distribution take place in Abuja on August 30th, 2025.</p>
                             </div>
                         </li>
                         <li>
                             <div class="bringer-detailed-list-title">
-                                <h4>Departure<span class="bringer-accent">.</span></h4>
+                                <h4 data-lang-en="Departure" data-lang-ar="المغادرة">Departure<span class="bringer-accent">.</span></h4>
                             </div>
                             <div class="bringer-detailed-list-description">
-                                <p>International participants depart on August 31st and September 1st, 2025.</p>
+                                <p data-lang-en="International participants depart on August 31st and September 1st, 2025." data-lang-ar="يغادر المشاركون الدوليون يومي 31 أغسطس و 1 سبتمبر 2025.">International participants depart on August 31st and September 1st, 2025.</p>
                             </div>
                         </li>
                     </ul>
@@ -180,21 +294,21 @@
                     </div>
                     <div class="stg-col-6 stg-vertical-space-between" data-appear="fade-left" data-unload="fade-right">
                         <div>
-                            <h2>Participants & Countries</h2>
-                            <p class="bringer-large-text">A diverse gathering of 44 reciters from 20 nations.</p>
-                            <p>The competition will feature 44 male and female participants from countries including Cameroon, Ghana, Chad, Senegal, Kenya, Tanzania, Mauritania, Niger, Egypt, Morocco, Libya, Algeria, Saudi Arabia, Kuwait, Qatar, Malaysia, England, the UAE, and the USA. Each country will send talented reciters and officials, showcasing the global richness of Qur'anic scholarship.</p>
+                            <h2 data-lang-en="Participants & Countries" data-lang-ar="المشاركون والدول">Participants & Countries</h2>
+                            <p class="bringer-large-text" data-lang-en="A diverse gathering of 44 reciters from 20 nations." data-lang-ar="تجمع متنوع يضم 44 قارئًا من 20 دولة.">A diverse gathering of 44 reciters from 20 nations.</p>
+                            <p data-lang-en="The competition will feature 44 male and female participants from countries including Cameroon, Ghana, Chad, Senegal, Kenya, Tanzania, Mauritania, Niger, Egypt, Morocco, Libya, Algeria, Saudi Arabia, Kuwait, Qatar, Malaysia, England, the UAE, and the USA. Each country will send talented reciters and officials, showcasing the global richness of Qur'anic scholarship." data-lang-ar="ستضم المسابقة 44 مشاركًا ومشاركة من دول تشمل الكاميرون، غانا، تشاد، السنغال، كينيا، تنزانيا، موريتانيا، النيجر، مصر، المغرب، ليبيا، الجزائر، المملكة العربية السعودية، الكويت، قطر، ماليزيا، إنجلترا، الإمارات العربية المتحدة، والولايات المتحدة الأمريكية. سترسل كل دولة قراء ومسؤولين موهوبين، مما يعرض الثراء العالمي للدراسات القرآنية.">The competition will feature 44 male and female participants from countries including Cameroon, Ghana, Chad, Senegal, Kenya, Tanzania, Mauritania, Niger, Egypt, Morocco, Libya, Algeria, Saudi Arabia, Kuwait, Qatar, Malaysia, England, the UAE, and the USA. Each country will send talented reciters and officials, showcasing the global richness of Qur'anic scholarship.</p>
                         </div>
                         <a href="contacts.html" class="bringer-icon-link">
                             <div class="bringer-icon-wrap">
                                 <i class="bringer-icon bringer-icon-explore"></i>
                             </div>
                             <div class="bringer-icon-link-content">
-                                <h6>
+                                <h6 data-lang-en="Support the<br>Event" data-lang-ar="ادعم<br>الفعالية">
                                     Support the
                                     <br>
                                     Event
                                 </h6>
-                                <span class="bringer-label">Get involved</span>
+                                <span class="bringer-label" data-lang-en="Get involved" data-lang-ar="شارك معنا">Get involved</span>
                             </div>
                         </a>
                     </div>
@@ -204,38 +318,38 @@
             <section class="backlight-bottom divider-top">
                 <div class="stg-row stg-large-gap stg-bottom-gap-l">
                     <div class="stg-col-6 stg-tp-col-8 stg-tp-bottom-gap-l" data-unload="fade-left">
-                        <h2 data-split-appear="fade-up">Our Vision</h2>
+                        <h2 data-split-appear="fade-up" data-lang-en="Our Vision" data-lang-ar="رؤيتنا">Our Vision</h2>
                     </div>
                     <div class="stg-col-6 stg-tp-col-9 stg-tp-offset-3" data-unload="fade-right">
-                        <p class="bringer-large-text" data-split-appear="fade-up" data-delay="100">Promoting Islamic values and unity through the Qur'an.</p>
-                        <p data-appear="fade-up" data-delay="200">Led by Hon. Muhammad Adam Alkali and organized by Majlisu Ahlil Qur'an Initiatives, this competition aims to foster a deeper connection with the Holy Qur'an. With robust support from the Centre for Islamic Studies at Usman Danfodio University, Sokoto, and under the leadership of Organizing Committee Chairman Gwani Sadiq Zamfara, the event is poised to be a historic milestone in promoting Qur'anic excellence and global Islamic unity.</p>
+                        <p class="bringer-large-text" data-split-appear="fade-up" data-delay="100" data-lang-en="Promoting Islamic values and unity through the Qur'an." data-lang-ar="تعزيز القيم الإسلامية والوحدة من خلال القرآن.">Promoting Islamic values and unity through the Qur'an.</p>
+                        <p data-appear="fade-up" data-delay="200" data-lang-en="Led by Hon. Muhammad Adam Alkali and organized by Majlisu Ahlil Qur'an Initiatives, this competition aims to foster a deeper connection with the Holy Qur'an. With robust support from the Centre for Islamic Studies at Usman Danfodio University, Sokoto, and under the leadership of Organizing Committee Chairman Gwani Sadiq Zamfara, the event is poised to be a historic milestone in promoting Qur'anic excellence and global Islamic unity." data-lang-ar="بقيادة سعادة محمد آدم القلي وتنظيم مبادرات مجلس أهل القرآن، تهدف هذه المسابقة إلى تعزيز ارتباط أعمق بالقرآن الكريم. بدعم قوي من مركز الدراسات الإسلامية بجامعة عثمان دانفوديو، سوكوتو، وتحت قيادة رئيس اللجنة المنظمة غواني صادق زمفارا، يستعد الحدث ليكون علامة فارقة تاريخية في تعزيز التميز القرآني والوحدة الإسلامية العالمية.">Led by Hon. Muhammad Adam Alkali and organized by Majlisu Ahlil Qur'an Initiatives, this competition aims to foster a deeper connection with the Holy Qur'an. With robust support from the Centre for Islamic Studies at Usman Danfodio University, Sokoto, and under the leadership of Organizing Committee Chairman Gwani Sadiq Zamfara, the event is poised to be a historic milestone in promoting Qur'anic excellence and global Islamic unity.</p>
                     </div>
                 </div>
                 <div class="bringer-grid-2cols" data-stagger-appear="zoom-in" data-delay="150" data-unload="fade-up">
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Unity<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Bringing together diverse Islamic communities through shared values.</p>
+                        <h4 data-lang-en="Unity" data-lang-ar="الوحدة">Unity<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Bringing together diverse Islamic communities through shared values." data-lang-ar="جمع المجتمعات الإسلامية المتنوعة من خلال القيم المشتركة.">Bringing together diverse Islamic communities through shared values.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-unity"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Excellence<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Showcasing mastery in recitation, memorization, and Tajweed.</p>
+                        <h4 data-lang-en="Excellence" data-lang-ar="التميز">Excellence<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Showcasing mastery in recitation, memorization, and Tajweed." data-lang-ar="عرض الإتقان في التلاوة والحفظ والتجويد.">Showcasing mastery in recitation, memorization, and Tajweed.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-star"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Guidance<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Celebrating the Qur'an as the ultimate guide for a meaningful life.</p>
+                        <h4 data-lang-en="Guidance" data-lang-ar="الإرشاد">Guidance<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Celebrating the Qur'an as the ultimate guide for a meaningful life." data-lang-ar="الاحتفال بالقرآن كدليل نهائي لحياة ذات معنى.">Celebrating the Qur'an as the ultimate guide for a meaningful life.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-guide"></i>
                         </div>
                     </div>
                     <div class="bringer-icon-box bringer-block">
-                        <h4>Community<span class="bringer-accent">.</span></h4>
-                        <p class="bringer-large-text">Strengthening global bonds within the Ummah.</p>
+                        <h4 data-lang-en="Community" data-lang-ar="المجتمع">Community<span class="bringer-accent">.</span></h4>
+                        <p class="bringer-large-text" data-lang-en="Strengthening global bonds within the Ummah." data-lang-ar="تعزيز الروابط العالمية داخل الأمة.">Strengthening global bonds within the Ummah.</p>
                         <div class="bringer-box-icon">
                             <i class="bringer-icon bringer-icon-community"></i>
                         </div>
@@ -247,14 +361,14 @@
                 <div class="bringer-bento-grid bringer-grid-cta">
                     <div class="is-large bringer-masked-block" data-appear="fade-right" data-unload="fade-left">
                         <div class="bringer-grid-cta-media bringer-masked-media" data-bg-src="img/quran-cta-background.jpg">
-                            <div class="bringer-grid-cta-heading">Be part of this historic event!</div>
+                            <div class="bringer-grid-cta-heading" data-lang-en="Be part of this historic event!" data-lang-ar="كن جزءًا من هذا الحدث التاريخي!">Be part of this historic event!</div>
                         </div>
                         <div class="bringer-masked-content at-bottom-right">
-                            <p class="bringer-large-text" data-appear="fade-right" data-delay="100">Support or participate in the competition →</p>
+                            <p class="bringer-large-text" data-appear="fade-right" data-delay="100" data-lang-en="Support or participate in the competition →" data-lang-ar="ادعم أو شارك في المسابقة →">Support or participate in the competition →</p>
                         </div>
                     </div>
                     <div class="is-medium bringer-block" data-appear="fade-down" data-unload="fade-right">
-                        <h3>Join us in celebrating Qur'anic excellence</h3>
+                        <h3 data-lang-en="Join us in celebrating Qur'anic excellence" data-lang-ar="انضم إلينا في الاحتفال بالتميز القرآني">Join us in celebrating Qur'anic excellence</h3>
                     </div>
                     <div class="is-small" data-appear="zoom-out" data-delay="100" data-unload="zoom-out">
                         <a href="contacts.html" class="bringer-square-button">
@@ -277,8 +391,8 @@
                                 <a href="./" class="bringer-logo footer-logo">
                                     <img src="img/logo.png" alt="Majlisu Ahlil Qur'an" width="88" height="24">
                                 </a>
-                                <div class="bringer-info-description">Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally.</div>
-                                <span class="bringer-label">Follow us:</span>
+                                <div class="bringer-info-description" data-lang-en="Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally." data-lang-ar="مبادرة مجلس أهل القرآن مكرسة لتعزيز حب وفهم القرآن الكريم عالميًا.">Majlisu Ahlil Qur'an Initiative is dedicated to fostering the love and understanding of the Holy Qur'an globally.</div>
+                                <span class="bringer-label" data-lang-en="Follow us:" data-lang-ar="تابعنا:">Follow us:</span>
                                 <ul class="bringer-socials-list" data-stagger-appear="fade-up" data-stagger-delay="75">
                                     <li>
                                         <a href="#" target="_blank" class="bringer-socials-facebook"><i></i></a>
@@ -294,39 +408,39 @@
                         </div>
                         <div class="stg-col-2 stg-offset-1 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>Programs</h6>
+                                <h6 data-lang-en="Programs" data-lang-ar="البرامج">Programs</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="program-details.html">Qur'an Competition</a></li>
-                                        <li><a href="program-details.html">Qur'anic Camps</a></li>
-                                        <li><a href="program-details.html">Women Empowerment</a></li>
-                                        <li><a href="program-details.html">Digital Platforms</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Qur'an Competition" data-lang-ar="مسابقة القرآن">Qur'an Competition</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Qur'anic Camps" data-lang-ar="المعسكرات القرآنية">Qur'anic Camps</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Women Empowerment" data-lang-ar="تمكين المرأة">Women Empowerment</a></li>
+                                        <li><a href="program-details.html" data-lang-en="Digital Platforms" data-lang-ar="المنصات الرقمية">Digital Platforms</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="stg-col-2 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>About Us</h6>
+                                <h6 data-lang-en="About Us" data-lang-ar="نبذة عنا">About Us</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="about-us.html">Our Mission</a></li>
-                                        <li><a href="team.html">Our Team</a></li>
-                                        <li><a href="partners.html">Partners</a></li>
-                                        <li><a href="contacts.html">Contact Us</a></li>
+                                        <li><a href="about-us.html" data-lang-en="Our Mission" data-lang-ar="مهمتنا">Our Mission</a></li>
+                                        <li><a href="team.html" data-lang-en="Our Team" data-lang-ar="فريقنا">Our Team</a></li>
+                                        <li><a href="partners.html" data-lang-en="Partners" data-lang-ar="الشركاء">Partners</a></li>
+                                        <li><a href="contacts.html" data-lang-en="Contact Us" data-lang-ar="اتصل بنا">Contact Us</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div class="stg-col-2 stg-tp-col-4 stg-m-col-4">
                             <div class="bringer-widget">
-                                <h6>Resources</h6>
+                                <h6 data-lang-en="Resources" data-lang-ar="الموارد">Resources</h6>
                                 <div class="bringer-menu-widget">
                                     <ul>
-                                        <li><a href="faq.html">FAQ</a></li>
-                                        <li><a href="events.html">Events</a></li>
-                                        <li><a href="terms.html">Terms of Use</a></li>
-                                        <li><a href="privacy.html">Privacy Policy</a></li>
+                                        <li><a href="faq.html" data-lang-en="FAQ" data-lang-ar="الأسئلة الشائعة">FAQ</a></li>
+                                        <li><a href="events.html" data-lang-en="Events" data-lang-ar="الفعاليات">Events</a></li>
+                                        <li><a href="terms.html" data-lang-en="Terms of Use" data-lang-ar="شروط الاستخدام">Terms of Use</a></li>
+                                        <li><a href="privacy.html" data-lang-en="Privacy Policy" data-lang-ar="سياسة الخصوصية">Privacy Policy</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -335,7 +449,7 @@
                 </div>
             </div>
             <div class="bringer-footer-line stg-container">
-                <div class="align-center">
+                <div class="align-center" data-lang-en="Copyright © 2025. All Rights Reserved." data-lang-ar="حقوق الطبع والنشر © 2025. جميع الحقوق محفوظة.">
                     Copyright © 2025. All Rights Reserved.
                 </div>
             </div>
@@ -350,5 +464,77 @@
     <script src="js/st-core.js"></script>
     <script src="js/classes.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        $(document).ready(function () {
+            const elements = $('[data-lang-en]');
+            const langSelectDesktop = $('#lang-select');
+            const langSelectMobile = $('#lang-select-mobile');
+            const pageTitleElement = $('title'); 
+
+            function switchLanguage(lang, storePreference = true) {
+                elements.each(function () {
+                    const $this = $(this);
+                    const text = $this.data(`lang-${lang}`);
+                    if (text !== undefined) {
+                        if ($this.is('h6') && text.includes('<br>')) { // Handle elements with <br>
+                             $this.html(text);
+                        } else {
+                             $this.text(text);
+                        }
+                    }
+                    if (lang === 'ar') {
+                        $this.addClass('arabic');
+                    } else {
+                        $this.removeClass('arabic');
+                    }
+                });
+
+                const titleText = pageTitleElement.data(`lang-${lang}`);
+                if (titleText) {
+                    pageTitleElement.text(titleText);
+                }
+
+                langSelectDesktop.val(lang);
+                langSelectMobile.val(lang);
+
+                if (lang === 'ar') {
+                    $('html').attr('lang', 'ar').attr('dir', 'rtl');
+                    $('body').addClass('arabic-lang');
+                } else {
+                    $('html').attr('lang', 'en').attr('dir', 'ltr');
+                    $('body').removeClass('arabic-lang');
+                }
+
+                if (storePreference) {
+                    try {
+                        localStorage.setItem('selectedLanguage', lang);
+                    } catch (e) {
+                        console.error("Could not save language preference to localStorage:", e);
+                    }
+                }
+            }
+
+            langSelectDesktop.on('change', function () {
+                const lang = $(this).val();
+                switchLanguage(lang);
+            });
+
+            langSelectMobile.on('change', function () {
+                const lang = $(this).val();
+                switchLanguage(lang);
+            });
+
+            let preferredLang = 'en'; 
+            try {
+                const savedLang = localStorage.getItem('selectedLanguage');
+                if (savedLang) {
+                    preferredLang = savedLang;
+                }
+            } catch (e) {
+                console.error("Could not read language preference from localStorage:", e);
+            }
+            switchLanguage(preferredLang, false); 
+        });
+    </script>
 </body>
 </html>
