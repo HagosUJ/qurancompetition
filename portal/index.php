@@ -495,29 +495,32 @@ header("X-XSS-Protection: 1; mode=block");
 
     <!-- Countdown Timer Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+               document.addEventListener('DOMContentLoaded', function() {
             const countdownElement = document.getElementById('countdown');
-            const targetTimestamp = <?php echo $countdown_target_timestamp ? $countdown_target_timestamp * 1000 : 'null'; ?>;
-
-            if (countdownElement && targetTimestamp) {
+            
+            // Set a fixed 10-day countdown from the current date
+            const now = new Date().getTime();
+            const targetTimestamp = now + (10 * 24 * 60 * 60 * 1000); // 10 days in milliseconds
+            
+            if (countdownElement) {
                 function updateCountdown() {
-                    const now = new Date().getTime();
-                    const distance = targetTimestamp - now;
-
+                    const currentTime = new Date().getTime();
+                    const distance = targetTimestamp - currentTime;
+        
                     if (distance < 0) {
                         countdownElement.innerHTML = "<?php echo $translations[$language]['deadline_passed']; ?>";
                         if (countdownInterval) clearInterval(countdownInterval);
                         return;
                     }
-
+        
                     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
+        
                     countdownElement.innerHTML = `<span>${days}</span>d <span>${hours}</span>h <span>${minutes}</span>m <span>${seconds}</span>s remaining`;
                 }
-
+        
                 updateCountdown();
                 const countdownInterval = setInterval(updateCountdown, 1000);
             }
