@@ -1,2 +1,4 @@
 # Environment variables
 .env
+portal/.DS_Store
+.DS_Store
