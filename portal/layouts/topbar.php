@@ -106,12 +106,12 @@
             <li class="dropdown">
                 <a class="nav-link dropdown-toggle arrow-none nav-user px-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     <span class="account-user-avatar">
-                        <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="User" width="32" class="rounded-circle">
+                        <img src="<?php echo htmlspecialchars($profile_picture) . '?t=' . time(); ?>" alt="User" width="32" class="rounded-circle">
                     </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated profile-dropdown">
                     <div class="dropdown-header noti-title">
-                        <h6 class="text-overflow m-0">Welcome!</h6>
+                        <h6 class="text-overflow m-0">Welcome, <?php echo htmlspecialchars($_SESSION['fullname'] ?? 'User'); ?>!</h6>
                     </div>
                     <a href="profile.php" class="dropdown-item">
                         <i class="ri-account-circle-line fs-18 align-middle me-1"></i>
