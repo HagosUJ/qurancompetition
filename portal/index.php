@@ -518,7 +518,7 @@ header("X-XSS-Protection: 1; mode=block");
             
             // Set a fixed 10-day countdown from the current date
             const now = new Date().getTime();
-            const targetTimestamp = now + (10 * 24 * 60 * 60 * 1000); // 10 days in milliseconds
+            const targetTimestamp = now + (7 * 24 * 60 * 60 * 1000); // 10 days in milliseconds
             
             if (countdownElement) {
                 function updateCountdown() {
