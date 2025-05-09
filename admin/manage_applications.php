@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $update_query = "UPDATE applications SET status = ?, rejection_reason = ?, last_updated = NOW() WHERE id IN ($placeholders)";
             $stmt = $pdo->prepare($update_query);
             $stmt->execute(array_merge([$new_status, $new_status === 'Rejected' ? $rejection_reason : null], $application_ids));
-
+        
             $query = "SELECT u.id AS user_id, u.fullname, u.email, a.contestant_type 
                      FROM applications a 
                      JOIN users u ON a.user_id = u.id 
@@ -55,18 +55,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt = $pdo->prepare($query);
             $stmt->execute($application_ids);
             $applicants = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+        
             $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
             $email_errors = [];
+            
             foreach ($applicants as $applicant) {
-                $mail->isSMTP();
-        $mail->Host = 'mail.majlisuahlilquran.org'; // Updated mail server
-        $mail->SMTPAuth = true;
-        $mail->Username = 'admin@majlisuahlilquran.org'; // Updated username
-        $mail->Password = '%bDbxex4n%Mn'; // Updated password
-        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS; // Changed to ENCRYPTION_SMTPS for port 465
-        $mail->Port = 465; // Updated port
-
+                try {
+                    $mail->isSMTP();
+                    $mail->Host = 'mail.majlisuahlilquran.org'; 
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'admin@majlisuahlilquran.org'; 
+                    $mail->Password = '%bDbxex4n%Mn'; 
+                    $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+                    $mail->Port = 465;
+        
                     $mail->setFrom('no-reply@majlisahlilquran.org', 'Majlis Ahlil Quran Musabaqa Team');
                     $mail->addAddress($applicant['email'], $applicant['fullname']);
                     $mail->isHTML(true);
@@ -79,9 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $body .= "<p>Please check your dashboard for further details.</p>
                               <p>Best regards,<br>Musabaqa Team</p>";
                     $mail->Body = $body;
-
+        
                     $mail->send();
-
+        
                     $notification_message = "Your application has been $new_status.";
                     if ($new_status === 'Rejected' && $rejection_reason) {
                         $notification_message .= " Reason: $rejection_reason";
@@ -93,13 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         'user_id' => $applicant['user_id'],
                         'message' => $notification_message
                     ]);
-
+        
                     $mail->clearAddresses();
                 } catch (\PHPMailer\PHPMailer\Exception $e) {
                     $email_errors[] = "Failed to send email to {$applicant['email']}: " . $mail->ErrorInfo;
                 }
             }
-
+        
             if (empty($email_errors)) {
                 $_SESSION['success'] = count($application_ids) . " application(s) $new_status successfully.";
             } else {
@@ -108,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } catch (PDOException $e) {
             $_SESSION['error'] = "Error updating application(s): " . $e->getMessage();
         }
-
+        
         header("Location: manage_applications.php" . (isset($_GET['status']) ? "?status={$_GET['status']}" : ""));
         exit;
     } else {
