@@ -1,4 +1,5 @@
 <?php
+// filepath: /Applications/XAMPP/xamppfiles/htdocs/musabaqa/portal/sign-up.php
 require_once 'includes/auth.php';
 
 // Start session if not already started
@@ -49,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Password is required.";
             $field_error = 'password';
         } elseif (!is_strong_password($password)) {
-            $error = "Password does not meet complexity requirements.";
+            $error = "Password must be at least 8 characters with at least two character types.";
             $field_error = 'password';
         } elseif ($password !== $confirm_password) {
             $error = "Passwords do not match.";
@@ -62,16 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             list($success_status, $message, $user_id) = register_user($fullname, $email, $password);
 
             if ($success_status) {
-                // Set flash message for the next page
-                // set_flash_message($message, 'success');
-
-                // Redirect to a page indicating email verification is needed
                 redirect('check-email.php?email=' . urlencode($email) . '&type=verification');
                 exit;
             } else {
                 $error = $message;
-
-                // Determine which field caused the error
                 if (stripos($message, 'email') !== false) {
                     $field_error = 'email';
                 } else {
@@ -191,21 +186,16 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
         }
 
         .strength-weak > div {
-            width: 25%;
+            width: 33%;
             background-color: #ef4444;
         }
 
         .strength-medium > div {
-            width: 50%;
+            width: 66%;
             background-color: #f59e0b;
         }
 
         .strength-strong > div {
-            width: 75%;
-            background-color: #3b82f6;
-        }
-
-        .strength-very-strong > div {
             width: 100%;
             background-color: #10b981;
         }
@@ -227,8 +217,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
         .lang-toggle:hover {
             color: #3b82f6;
         }
-        
-        /* Logo styles */
+
         .logo-container {
             display: flex;
             justify-content: center;
@@ -294,7 +283,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
                             <?php
                             $translations = [
                                 "Invalid form submission. Please try again." => "إرسال نموذج غير صالح. يرجى المحاولة مرة أخرى.",
-                                "Email already exists." => "البريد الإلكتروني موجود بالفعل."
+                                "Email address is already registered." => "البريد الإلكتروني مسجل بالفعل."
                             ];
                             $error_ar = $error;
                             foreach ($translations as $en => $ar) {
@@ -311,7 +300,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" class="card-body flex flex-col gap-5 p-10" id="sign_up_form" method="post" novalidate>
             <!-- CSRF Protection -->
             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            
+
             <!-- Logo -->
             <div class="logo-container">
                 <img src="assets/images/logo.png" alt="Majlisu Ahlil Qur'an Logo" class="logo">
@@ -319,7 +308,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
 
             <div class="text-center mb-2.5">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white leading-none mb-2.5">
-                    <span class="lang-en">Sign up</span>
+                    <span class="lang-en">Sign Up</span>
                     <span class="lang-ar hidden">إنشاء حساب</span>
                 </h3>
                 <div class="flex items-center justify-center font-medium">
@@ -328,7 +317,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
                         <span class="lang-ar hidden">لديك حساب بالفعل؟</span>
                     </span>
                     <a class="text-2sm link" href="sign-in.php">
-                        <span class="lang-en">Sign in</span>
+                        <span class="lang-en">Sign In</span>
                         <span class="lang-ar hidden">تسجيل الدخول</span>
                     </a>
                 </div>
@@ -366,7 +355,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
                             $translations = [
                                 "Email address is required." => "عنوان البريد الإلكتروني مطلوب.",
                                 "Please enter a valid email address." => "يرجى إدخال عنوان بريد إلكتروني صالح.",
-                                "Email already exists." => "البريد الإلكتروني موجود بالفعل."
+                                "Email address is already registered." => "البريد الإلكتروني مسجل بالفعل."
                             ];
                             $error_ar = $error;
                             foreach ($translations as $en => $ar) {
@@ -393,13 +382,13 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
                 </div>
                 <div class="password-strength" id="password-strength"><div></div></div>
                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="password-feedback">
-                    <span class="lang-en">Password should be at least 8 characters, include upper & lower case, a number, and a special character.</span>
-                    <span class="lang-ar hidden">يجب أن تتكون كلمة المرور من 8 أحرف على الأقل، وتشمل أحرفًا كبيرة وصغيرة، ورقمًا، وحرفًا خاصًا.</span>
+                    <span class="lang-en">Password must be at least 8 characters with at least two character types.</span>
+                    <span class="lang-ar hidden">يجب أن تكون كلمة المرور 8 أحرف على الأقل مع نوعين من الأحرف على الأقل.</span>
                 </div>
                 <?php if ($field_error === 'password'): ?>
                     <div class="field-error-text" id="password-error">
                         <span class="lang-en"><?php echo htmlspecialchars($error); ?></span>
-                        <span class="lang-ar hidden">كلمة المرور لا تلبي متطلبات التعقيد.</span>
+                        <span class="lang-ar hidden">يجب أن تكون كلمة المرور 8 أحرف على الأقل مع نوعين من الأحرف على الأقل.</span>
                     </div>
                 <?php endif; ?>
             </div>
@@ -502,81 +491,77 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordStrengthInnerDiv = passwordStrengthDiv.querySelector('div');
     const passwordFeedback = document.getElementById('password-feedback');
 
-    // Password strength checker function
+    // Password strength checker function - FIXED to properly count character types
     function checkPasswordStrength(password) {
-        let strength = 0;
-        let feedbackMessages = [];
-
         // Reset strength indicator
         passwordStrengthInnerDiv.style.width = '0%';
         passwordStrengthDiv.className = 'password-strength';
-
+        
         if (!password) {
             return {
                 strength: 0,
-                feedback: '<span class="lang-en">Password should be at least 8 characters, include upper & lower case, a number, and a special character.</span><span class="lang-ar hidden">يجب أن تتكون كلمة المرور من 8 أحرف على الأقل، وتشمل أحرفًا كبيرة وصغيرة، ورقمًا، وحرفًا خاصًا.</span>'
+                feedback: '<span class="lang-en">Password must be at least 8 characters with at least two character types.</span><span class="lang-ar hidden">يجب أن تكون كلمة المرور 8 أحرف على الأقل مع نوعين من الأحرف.</span>',
+                feedbackColorClass: 'text-gray-500 dark:text-gray-400'
             };
         }
 
-        // Length check
-        if (password.length >= 8) {
-            strength += 1;
-        } else {
+        // Check minimum length
+        const hasMinLength = password.length >= 8;
+        
+        // Count character types present
+        let charTypesCount = 0;
+        if (/[A-Z]/.test(password)) charTypesCount++;
+        if (/[a-z]/.test(password)) charTypesCount++;
+        if (/\d/.test(password)) charTypesCount++;
+        if (/[^a-zA-Z\d]/.test(password)) charTypesCount++;
+        
+        // Calculate feedback messages for missing requirements
+        let feedbackMessages = [];
+        if (!hasMinLength) {
             feedbackMessages.push('<span class="lang-en">at least 8 characters</span><span class="lang-ar hidden">8 أحرف على الأقل</span>');
         }
-
-        // Uppercase letter
-        if (/[A-Z]/.test(password)) {
-            strength += 1;
-        } else {
-            feedbackMessages.push('<span class="lang-en">an uppercase letter</span><span class="lang-ar hidden">حرف كبير</span>');
+        
+        // Add missing character types to feedback
+        if (!/[A-Z]/.test(password)) {
+            feedbackMessages.push('<span class="lang-en">uppercase letter</span><span class="lang-ar hidden">حرف كبير</span>');
+        }
+        if (!/[a-z]/.test(password)) {
+            feedbackMessages.push('<span class="lang-en">lowercase letter</span><span class="lang-ar hidden">حرف صغير</span>');
+        }
+        if (!/\d/.test(password)) {
+            feedbackMessages.push('<span class="lang-en">number</span><span class="lang-ar hidden">رقم</span>');
+        }
+        if (!/[^a-zA-Z\d]/.test(password)) {
+            feedbackMessages.push('<span class="lang-en">special character</span><span class="lang-ar hidden">حرف خاص</span>');
         }
 
-        // Lowercase letter
-        if (/[a-z]/.test(password)) {
-            strength += 1;
+        // Set strength based on requirements met
+        let strength = 0;
+        if (!hasMinLength || charTypesCount < 2) {
+            strength = 1; // Weak
+        } else if (charTypesCount === 2) {
+            strength = 2; // Medium (meets minimum requirements)
         } else {
-            feedbackMessages.push('<span class="lang-en">a lowercase letter</span><span class="lang-ar hidden">حرف صغير</span>');
+            strength = 3; // Strong (exceeds minimum requirements)
         }
 
-        // Number
-        if (/\d/.test(password)) {
-            strength += 1;
-        } else {
-            feedbackMessages.push('<span class="lang-en">a number</span><span class="lang-ar hidden">رقم</span>');
-        }
-
-        // Special character
-        if (/[^a-zA-Z\d]/.test(password)) {
-            strength += 1;
-        } else {
-            feedbackMessages.push('<span class="lang-en">a special character</span><span class="lang-ar hidden">حرف خاص</span>');
-        }
-
-        // Determine overall strength class and feedback text
+        // Determine UI feedback
         let strengthClass = '';
         let feedbackText = '';
-        let feedbackColorClass = 'text-gray-500 dark:text-gray-400';
+        let feedbackColorClass = '';
 
-        if (strength <= 1) {
+        if (strength === 1) {
             strengthClass = 'strength-weak';
-            feedbackText = '<span class="lang-en">Weak. Needs: </span><span class="lang-ar hidden">ضعيف. يحتاج: </span>' + feedbackMessages.join(', ') + '.';
+            feedbackText = '<span class="lang-en">Weak. Need: </span><span class="lang-ar hidden">ضعيف. يحتاج: </span>' + 
+                feedbackMessages.join(', ') + '.';
             feedbackColorClass = 'text-red-500';
         } else if (strength === 2) {
-            strengthClass = 'strength-weak';
-            feedbackText = '<span class="lang-en">Weak. Needs: </span><span class="lang-ar hidden">ضعيف. يحتاج: </span>' + feedbackMessages.join(', ') + '.';
-            feedbackColorClass = 'text-red-500';
-        } else if (strength === 3) {
             strengthClass = 'strength-medium';
-            feedbackText = '<span class="lang-en">Medium. Needs: </span><span class="lang-ar hidden">متوسط. يحتاج: </span>' + feedbackMessages.join(', ') + '.';
+            feedbackText = '<span class="lang-en">Medium. Password meets minimum requirements.</span><span class="lang-ar hidden">متوسط. كلمة المرور تلبي الحد الأدنى من المتطلبات.</span>';
             feedbackColorClass = 'text-amber-500';
-        } else if (strength === 4) {
+        } else {
             strengthClass = 'strength-strong';
-            feedbackText = '<span class="lang-en">Strong. Consider adding: </span><span class="lang-ar hidden">قوي. فكر في إضافة: </span>' + feedbackMessages.join(', ') + '.';
-            feedbackColorClass = 'text-blue-500';
-        } else if (strength >= 5) {
-            strengthClass = 'strength-very-strong';
-            feedbackText = '<span class="lang-en">Very Strong!</span><span class="lang-ar hidden">قوي جدًا!</span>';
+            feedbackText = '<span class="lang-en">Strong. Password exceeds minimum requirements.</span><span class="lang-ar hidden">قوي. كلمة المرور تتجاوز الحد الأدنى من المتطلبات.</span>';
             feedbackColorClass = 'text-green-500';
         }
 
@@ -628,17 +613,17 @@ document.addEventListener('DOMContentLoaded', function() {
             appendError(emailInput, '<span class="lang-en">Please enter a valid email address</span><span class="lang-ar hidden">يرجى إدخال عنوان بريد إلكتروني صالح</span>');
         }
 
-        // Validate password
+        // Validate password - FIXED to use strength >= 2
         const currentPasswordValue = passwordInput.value;
         const { strength } = checkPasswordStrength(currentPasswordValue);
         if (!currentPasswordValue) {
             isValid = false;
             passwordInput.parentElement.classList.add('input-error');
             appendError(passwordInput.parentElement, '<span class="lang-en">Password is required</span><span class="lang-ar hidden">كلمة المرور مطلوبة</span>');
-        } else if (strength < 3) {
+        } else if (strength < 2) { // Changed from < 3 to < 2 to match backend
             isValid = false;
             passwordInput.parentElement.classList.add('input-error');
-            appendError(passwordInput.parentElement, '<span class="lang-en">Password does not meet complexity requirements.</span><span class="lang-ar hidden">كلمة المرور لا تلبي متطلبات التعقيد.</span>');
+            appendError(passwordInput.parentElement, '<span class="lang-en">Password must be at least 8 characters with at least two character types.</span><span class="lang-ar hidden">يجب أن تكون كلمة المرور 8 أحرف على الأقل مع نوعين من الأحرف على الأقل.</span>');
         }
 
         // Validate confirm password

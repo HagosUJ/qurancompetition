@@ -56,9 +56,7 @@ function redirect($url, $message = "", $type = "success") {
 function set_flash_message(string $message, string $type = 'success') {
     // Ensure session is active (though it should be from auth.php)
     if (session_status() === PHP_SESSION_NONE) {
-        // Log warning or start session if absolutely necessary, but ideally auth.php handles this
         error_log("Warning: Session not started before calling set_flash_message.");
-        // session_start(); // Uncomment cautiously if needed, but prefer starting earlier
     }
     $_SESSION['flash_message'] = $message;
     $_SESSION['flash_type'] = $type;
@@ -106,9 +104,10 @@ function get_flash_message() {
 
 /**
  * Checks if a password meets complexity requirements.
+ * Requires at least 8 characters and at least two of: uppercase, lowercase, number, special character.
  *
  * @param string $password The password to check.
- * @return bool True if the password is strong, false otherwise.
+ * @return bool True if the password is strong enough, false otherwise.
  */
 function is_strong_password(string $password): bool
 {
@@ -116,24 +115,18 @@ function is_strong_password(string $password): bool
     if (strlen($password) < 8) {
         return false;
     }
-    // Must contain at least one uppercase letter
-    if (!preg_match('/[A-Z]/', $password)) {
-        return false;
-    }
-    // Must contain at least one lowercase letter
-    if (!preg_match('/[a-z]/', $password)) {
-        return false;
-    }
-    // Must contain at least one number
-    if (!preg_match('/[0-9]/', $password)) {
-        return false;
-    }
-    // Must contain at least one special character (adjust regex as needed)
-    if (!preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $password)) {
-        return false;
-    }
 
-    return true;
+    // Check for character types
+    $has_uppercase = preg_match('/[A-Z]/', $password);
+    $has_lowercase = preg_match('/[a-z]/', $password);
+    $has_number = preg_match('/[0-9]/', $password);
+    $has_special = preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $password);
+
+    // Count how many character types are present
+    $types_count = $has_uppercase + $has_lowercase + $has_number + $has_special;
+
+    // Require at least two character types
+    return $types_count >= 2;
 }
 
 /**
@@ -144,14 +137,13 @@ function is_strong_password(string $password): bool
 function logout_user(string $redirect_url = 'sign-in.php') {
     // Ensure session is started before trying to manipulate it
     if (session_status() === PHP_SESSION_NONE) {
-        session_start(); // Or use your secure session start function if available
+        session_start();
     }
 
     // Unset all session variables
     $_SESSION = array();
 
     // If it's desired to kill the session, also delete the session cookie.
-    // Note: This will destroy the session, and not just the session data!
     if (ini_get("session.use_cookies")) {
         $params = session_get_cookie_params();
         setcookie(session_name(), '', time() - 42000,
@@ -166,8 +158,6 @@ function logout_user(string $redirect_url = 'sign-in.php') {
     }
 
     // Redirect to the specified page
-    // Use the existing redirect function if it handles exit()
     redirect($redirect_url);
-    // exit; // exit() is likely handled within your redirect() function already
 }
 ?>
