@@ -59,14 +59,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
             $email_errors = [];
             foreach ($applicants as $applicant) {
-                try {
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.example.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'your_email@example.com';
-                    $mail->Password = 'your_password';
-                    $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-                    $mail->Port = 587;
+                $mail->isSMTP();
+        $mail->Host = 'mail.majlisuahlilquran.org'; // Updated mail server
+        $mail->SMTPAuth = true;
+        $mail->Username = 'admin@majlisuahlilquran.org'; // Updated username
+        $mail->Password = '%bDbxex4n%Mn'; // Updated password
+        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS; // Changed to ENCRYPTION_SMTPS for port 465
+        $mail->Port = 465; // Updated port
 
                     $mail->setFrom('no-reply@majlisahlilquran.org', 'Majlis Ahlil Quran Musabaqa Team');
                     $mail->addAddress($applicant['email'], $applicant['fullname']);
