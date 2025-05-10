@@ -564,7 +564,7 @@ $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 var downloadLink = document.getElementById('downloadLink');
 
                 // Construct file URL using download.php for security
-                var fileUrl = 'download.php?application_id=<?php echo $application_id; ?>&file=' + file;
+                var fileUrl = 'download.php?application_id=<?php echo $application_id; ?>&file=' + file + '&preview=true';
                 downloadLink.href = fileUrl;
 
                 // Clear previous content

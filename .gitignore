@@ -6,3 +6,5 @@ portal/.DS_Store
 admin/create_admin.php
 admin/.DS_Store
 admin/.env
+portal/uploads
+portal/Uploads
