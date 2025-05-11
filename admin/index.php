@@ -37,6 +37,19 @@ $stmt = $pdo->prepare($user_count_query);
 $stmt->execute();
 $user_count = $stmt->fetch(PDO::FETCH_ASSOC)['total_users'];
 
+// Fetch active user count
+$active_users_query = "SELECT COUNT(*) AS active_users FROM users WHERE role = 'user' AND status = 'active'";
+$stmt_active = $pdo->prepare($active_users_query);
+$stmt_active->execute();
+$active_users_count = $stmt_active->fetch(PDO::FETCH_ASSOC)['active_users'];
+
+// Fetch pending user count
+$pending_users_query = "SELECT COUNT(*) AS pending_users FROM users WHERE role = 'user' AND status = 'pending'";
+$stmt_pending = $pdo->prepare($pending_users_query);
+$stmt_pending->execute();
+$pending_users_count = $stmt_pending->fetch(PDO::FETCH_ASSOC)['pending_users'];
+
+
 // --- Fetch Application Metrics ---
 
 // Fetch count for Submitted Applications (awaiting review)
@@ -53,9 +66,6 @@ $stmt_pending_completion = $pdo->prepare($pending_completion_applications_query)
 $stmt_pending_completion->execute($pending_completion_statuses);
 $pending_completion_applications_count = $stmt_pending_completion->fetch(PDO::FETCH_ASSOC)['count'];
 
-// Placeholder for $new_users and $completed_profiles if their calculation is elsewhere
-$new_users = $new_users ?? 0; // Assuming it might be calculated elsewhere
-$completed_profiles = $completed_profiles ?? 0; // Assuming it might be calculated elsewhere
 // Placeholder for chart data if dynamic data is intended for them
 $user_counts = $user_counts ?? array_fill(0, 12, 0); // Example: 12 months, all zero
 $months = $months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -146,15 +156,15 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-6">
-                                            <h5 class="text-uppercase fs-13 mt-0 text-truncate" title="New Users">New Users</h5>
-                                            <h2 class="my-2 py-1"><?php echo number_format($new_users); ?></h2>
+                                            <h5 class="text-uppercase fs-13 mt-0 text-truncate" title="Active Users">Active Users</h5>
+                                            <h2 class="my-2 py-1"><?php echo number_format($active_users_count); ?></h2>
                                             <p class="mb-0 text-muted text-truncate">
-                                                <span class="text-success me-2">Last 30 days</span>
+                                                <a href="users.php?status=active" class="text-success">View Active Users <i class="ri-arrow-right-line"></i></a>
                                             </p>
                                         </div>
                                         <div class="col-6">
                                             <div class="text-end">
-                                                <div id="new-users-chart" data-colors="#47ad77"></div>
+                                                <div id="active-users-chart" data-colors="#47ad77"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -167,15 +177,15 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-6">
-                                            <h5 class="text-uppercase fs-13 mt-0 text-truncate" title="Completed Profiles">Completed Profiles</h5>
-                                            <h2 class="my-2 py-1"><?php echo number_format($completed_profiles); ?></h2>
+                                            <h5 class="text-uppercase fs-13 mt-0 text-truncate" title="Pending Users">Pending Users</h5>
+                                            <h2 class="my-2 py-1"><?php echo number_format($pending_users_count); ?></h2>
                                             <p class="mb-0 text-muted text-truncate">
-                                                <a href="users.php" class="text-info">Manage Profiles <i class="ri-arrow-right-line"></i></a>
+                                                <a href="users.php?status=pending" class="text-warning">View Pending Users <i class="ri-arrow-right-line"></i></a>
                                             </p>
                                         </div>
                                         <div class="col-6">
                                             <div class="text-end">
-                                                <div id="completed-profiles-chart" data-colors="#f4bc30"></div>
+                                                <div id="pending-users-chart" data-colors="#f4bc30"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -361,12 +371,12 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                 new ApexCharts(document.querySelector('#total-users-chart'), 
                     {...cardChartOptions, colors: ['#16a7e9']}).render();
             }
-            if (document.querySelector('#new-users-chart')) {
-                new ApexCharts(document.querySelector('#new-users-chart'), 
+            if (document.querySelector('#active-users-chart')) {
+                new ApexCharts(document.querySelector('#active-users-chart'), 
                     {...cardChartOptions, colors: ['#47ad77']}).render();
             }
-            if (document.querySelector('#completed-profiles-chart')) {
-                new ApexCharts(document.querySelector('#completed-profiles-chart'), 
+            if (document.querySelector('#pending-users-chart')) {
+                new ApexCharts(document.querySelector('#pending-users-chart'), 
                     {...cardChartOptions, colors: ['#f4bc30']}).render();
             }
             // New charts for application metrics
@@ -399,7 +409,7 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                     dataLabels: {enabled: false},
                     stroke: {show: true, width: 2, colors: ['transparent']},
                     series: [{
-                        name: 'New Users',
+                        name: 'New Users', // You might want to change this label if $user_counts represents total users per month
                         data: userCountsData
                     }],
                     xaxis: {
@@ -422,40 +432,7 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                 }).render();
             }
             
-            // Profile Completion Chart (if data is available)
-            const completedProfilesCount = <?php echo $completed_profiles; ?>;
-            const totalUserCountForProfileChart = <?php echo $user_count; ?>;
-            if (document.querySelector('#profile-completion-chart')) {
-                new ApexCharts(document.querySelector('#profile-completion-chart'), {
-                    chart: {
-                        type: 'pie',
-                        height: 320
-                    },
-                    series: [completedProfilesCount, Math.max(0, totalUserCountForProfileChart - completedProfilesCount)],
-                    labels: ['Completed', 'Incomplete'],
-                    colors: ['#47ad77', '#fa5c7c'],
-                    legend: {
-                        show: true,
-                        position: 'bottom',
-                        horizontalAlign: 'center',
-                        floating: false,
-                        fontSize: '14px',
-                        offsetX: 0,
-                        offsetY: 7
-                    },
-                    responsive: [{
-                        breakpoint: 600,
-                        options: {
-                            chart: {
-                                height: 240
-                            },
-                            legend: {
-                                show: false
-                            }
-                        }
-                    }]
-                }).render();
-            }
+            // Removed Profile Completion Chart as per request
         });
         
     </script>

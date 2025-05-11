@@ -1,3 +1,6 @@
+<?php
+// filepath: /Applications/XAMPP/xamppfiles/htdocs/musabaqa/admin/layouts/left-sidebar.php
+?>
 <!-- ========== Left Sidebar Start ========== -->
 <div class="leftside-menu">
   <!-- Brand Logo Light -->
@@ -37,7 +40,7 @@
       <a href="admin-profile.php">
         <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42" class="rounded-circle shadow-sm" />
         <span
-          class="leftbar-user-name mt-2"><?php echo isset($_SESSION['admin_username']) ? $_SESSION['admin_username'] : 'Admin User'; ?></span>
+          class="leftbar-user-name mt-2"><?php echo isset($_SESSION['admin_username']) ? htmlspecialchars($_SESSION['admin_username']) : 'Admin User'; ?></span>
       </a>
     </div>
 
@@ -57,27 +60,31 @@
           <i class="ri-user-line"></i>
           <span> All Users </span>
         </a>
-
-
       </li>
 
       <li class="side-nav-item">
-        <a data-bs-toggle="collapse" href="#sidebarRegistrationManagement" aria-expanded="false"
-          aria-controls="sidebarRegistrationManagement" class="side-nav-link">
-          <i class="ri-profile-line"></i>
-          <span> Registrations </span>
+        <a data-bs-toggle="collapse" href="#sidebarApplications" aria-expanded="false"
+          aria-controls="sidebarApplications" class="side-nav-link">
+          <i class="ri-file-list-3-line"></i> 
+          <span> Applications </span>
           <span class="menu-arrow"></span>
         </a>
-        <div class="collapse" id="sidebarRegistrationManagement">
+        <div class="collapse" id="sidebarApplications">
           <ul class="side-nav-second-level">
             <li>
-              <a href="registrations.php">All Registrations</a>
+              <a href="manage_applications.php">All Applications</a>
             </li>
             <li>
-              <a href="registrations.php?state=pending">Pending Registrations</a>
+              <a href="manage_applications.php?status=Submitted">Submitted Applications</a>
             </li>
             <li>
-              <a href="registrations.php?state=approved">Approved Registrations</a>
+              <a href="manage_applications.php?status=Not Started">Pending Completion</a>
+            </li>
+            <li>
+              <a href="manage_applications.php?status=Approved">Approved Applications</a>
+            </li>
+            <li>
+              <a href="manage_applications.php?status=Rejected">Rejected Applications</a>
             </li>
           </ul>
         </div>
@@ -180,7 +187,7 @@
       </li>
 
       <li class="side-nav-item">
-        <a href="?state=logout" class="side-nav-link">
+        <a href="index.php?state=logout" class="side-nav-link">
           <i class="ri-logout-box-line"></i>
           <span> Logout </span>
         </a>
