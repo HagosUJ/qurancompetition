@@ -172,55 +172,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 exit;
             }
 
-            $mail_remind = new \PHPMailer\PHPMailer\PHPMailer(true); 
-            $email_errors_remind = []; 
-            $sent_count = 0;
+            $queued_count = 0;
+            $queue_errors = [];
 
-            // SMTP Configuration
-            $mail_remind->isSMTP();
-            $mail_remind->Host = 'mail.majlisuahlilquran.org'; 
-            $mail_remind->SMTPAuth = true;
-            $mail_remind->Username = 'admin@majlisuahlilquran.org'; 
-            $mail_remind->Password = '%bDbxex4n%Mn'; 
-            $mail_remind->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-            $mail_remind->Port = 465;
-            $mail_remind->SMTPKeepAlive = true;
-
-            // DKIM Settings (Requires setup on your server and DNS)
-            // $mail_remind->DKIM_domain = 'majlisuahlilquran.org';
-            // $mail_remind->DKIM_private = '/path/to/your/dkim_private.key';
-            // $mail_remind->DKIM_selector = 'default';
-            // $mail_remind->DKIM_passphrase = '';
-            // $mail_remind->DKIM_identity = $mail_remind->From; // Usually the same as From
+            $insert_queue_query = "INSERT INTO email_queue (recipient_email, recipient_name, subject, html_body, text_body, status) 
+                                   VALUES (:recipient_email, :recipient_name, :subject, :html_body, :text_body, 'pending')";
+            $stmt_queue = $pdo->prepare($insert_queue_query);
 
             foreach ($applicants_to_remind as $applicant) {
-                try {
-                    $mail_remind->setFrom('admin@majlisuahlilquran.org', 'Majlis Ahlil Quran Musabaqa Team');
-                    $mail_remind->addReplyTo('admin@majlisuahlilquran.org', 'Majlis Ahlil Quran Musabaqa Team');
-                    $mail_remind->addAddress($applicant['email'], $applicant['fullname']);
-                    $mail_remind->isHTML(true);
-                    $mail_remind->CharSet = 'UTF-8';
-                    $mail_remind->Subject = 'Reminder: Complete Your Musabaqa Application';
-                    
-                    $htmlBody_remind = "<h3>Dear {$applicant['fullname']},</h3>
-                             <p>This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa.</p>
-                             <p>Your current application status is: <strong>" . htmlspecialchars($applicant['application_status']) . "</strong>.</p>
-                             <p>Please log in to your dashboard to continue and submit your application: <a href='https://majlisuahlilquran.org/portal/sign-in.php'>Complete Your Application</a></p>
-                             <p>If you have any questions, please do not hesitate to contact us.</p>
-                             <p>Best regards,<br>Musabaqa Team</p>";
-                    $mail_remind->Body = $htmlBody_remind;
+                $subject_remind = 'Reminder: Complete Your Musabaqa Application';
+                $htmlBody_remind = "<h3>Dear {$applicant['fullname']},</h3>
+                         <p>This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa.</p>
+                         <p>Your current application status is: <strong>" . htmlspecialchars($applicant['application_status']) . "</strong>.</p>
+                         <p>Please log in to your dashboard to continue and submit your application: <a href='https://majlisuahlilquran.org/portal/sign-in.php'>Complete Your Application</a></p>
+                         <p>If you have any questions, please do not hesitate to contact us.</p>
+                         <p>Best regards,<br>Musabaqa Team</p>";
 
-                    $plainTextBody_remind = "Dear {$applicant['fullname']},\n\n" .
-                                     "This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa.\n" .
-                                     "Your current application status is: " . htmlspecialchars($applicant['application_status']) . ".\n" .
-                                     "Please log in to your dashboard to continue and submit your application: https://majlisuahlilquran.org/portal/sign-in.php\n\n" .
-                                     "If you have any questions, please do not hesitate to contact us.\n\n" .
-                                     "Best regards,\nMusabaqa Team";
-                    $mail_remind->AltBody = $plainTextBody_remind;
-        
-                    $mail_remind->send();
-                    $sent_count++;
-        
+                $plainTextBody_remind = "Dear {$applicant['fullname']},\n\n" .
+                                 "This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa.\n" .
+                                 "Your current application status is: " . htmlspecialchars($applicant['application_status']) . ".\n" .
+                                 "Please log in to your dashboard to continue and submit your application: https://majlisuahlilquran.org/portal/sign-in.php\n\n" .
+                                 "If you have any questions, please do not hesitate to contact us.\n\n" .
+                                 "Best regards,\nMusabaqa Team";
+                try {
+                    $stmt_queue->execute([
+                        ':recipient_email' => $applicant['email'],
+                        ':recipient_name' => $applicant['fullname'],
+                        ':subject' => $subject_remind,
+                        ':html_body' => $htmlBody_remind,
+                        ':text_body' => $plainTextBody_remind
+                    ]);
+                    $queued_count++;
+
+                    // Also create an in-app notification
                     $notification_message_remind = "Reminder: Please complete your Musabaqa application. Current status: " . htmlspecialchars($applicant['application_status']);
                     $notification_query_remind = "INSERT INTO notifications (user_id, message, type, created_at) 
                                         VALUES (:user_id, :message, 'application_reminder', NOW())";
@@ -229,28 +213,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         'user_id' => $applicant['user_id'],
                         'message' => $notification_message_remind
                     ]);
-                    $mail_remind->clearAddresses();
-                    $mail_remind->clearAttachments();
-                } catch (\PHPMailer\PHPMailer\Exception $e) {
-                    $email_errors_remind[] = "Failed to send reminder to {$applicant['email']}: " . $mail_remind->ErrorInfo;
+
+                } catch (PDOException $e) {
+                    $queue_errors[] = "Failed to queue email for {$applicant['email']}: " . $e->getMessage();
                 }
             }
-            $mail_remind->smtpClose(); 
 
-            if ($sent_count > 0 && empty($email_errors_remind)) {
-                $_SESSION['success'] = "$sent_count reminder email(s) sent successfully.";
-            } elseif ($sent_count > 0 && !empty($email_errors_remind)) {
-                $_SESSION['warning'] = "$sent_count reminder(s) sent, but some emails failed: " . implode(', ', $email_errors_remind);
-            } elseif (empty($email_errors_remind)) { 
-                 $_SESSION['info'] = "No applications found requiring a reminder at this time.";
+            if ($queued_count > 0 && empty($queue_errors)) {
+                $_SESSION['success'] = "$queued_count reminder email(s) have been queued for sending. Please run the email processing script.";
+            } elseif ($queued_count > 0 && !empty($queue_errors)) {
+                $_SESSION['warning'] = "$queued_count reminder(s) queued, but some failed to queue: " . implode(', ', $queue_errors);
+            } elseif (empty($queue_errors)) { 
+                 $_SESSION['info'] = "No applications found requiring a reminder at this time (or all already processed for queueing).";
             } else { 
-                $_SESSION['error'] = "Failed to send reminder emails. Errors: " . implode(', ', $email_errors_remind);
+                $_SESSION['error'] = "Failed to queue reminder emails. Errors: " . implode(', ', $queue_errors);
             }
 
         } catch (PDOException $e) {
-            $_SESSION['error'] = "Database error while fetching applicants for reminders: " . $e->getMessage();
-        } catch (\PHPMailer\PHPMailer\Exception $e) { 
-            $_SESSION['error'] = "Mailer Error: " . $e->getMessage();
+            $_SESSION['error'] = "Database error while preparing to queue reminders: " . $e->getMessage();
         }
         header("Location: manage_applications.php" . (isset($_GET['status']) ? "?status={$_GET['status']}" : ""));
         exit;
