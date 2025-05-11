@@ -100,7 +100,7 @@ $translations = [
         // Guidelines in English
         'guidelines_content' => <<<EOT
 <p><em>In the name of Allah, the Most Gracious, the Most Merciful. Peace and blessings be upon the noble Prophet.</em></p>
-<p><em>These are simple guidelines for the <strong>Global Ahlul Qur'an Council Competition in Nigeria</strong>, the first of its kind in this blessed country (2020/1441). Prepared by the guidance committee, these instructions serve as a guide for participants and judges.</em></p>
+<p><em>These are simple guidelines for the <strong>Global Ahlul Qur'an Council Competition in Nigeria</strong>, the first of its kind in this blessed country (2025/1446). Prepared by the guidance committee, these instructions serve as a guide for participants and judges.</em></p>
 
 <h3>Competition Title</h3>
 <p><strong>Global Ahlul Qur'an Council Competition – Nigeria</strong></p>
@@ -246,7 +246,7 @@ EOT
         // Guidelines in Arabic
         'guidelines_content' => <<<EOT
 <p><em>بسم الله الرحمن الرحيم. والصلاة والسلام على النبي الكريم.</em></p>
-<p><em>هذه إرشادات بسيطة لمسابقة <strong>مجلس أهل القرآن العالمي في نيجيريا</strong>، وهي الأولى من نوعها في هذا البلد المبارك (2020/1441). تم إعداد هذه التعليمات من قبل لجنة الإرشاد لتكون دليلاً للمشاركين والحكام.</em></p>
+<p><em>هذه إرشادات بسيطة لمسابقة <strong>مجلس أهل القرآن العالمي في نيجيريا</strong>، وهي الأولى من نوعها في هذا البلد المبارك (2025/1446). تم إعداد هذه التعليمات من قبل لجنة الإرشاد لتكون دليلاً للمشاركين والحكام.</em></p>
 
 <h3>عنوان المسابقة</h3>
 <p><strong>مسابقة مجلس أهل القرآن العالمي – نيجيريا</strong></p>
