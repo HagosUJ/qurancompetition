@@ -37,6 +37,30 @@ $stmt = $pdo->prepare($user_count_query);
 $stmt->execute();
 $user_count = $stmt->fetch(PDO::FETCH_ASSOC)['total_users'];
 
+// --- Fetch Application Metrics ---
+
+// Fetch count for Submitted Applications (awaiting review)
+$submitted_applications_query = "SELECT COUNT(*) AS count FROM applications WHERE status = 'Submitted' OR status = 'Under Review'";
+$stmt_submitted = $pdo->prepare($submitted_applications_query);
+$stmt_submitted->execute();
+$submitted_applications_count = $stmt_submitted->fetch(PDO::FETCH_ASSOC)['count'];
+
+// Fetch count for Applications Pending Completion by users
+$pending_completion_statuses = ['Not Started', 'Personal Info Complete', 'Sponsor Info Complete', 'Documents Uploaded', 'Information Requested'];
+$placeholders_pending = implode(',', array_fill(0, count($pending_completion_statuses), '?'));
+$pending_completion_applications_query = "SELECT COUNT(*) AS count FROM applications WHERE status IN ($placeholders_pending)";
+$stmt_pending_completion = $pdo->prepare($pending_completion_applications_query);
+$stmt_pending_completion->execute($pending_completion_statuses);
+$pending_completion_applications_count = $stmt_pending_completion->fetch(PDO::FETCH_ASSOC)['count'];
+
+// Placeholder for $new_users and $completed_profiles if their calculation is elsewhere
+$new_users = $new_users ?? 0; // Assuming it might be calculated elsewhere
+$completed_profiles = $completed_profiles ?? 0; // Assuming it might be calculated elsewhere
+// Placeholder for chart data if dynamic data is intended for them
+$user_counts = $user_counts ?? array_fill(0, 12, 0); // Example: 12 months, all zero
+$months = $months ?? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+
 if (isset($_GET['state']) && $_GET['state'] === 'logout') {
     // Unset all session variables
     $_SESSION = array();
@@ -85,7 +109,7 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                             <div class="page-title-box">
                                 <div class="page-title-right">
                                     <form class="d-flex">
-                                        <a href="javascript: void(0);" class="btn btn-success ms-2 flex-shrink-0">
+                                        <a href="index.php" class="btn btn-success ms-2 flex-shrink-0">
                                             <i class="ri-refresh-line"></i> Refresh
                                         </a>
                                     </form>
@@ -146,7 +170,7 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                                             <h5 class="text-uppercase fs-13 mt-0 text-truncate" title="Completed Profiles">Completed Profiles</h5>
                                             <h2 class="my-2 py-1"><?php echo number_format($completed_profiles); ?></h2>
                                             <p class="mb-0 text-muted text-truncate">
-                                                <a href="profiles.php" class="text-info">Manage Profiles <i class="ri-arrow-right-line"></i></a>
+                                                <a href="users.php" class="text-info">Manage Profiles <i class="ri-arrow-right-line"></i></a>
                                             </p>
                                         </div>
                                         <div class="col-6">
@@ -160,47 +184,54 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                         </div>
                     </div>
 
-                    <!-- <div class="row">
-                        <div class="col-xl-6">
+                    <!-- Application Metrics Row -->
+                    <div class="row">
+                        <div class="col-xl-4 col-lg-6">
                             <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h4 class="header-title">User Registration Trend</h4>
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle arrow-none card-drop" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ri-more-2-fill"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="reports.php?export=users" class="dropdown-item">Export Data</a>
-                                            <a href="users.php" class="dropdown-item">View All Users</a>
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-6">
+                                            <h5 class="text-uppercase fs-13 mt-0 text-truncate" title="Submitted Applications">Submitted Applications</h5>
+                                            <h2 class="my-2 py-1"><?php echo number_format($submitted_applications_count); ?></h2>
+                                            <p class="mb-0 text-muted text-truncate">
+                                                <a href="manage_applications.php?status=Submitted" class="text-info">Review Applications <i class="ri-arrow-right-line"></i></a>
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-end">
+                                                <div id="submitted-applications-chart" data-colors="#007bff"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-body pt-0">
-                                    <div id="registration-trend-chart" class="apex-charts" data-colors="#16a7e9"></div>
-                                </div>
                             </div>
                         </div>
-                        
-                        <div class="col-xl-6">
+
+                        <div class="col-xl-4 col-lg-6">
                             <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h4 class="header-title">Profile Completion Status</h4>
-                                    <div class="dropdown">
-                                        <a href="#" class="dropdown-toggle arrow-none card-drop" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ri-more-2-fill"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a href="reports.php?export=profiles" class="dropdown-item">Export Data</a>
-                                            <a href="profiles.php" class="dropdown-item">View All Profiles</a>
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-6">
+                                            <h5 class="text-uppercase fs-13 mt-0 text-truncate" title="Applications Pending Completion">Pending Completion</h5>
+                                            <h2 class="my-2 py-1"><?php echo number_format($pending_completion_applications_count); ?></h2>
+                                            <p class="mb-0 text-muted text-truncate">
+                                                <a href="manage_applications.php?status=Not Started" class="text-warning">View In-Progress <i class="ri-arrow-right-line"></i></a>
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-end">
+                                                <div id="pending-completion-chart" data-colors="#ffc107"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-body pt-0">
-                                    <div id="profile-completion-chart" class="apex-charts" data-colors="#16a7e9,#fa5c7c"></div>
-                                </div>
                             </div>
                         </div>
-                    </div> -->
+                         <div class="col-xl-4 col-lg-6">
+                            <!-- Placeholder for a potential third card in this row or leave empty -->
+                        </div>
+                    </div>
+
 
                     <!-- Recent Users Table -->
                     <div class="row">
@@ -242,6 +273,9 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                                                     </td>
                                                 </tr>
                                                 <?php endforeach; ?>
+                                                <?php if (empty($recent_users)): ?>
+                                                    <tr><td colspan="5" class="text-center">No recent users found.</td></tr>
+                                                <?php endif; ?>
                                             </tbody>
                                         </table>
                                     </div>
@@ -292,11 +326,10 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                     sparkline: {enabled: true}
                 },
                 series: [{
-                    data: [25, 33, 28, 35, 30, 40]
+                    data: [25, 33, 28, 35, 30, 40] // Static data for sparklines
                 }],
                 stroke: {width: 2, curve: 'smooth'},
                 markers: {size: 0},
-                colors: ['#16a7e9'],
                 tooltip: {
                     fixed: {enabled: false},
                     x: {show: false},
@@ -324,92 +357,107 @@ if (isset($_GET['state']) && $_GET['state'] === 'logout') {
                 }
             };
             
-            new ApexCharts(document.querySelector('#total-users-chart'), 
-                {...cardChartOptions, colors: ['#16a7e9']}).render();
-            new ApexCharts(document.querySelector('#new-users-chart'), 
-                {...cardChartOptions, colors: ['#47ad77']}).render();
-            new ApexCharts(document.querySelector('#completed-profiles-chart'), 
-                {...cardChartOptions, colors: ['#f4bc30']}).render();
-            new ApexCharts(document.querySelector('#payments-chart'), 
-                {...cardChartOptions, colors: ['#fa5c7c']}).render();
+            if (document.querySelector('#total-users-chart')) {
+                new ApexCharts(document.querySelector('#total-users-chart'), 
+                    {...cardChartOptions, colors: ['#16a7e9']}).render();
+            }
+            if (document.querySelector('#new-users-chart')) {
+                new ApexCharts(document.querySelector('#new-users-chart'), 
+                    {...cardChartOptions, colors: ['#47ad77']}).render();
+            }
+            if (document.querySelector('#completed-profiles-chart')) {
+                new ApexCharts(document.querySelector('#completed-profiles-chart'), 
+                    {...cardChartOptions, colors: ['#f4bc30']}).render();
+            }
+            // New charts for application metrics
+            if (document.querySelector('#submitted-applications-chart')) {
+                new ApexCharts(document.querySelector('#submitted-applications-chart'), 
+                    {...cardChartOptions, colors: ['#007bff']}).render();
+            }
+            if (document.querySelector('#pending-completion-chart')) {
+                new ApexCharts(document.querySelector('#pending-completion-chart'), 
+                    {...cardChartOptions, colors: ['#ffc107']}).render();
+            }
                 
-            // Registration Trend Chart
-            new ApexCharts(document.querySelector('#registration-trend-chart'), {
-                chart: {
-                    type: 'bar',
-                    height: 350,
-                    toolbar: {show: false}
-                },
-                plotOptions: {
-                    bar: {
-                        horizontal: false,
-                        columnWidth: '45%',
-                        borderRadius: 4
-                    }
-                },
-                dataLabels: {enabled: false},
-                stroke: {show: true, width: 2, colors: ['transparent']},
-                series: [{
-                    name: 'New Users',
-                    data: <?php echo json_encode($user_counts); ?>
-                }],
-                xaxis: {
-                    categories: <?php echo json_encode($months); ?>,
-                },
-                yaxis: {
-                    title: {text: 'User Count'}
-                },
-                fill: {
-                    opacity: 1
-                },
-                tooltip: {
-                    y: {
-                        formatter: function (val) {
-                            return val + " users"
+            // Registration Trend Chart (if data is available)
+            const userCountsData = <?php echo json_encode($user_counts); ?>;
+            const monthsData = <?php echo json_encode($months); ?>;
+            if (document.querySelector('#registration-trend-chart') && userCountsData && monthsData) {
+                new ApexCharts(document.querySelector('#registration-trend-chart'), {
+                    chart: {
+                        type: 'bar',
+                        height: 350,
+                        toolbar: {show: false}
+                    },
+                    plotOptions: {
+                        bar: {
+                            horizontal: false,
+                            columnWidth: '45%',
+                            borderRadius: 4
                         }
-                    }
-                },
-                colors: ['#3e60d5', '#47ad77', '#fa5c7c']
-            }).render();
+                    },
+                    dataLabels: {enabled: false},
+                    stroke: {show: true, width: 2, colors: ['transparent']},
+                    series: [{
+                        name: 'New Users',
+                        data: userCountsData
+                    }],
+                    xaxis: {
+                        categories: monthsData,
+                    },
+                    yaxis: {
+                        title: {text: 'User Count'}
+                    },
+                    fill: {
+                        opacity: 1
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return val + " users"
+                            }
+                        }
+                    },
+                    colors: ['#3e60d5', '#47ad77', '#fa5c7c']
+                }).render();
+            }
             
-            // Profile Completion Chart
-            new ApexCharts(document.querySelector('#profile-completion-chart'), {
-                chart: {
-                    type: 'pie',
-                    height: 320
-                },
-                series: [<?php echo $completed_profiles; ?>, <?php echo max(0, $user_count - $completed_profiles); ?>],
-                labels: ['Completed', 'Incomplete'],
-                colors: ['#47ad77', '#fa5c7c'],
-                legend: {
-                    show: true,
-                    position: 'bottom',
-                    horizontalAlign: 'center',
-                    floating: false,
-                    fontSize: '14px',
-                    offsetX: 0,
-                    offsetY: 7
-                },
-                responsive: [{
-                    breakpoint: 600,
-                    options: {
-                        chart: {
-                            height: 240
-                        },
-                        legend: {
-                            show: false
+            // Profile Completion Chart (if data is available)
+            const completedProfilesCount = <?php echo $completed_profiles; ?>;
+            const totalUserCountForProfileChart = <?php echo $user_count; ?>;
+            if (document.querySelector('#profile-completion-chart')) {
+                new ApexCharts(document.querySelector('#profile-completion-chart'), {
+                    chart: {
+                        type: 'pie',
+                        height: 320
+                    },
+                    series: [completedProfilesCount, Math.max(0, totalUserCountForProfileChart - completedProfilesCount)],
+                    labels: ['Completed', 'Incomplete'],
+                    colors: ['#47ad77', '#fa5c7c'],
+                    legend: {
+                        show: true,
+                        position: 'bottom',
+                        horizontalAlign: 'center',
+                        floating: false,
+                        fontSize: '14px',
+                        offsetX: 0,
+                        offsetY: 7
+                    },
+                    responsive: [{
+                        breakpoint: 600,
+                        options: {
+                            chart: {
+                                height: 240
+                            },
+                            legend: {
+                                show: false
+                            }
                         }
-                    }
-                }]
-            }).render();
+                    }]
+                }).render();
+            }
         });
         
-        // Delete confirmation function
-        function confirmDelete(userId) {
-            if (confirm("Are you sure you want to delete this user?")) {
-                window.location.href = "user_delete.php?id=" + userId;
-            }
-        }
     </script>
 </body>
 </html>
