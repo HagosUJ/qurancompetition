@@ -90,7 +90,7 @@
         </div>
       </li>
 
-      <li class="side-nav-title">Reports & Tools</li>
+      <!-- <li class="side-nav-title">Reports & Tools</li>
 
       <li class="side-nav-item">
         <a data-bs-toggle="collapse" href="#sidebarReports" aria-expanded="false" aria-controls="sidebarReports"
@@ -118,7 +118,7 @@
             </li>
           </ul>
         </div>
-      </li>
+      </li> -->
 
       <li class="side-nav-item">
         <a data-bs-toggle="collapse" href="#sidebarCommunication" aria-expanded="false"
@@ -129,18 +129,15 @@
         </a>
         <div class="collapse" id="sidebarCommunication">
           <ul class="side-nav-second-level">
-            <li>
+            <!-- <li>
               <a href="email-templates.php">Email Templates</a>
-            </li>
+            </li> -->
             <li>
-              <a href="send-notifications.php">Send Notifications</a>
+              <a href="admin_notifications.php">Manage Notifications</a>
             </li>
-            <li>
-              <a href="email-history.php">Email History</a>
-            </li>
-            <li>
-              <a href="messaging.php">SMS/Messaging</a>
-            </li>
+           
+           
+
           </ul>
         </div>
       </li>

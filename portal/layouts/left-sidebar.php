@@ -91,6 +91,13 @@ error_log("Sidebar loaded with language: $current_lang");
           <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">الجدول</span>
         </a>
       </li>
+      <li class="side-nav-item">
+        <a href="notifications.php" class="side-nav-link">
+          <i class="ri-notification-3-line"></i>
+          <span class="sidebar-lang lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Notifications</span>
+          <span class="sidebar-lang lang-ar <?php echo $current_lang === 'en' ? 'hidden' : ''; ?>">الإشعارات</span>
+        </a>
+      </li>
 
       <li class="side-nav-title sidebar-lang mt-2">
         <span class="lang-en <?php echo $current_lang === 'ar' ? 'hidden' : ''; ?>">Account</span>
