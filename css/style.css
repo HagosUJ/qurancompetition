@@ -168,7 +168,7 @@ video {
 }
 header img,
 header video,
-footer video,
+footer video, 
 footer img,
 .bringer-logo img {
     border-radius: unset;

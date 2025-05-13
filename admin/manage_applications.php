@@ -24,20 +24,17 @@ if (empty($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true
     exit;
 }
 
-// Define APP_URL if not already defined (you should ideally set this in a global config)
+// Define APP_URL if not already defined
 if (!defined('APP_URL')) {
-    // Adjust the rtrim and dirname levels if your admin folder is nested differently
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
     $host = $_SERVER['HTTP_HOST'];
-    // Assuming admin is one level down from the root (e.g., /musabaqa/admin -> /musabaqa/)
     $script_dir = rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); 
-    $app_root_path = dirname($script_dir); // Go up one level from admin
-    if ($app_root_path === '/' || $app_root_path === '\\') { // Handle if admin is directly in root
+    $app_root_path = dirname($script_dir);
+    if ($app_root_path === '/' || $app_root_path === '\\') {
         $app_root_path = '';
     }
     define('APP_URL', $protocol . "://" . $host . $app_root_path . '/');
 }
-
 
 // Handle individual and bulk actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -84,13 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $mail->Port = 465;
             $mail->SMTPKeepAlive = true; 
 
-            // DKIM Settings (Requires setup on your server and DNS)
-            // $mail->DKIM_domain = 'majlisuahlilquran.org';
-            // $mail->DKIM_private = '/path/to/your/dkim_private.key'; // Path to your DKIM private key
-            // $mail->DKIM_selector = 'default'; // Your DKIM selector
-            // $mail->DKIM_passphrase = ''; // Passphrase for DKIM private key, if any
-            // $mail->DKIM_identity = $mail->From; // Usually the same as From
-
             foreach ($applicants as $applicant) {
                 try {
                     $mail->setFrom('admin@majlisuahlilquran.org', 'Majlis Ahlil Quran Musabaqa Team');
@@ -100,13 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $mail->CharSet = 'UTF-8';
                     $mail->Subject = 'Application Status Update';
                     
-                    $htmlBody = "<h3>Dear {$applicant['fullname']},</h3>
-                             <p>Your application for the " . ($applicant['contestant_type'] === 'nigerian' ? 'Nigerian' : 'International') . " competition has been <strong>" . ucfirst($new_status) . "</strong>.</p>";
+                    $htmlBody = "<h3 style='color: #1a3c34; font-family: Arial, sans-serif;'>Dear {$applicant['fullname']},</h3>
+                             <p style='font-family: Arial, sans-serif; font-size: 14px;'>Your application for the " . ($applicant['contestant_type'] === 'nigerian' ? 'Nigerian' : 'International') . " competition has been <strong>" . ucfirst($new_status) . "</strong>.</p>";
                     if ($new_status === 'Rejected' && $rejection_reason) {
-                        $htmlBody .= "<p><strong>Reason for Rejection:</strong> " . htmlspecialchars($rejection_reason) . "</p>";
+                        $htmlBody .= "<p style='font-family: Arial, sans-serif; font-size: 14px;'><strong>Reason for Rejection:</strong> " . htmlspecialchars($rejection_reason) . "</p>";
                     }
-                    $htmlBody .= "<p>Please check your dashboard for further details: <a href='" . APP_URL . "login.php'>Login to Dashboard</a></p>
-                              <p>Best regards,<br>Musabaqa Team</p>";
+                    $htmlBody .= "<p style='font-family: Arial, sans-serif; font-size: 14px;'>Please check your dashboard for further details: <a href='" . APP_URL . "login.php' style='color: #007bff; text-decoration: none;'>Login to Dashboard</a></p>
+                              <p style='font-family: Arial, sans-serif; font-size: 14px;'>Best regards,<br>Musabaqa Team</p>";
                     $mail->Body = $htmlBody;
 
                     $plainTextBody = "Dear {$applicant['fullname']},\n\n" .
@@ -158,16 +148,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $placeholders_statuses = implode(',', array_fill(0, count($reminder_statuses), '?'));
 
         try {
+            // Only select applications where last_reminder_at is NULL or older than 3 days
             $query_remind = "SELECT u.id AS user_id, u.fullname, u.email, a.status AS application_status, a.contestant_type
                       FROM applications a
                       JOIN users u ON a.user_id = u.id
-                      WHERE a.status IN ($placeholders_statuses)";
+                      WHERE a.status IN ($placeholders_statuses)
+                      AND (a.last_reminder_at IS NULL OR a.last_reminder_at < NOW() - INTERVAL 3 DAY)";
             $stmt_remind = $pdo->prepare($query_remind); 
             $stmt_remind->execute($reminder_statuses);
             $applicants_to_remind = $stmt_remind->fetchAll(PDO::FETCH_ASSOC);
 
             if (empty($applicants_to_remind)) {
-                $_SESSION['info'] = "No applications found requiring a reminder.";
+                $_SESSION['info'] = "No applications found requiring a reminder at this time.";
                 header("Location: manage_applications.php" . (isset($_GET['status']) ? "?status={$_GET['status']}" : ""));
                 exit;
             }
@@ -175,26 +167,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $queued_count = 0;
             $queue_errors = [];
 
-            $insert_queue_query = "INSERT INTO email_queue (recipient_email, recipient_name, subject, html_body, text_body, status) 
-                                   VALUES (:recipient_email, :recipient_name, :subject, :html_body, :text_body, 'pending')";
+            $insert_queue_query = "INSERT INTO email_queue (recipient_email, recipient_name, subject, html_body, text_body, status, created_at) 
+                                   VALUES (:recipient_email, :recipient_name, :subject, :html_body, :text_body, 'pending', NOW())";
             $stmt_queue = $pdo->prepare($insert_queue_query);
+
+            // Update last_reminder_at query
+            $update_reminder_query = "UPDATE applications SET last_reminder_at = NOW() WHERE user_id = :user_id";
+            $stmt_update_reminder = $pdo->prepare($update_reminder_query);
 
             foreach ($applicants_to_remind as $applicant) {
                 $subject_remind = 'Reminder: Complete Your Musabaqa Application';
-                $htmlBody_remind = "<h3>Dear {$applicant['fullname']},</h3>
-                         <p>This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa.</p>
-                         <p>Your current application status is: <strong>" . htmlspecialchars($applicant['application_status']) . "</strong>.</p>
-                         <p>Please log in to your dashboard to continue and submit your application: <a href='https://majlisuahlilquran.org/portal/sign-in.php'>Complete Your Application</a></p>
-                         <p>If you have any questions, please do not hesitate to contact us.</p>
-                         <p>Best regards,<br>Musabaqa Team</p>";
+                $htmlBody_remind = "
+                    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;'>
+                        <div style='background-color: #1a3c34; padding: 10px; text-align: center;'>
+                            <h2 style='color: #ffffff; margin: 0; font-size: 24px;'>Majlis Ahlil Quran Musabaqa</h2>
+                        </div>
+                        <div style='background-color: #ffffff; padding: 20px; border: 1px solid #e0e0e0;'>
+                            <h3 style='color: #1a3c34; font-size: 18px;'>Dear {$applicant['fullname']},</h3>
+                            <p style='font-size: 14px; color: #333333;'>This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa. Your current application status is: <strong>" . htmlspecialchars($applicant['application_status']) . "</strong>.</p>
+                            <p style='font-size: 14px; color: #333333;'>Please follow these steps to complete your application:</p>
+                            <ol style='font-size: 14px; color: #333333; line-height: 1.6;'>
+                                <li><strong>Login to Your Dashboard:</strong> Visit <a href='https://majlisuahlilquran.org/portal/sign-in.php' style='color: #007bff; text-decoration: none;'>the portal</a> and sign in with your credentials.</li>
+                                <li><strong>Proceed to Start Application:</strong> Navigate to the 'Applications' section and click 'Start Application' or continue where you left off.</li>
+                                <li><strong>Fill in Your Personal Information:</strong> Provide all required personal details accurately.</li>
+                                <li><strong>Enter Sponsor/Nominators Details:</strong> Include information about your sponsor or nominators as required.</li>
+                                <li><strong>Upload Your Documents:</strong> Upload all necessary documents in the specified formats.</li>
+                                <li><strong>Submit Your Application:</strong> Review your application and submit it when complete.</li>
+                            </ol>
+                            <p style='font-size: 14px; color: #333333;'>Complete your application here: <a href='https://majlisuahlilquran.org/portal/sign-in.php' style='color: #007bff; text-decoration: none;'>Complete Your Application</a></p>
+                            <p style='font-size: 14px; color: #333333;'>If you have any questions, please contact us at <a href='mailto:admin@majlisuahlilquran.org' style='color: #007bff; text-decoration: none;'>admin@majlisuahlilquran.org</a>.</p>
+                            <p style='font-size: 14px; color: #333333;'>Best regards,<br>The Musabaqa Team</p>
+                        </div>
+                        <div style='text-align: center; padding: 10px; font-size: 12px; color: #777777;'>
+                            <p>&copy; " . date('Y') . " Majlis Ahlil Quran Musabaqa. All rights reserved.</p>
+                        </div>
+                    </div>";
 
                 $plainTextBody_remind = "Dear {$applicant['fullname']},\n\n" .
                                  "This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa.\n" .
-                                 "Your current application status is: " . htmlspecialchars($applicant['application_status']) . ".\n" .
-                                 "Please log in to your dashboard to continue and submit your application: https://majlisuahlilquran.org/portal/sign-in.php\n\n" .
-                                 "If you have any questions, please do not hesitate to contact us.\n\n" .
-                                 "Best regards,\nMusabaqa Team";
+                                 "Your current application status is: " . htmlspecialchars($applicant['application_status']) . ".\n\n" .
+                                 "Please follow these steps to complete your application:\n" .
+                                 "1. Login to Your Dashboard: Visit https://majlisuahlilquran.org/portal/sign-in.php and sign in with your credentials.\n" .
+                                 "2. Proceed to Start Application: Navigate to the 'Applications' section and click 'Start Application' or continue where you left off.\n" .
+                                 "3. Fill in Your Personal Information: Provide all required personal details accurately.\n" .
+                                 "4. Enter Sponsor/Nominators Details: Include information about your sponsor or nominators as required.\n" .
+                                 "5. Upload Your Documents: Upload all necessary documents in the specified formats.\n" .
+                                 "6. Submit Your Application: Review your application and submit it when complete.\n\n" .
+                                 "Complete your application here: https://majlisuahlilquran.org/portal/sign-in.php\n\n" .
+                                 "If you have any questions, please contact us at admin@majlisuahlilquran.org.\n\n" .
+                                 "Best regards,\nThe Musabaqa Team";
+
                 try {
+                    // Queue the email
                     $stmt_queue->execute([
                         ':recipient_email' => $applicant['email'],
                         ':recipient_name' => $applicant['fullname'],
@@ -204,7 +228,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     ]);
                     $queued_count++;
 
-                    // Also create an in-app notification
+                    // Update last_reminder_at
+                    $stmt_update_reminder->execute([':user_id' => $applicant['user_id']]);
+
+                    // Create an in-app notification
                     $notification_message_remind = "Reminder: Please complete your Musabaqa application. Current status: " . htmlspecialchars($applicant['application_status']);
                     $notification_query_remind = "INSERT INTO notifications (user_id, message, type, created_at) 
                                         VALUES (:user_id, :message, 'application_reminder', NOW())";
@@ -224,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             } elseif ($queued_count > 0 && !empty($queue_errors)) {
                 $_SESSION['warning'] = "$queued_count reminder(s) queued, but some failed to queue: " . implode(', ', $queue_errors);
             } elseif (empty($queue_errors)) { 
-                 $_SESSION['info'] = "No applications found requiring a reminder at this time (or all already processed for queueing).";
+                 $_SESSION['info'] = "No applications found requiring a reminder at this time.";
             } else { 
                 $_SESSION['error'] = "Failed to queue reminder emails. Errors: " . implode(', ', $queue_errors);
             }
@@ -330,7 +357,6 @@ $applications = $stmt_main->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <?php unset($_SESSION['info']); ?>
                     <?php endif; ?>
-
 
                     <!-- Filter Form -->
                     <div class="row mb-3">
@@ -468,7 +494,6 @@ $applications = $stmt_main->fetchAll(PDO::FETCH_ASSOC);
                                                                         <p><strong>Submitted At:</strong> <?php echo $app['submitted_at'] ? date('M d, Y H:i', strtotime($app['submitted_at'])) : 'Not Yet Submitted'; ?></p>
                                                                         <p><strong>Last Updated:</strong> <?php echo $app['last_updated'] ? date('M d, Y H:i', strtotime($app['last_updated'])) : 'N/A'; ?></p>
 
-
                                                                         <h6>Applicant Information</h6>
                                                                         <p><strong>Name:</strong> <?php echo htmlspecialchars($app['fullname']); ?></p>
                                                                         <p><strong>Email:</strong> <?php echo htmlspecialchars($app['email']); ?></p>
@@ -530,7 +555,6 @@ $applications = $stmt_main->fetchAll(PDO::FETCH_ASSOC);
                                                 <form method="POST" id="bulk-reject-form-modal"> 
                                                     <div class="modal-body">
                                                         <input type="hidden" name="action" value="bulk_reject">
-                                                        <!-- application_ids[] will be added by JavaScript -->
                                                         <div class="mb-3">
                                                             <label for="bulk_rejection_reason" class="form-label">Reason for Rejection (Optional)</label>
                                                             <textarea class="form-control" id="bulk_rejection_reason" name="rejection_reason" rows="4" placeholder="Enter reason for rejection. This will apply to all selected applications."></textarea>
@@ -560,7 +584,6 @@ $applications = $stmt_main->fetchAll(PDO::FETCH_ASSOC);
     <?php include 'layouts/footer-scripts.php'; ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Select all checkboxes
             const selectAllCheckbox = document.getElementById('select-all');
             if (selectAllCheckbox) {
                 selectAllCheckbox.addEventListener('change', function() {
@@ -570,7 +593,6 @@ $applications = $stmt_main->fetchAll(PDO::FETCH_ASSOC);
                 });
             }
 
-            // Submit bulk action (Approve)
             window.submitBulkAction = function(action) {
                 const bulkActionsForm = document.getElementById('bulk-actions-form');
                 const checkedCheckboxes = bulkActionsForm.querySelectorAll('.application-checkbox:checked');
@@ -578,33 +600,24 @@ $applications = $stmt_main->fetchAll(PDO::FETCH_ASSOC);
                     alert('Please select at least one application.');
                     return;
                 }
-                // Ensure the main form's action input is set for bulk approve
                 document.getElementById('bulk-action').value = action; 
-                
-                // Clear any existing application_ids[] from the main form before submitting
-                // (though for bulk approve, they are already part of this form)
-                // This is more relevant if we were to reuse this function for a modal-based bulk approve
-
                 bulkActionsForm.submit();
             }
 
-            // Handle Bulk Reject Modal
             const bulkRejectModal = document.getElementById('bulkRejectModal');
             if (bulkRejectModal) {
                 const bulkRejectFormModal = document.getElementById('bulk-reject-form-modal');
                 
                 bulkRejectModal.addEventListener('show.bs.modal', function () {
-                    // Clear previous hidden inputs from the modal form
                     const existingInputs = bulkRejectFormModal.querySelectorAll('input[name="application_ids[]"]');
                     existingInputs.forEach(input => input.remove());
 
-                    // Add current selections from the main table form to the modal form
                     const checkedIds = Array.from(document.querySelectorAll('#bulk-actions-form .application-checkbox:checked')).map(cb => cb.value);
                     
                     if (checkedIds.length === 0) {
                         alert('Please select at least one application to reject.');
                         var modal = bootstrap.Modal.getInstance(bulkRejectModal);
-                        modal.hide(); // Hide modal if no selection
+                        modal.hide();
                         return false; 
                     }
                     checkedIds.forEach(id => {
@@ -620,12 +633,11 @@ $applications = $stmt_main->fetchAll(PDO::FETCH_ASSOC);
                     bulkRejectFormModal.addEventListener('submit', function(e) {
                         const checkedCheckboxesInModalForm = this.querySelectorAll('input[name="application_ids[]"]');
                         if (checkedCheckboxesInModalForm.length === 0) {
-                            e.preventDefault(); // Prevent submission
+                            e.preventDefault();
                             alert('No applications selected for bulk rejection. Please select applications from the table.');
                             var modal = bootstrap.Modal.getInstance(bulkRejectModal);
                             modal.hide();
                         }
-                        // If submission proceeds, the form has the action and application_ids
                     });
                 }
             }
