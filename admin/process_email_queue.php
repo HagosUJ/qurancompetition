@@ -19,10 +19,10 @@ if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
 }
 
 // --- Configuration ---
-$emails_to_process_per_run = 20; // Process N emails at a time
+$emails_to_process_per_run = 10; // Reduced to prevent SMTP throttling
 $max_attempts = 3; // Max attempts to send an email
-$delay_between_emails = 1; // Seconds to wait between sending emails
-$base_retry_delay = 60; // Base delay in seconds for exponential backoff (doubles each attempt)
+$delay_between_emails = 2; // Increased delay to respect rate limits
+$base_retry_delay = 60; // Base delay in seconds for exponential backoff
 $log_file = __DIR__ . '/email_queue_errors.log'; // Path to error log file
 // --- End Configuration ---
 

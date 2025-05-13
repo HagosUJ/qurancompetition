@@ -1,4 +1,8 @@
 <?php
+// Ensure session configurations are set before starting the session
+ini_set('session.cookie_lifetime', 86400);
+ini_set('session.gc_maxlifetime', 86400);
+
 // Include database connection
 try {
     if (!file_exists('includes/db.php')) {
@@ -17,6 +21,9 @@ try {
 if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
     require_once 'vendor/autoload.php';
 }
+
+// Start session after configurations
+session_start();
 
 // Check if admin is logged in
 if (empty($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -144,7 +151,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         header("Location: manage_applications.php" . (isset($_GET['status']) ? "?status={$_GET['status']}" : ""));
         exit;
     } elseif ($action === 'send_reminders') {
-        $reminder_statuses = ['Not Started', 'Personal Info Complete', 'Sponsor Info Complete', 'Documents Uploaded', 'Information Requested'];
+        // Include all statuses except Approved and Rejected
+        $reminder_statuses = [
+            'Not Started',
+            'Personal Info Complete',
+            'Sponsor Info Complete',
+            'Documents Uploaded',
+            'Information Requested',
+            'Submitted',
+            'Under Review'
+        ];
         $placeholders_statuses = implode(',', array_fill(0, count($reminder_statuses), '?'));
 
         try {
@@ -176,7 +192,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt_update_reminder = $pdo->prepare($update_reminder_query);
 
             foreach ($applicants_to_remind as $applicant) {
-                $subject_remind = 'Reminder: Complete Your Musabaqa Application';
+                $subject_remind = 'Reminder: Majlis Ahlil Quran Musabaqa Application Update';
+                
+                // Tailor message based on application status
+                $status_message = '';
+                $action_prompt = '';
+                switch ($applicant['application_status']) {
+                    case 'Not Started':
+                        $status_message = "Your application has not yet been started.";
+                        $action_prompt = "Please begin your application by logging into your dashboard.";
+                        break;
+                    case 'Personal Info Complete':
+                        $status_message = "Your personal information is complete, but additional details are needed.";
+                        $action_prompt = "Please proceed to enter your sponsor/nominator details.";
+                        break;
+                    case 'Sponsor Info Complete':
+                        $status_message = "Your sponsor/nominator details are complete.";
+                        $action_prompt = "Please upload the required documents to continue.";
+                        break;
+                    case 'Documents Uploaded':
+                        $status_message = "Your documents have been uploaded.";
+                        $action_prompt = "Please review and submit your application.";
+                        break;
+                    case 'Information Requested':
+                        $status_message = "Additional information has been requested for your application.";
+                        $action_prompt = "Please check your dashboard for details and provide the requested information.";
+                        break;
+                    case 'Submitted':
+                        $status_message = "Your application has been submitted and is awaiting review.";
+                        $action_prompt = "Please check your dashboard for any updates or additional requirements.";
+                        break;
+                    case 'Under Review':
+                        $status_message = "Your application is currently under review.";
+                        $action_prompt = "Please stay tuned for updates on your application status.";
+                        break;
+                    default:
+                        $status_message = "Your application status is: " . htmlspecialchars($applicant['application_status']) . ".";
+                        $action_prompt = "Please check your dashboard for next steps.";
+                }
+
                 $htmlBody_remind = "
                     <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;'>
                         <div style='background-color: #1a3c34; padding: 10px; text-align: center;'>
@@ -184,8 +238,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         </div>
                         <div style='background-color: #ffffff; padding: 20px; border: 1px solid #e0e0e0;'>
                             <h3 style='color: #1a3c34; font-size: 18px;'>Dear {$applicant['fullname']},</h3>
-                            <p style='font-size: 14px; color: #333333;'>This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa. Your current application status is: <strong>" . htmlspecialchars($applicant['application_status']) . "</strong>.</p>
-                            <p style='font-size: 14px; color: #333333;'>Please follow these steps to complete your application:</p>
+                            <p style='font-size: 14px; color: #333333;'>This is a reminder regarding your application for the Majlis Ahlil Quran Musabaqa.</p>
+                            <p style='font-size: 14px; color: #333333;'>$status_message Your current application status is: <strong>" . htmlspecialchars($applicant['application_status']) . "</strong>.</p>
+                            <p style='font-size: 14px; color: #333333;'>$action_prompt</p>
+                            <p style='font-size: 14px; color: #333333;'>To complete or update your application, please follow these steps:</p>
                             <ol style='font-size: 14px; color: #333333; line-height: 1.6;'>
                                 <li><strong>Login to Your Dashboard:</strong> Visit <a href='https://majlisuahlilquran.org/portal/sign-in.php' style='color: #007bff; text-decoration: none;'>the portal</a> and sign in with your credentials.</li>
                                 <li><strong>Proceed to Start Application:</strong> Navigate to the 'Applications' section and click 'Start Application' or continue where you left off.</li>
@@ -194,26 +250,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                 <li><strong>Upload Your Documents:</strong> Upload all necessary documents in the specified formats.</li>
                                 <li><strong>Submit Your Application:</strong> Review your application and submit it when complete.</li>
                             </ol>
-                            <p style='font-size: 14px; color: #333333;'>Complete your application here: <a href='https://majlisuahlilquran.org/portal/sign-in.php' style='color: #007bff; text-decoration: none;'>Complete Your Application</a></p>
+                            <p style='font-size: 14px; color: #333333;'>Access your dashboard here: <a href='https://majlisuahlilquran.org/portal/sign-in.php' style='color: #007bff; text-decoration: none;'>Update Your Application</a></p>
                             <p style='font-size: 14px; color: #333333;'>If you have any questions, please contact us at <a href='mailto:admin@majlisuahlilquran.org' style='color: #007bff; text-decoration: none;'>admin@majlisuahlilquran.org</a>.</p>
                             <p style='font-size: 14px; color: #333333;'>Best regards,<br>The Musabaqa Team</p>
                         </div>
                         <div style='text-align: center; padding: 10px; font-size: 12px; color: #777777;'>
-                            <p>&copy; " . date('Y') . " Majlis Ahlil Quran Musabaqa. All rights reserved.</p>
+                            <p>© " . date('Y') . " Majlis Ahlil Quran Musabaqa. All rights reserved.</p>
                         </div>
                     </div>";
 
                 $plainTextBody_remind = "Dear {$applicant['fullname']},\n\n" .
-                                 "This is a friendly reminder to complete your application for the Majlis Ahlil Quran Musabaqa.\n" .
-                                 "Your current application status is: " . htmlspecialchars($applicant['application_status']) . ".\n\n" .
-                                 "Please follow these steps to complete your application:\n" .
+                                 "This is a reminder regarding your application for the Majlis Ahlil Quran Musabaqa.\n" .
+                                 "$status_message Your current application status is: " . htmlspecialchars($applicant['application_status']) . ".\n" .
+                                 "$action_prompt\n\n" .
+                                 "To complete or update your application, please follow these steps:\n" .
                                  "1. Login to Your Dashboard: Visit https://majlisuahlilquran.org/portal/sign-in.php and sign in with your credentials.\n" .
                                  "2. Proceed to Start Application: Navigate to the 'Applications' section and click 'Start Application' or continue where you left off.\n" .
                                  "3. Fill in Your Personal Information: Provide all required personal details accurately.\n" .
                                  "4. Enter Sponsor/Nominators Details: Include information about your sponsor or nominators as required.\n" .
                                  "5. Upload Your Documents: Upload all necessary documents in the specified formats.\n" .
                                  "6. Submit Your Application: Review your application and submit it when complete.\n\n" .
-                                 "Complete your application here: https://majlisuahlilquran.org/portal/sign-in.php\n\n" .
+                                 "Access your dashboard here: https://majlisuahlilquran.org/portal/sign-in.php\n\n" .
                                  "If you have any questions, please contact us at admin@majlisuahlilquran.org.\n\n" .
                                  "Best regards,\nThe Musabaqa Team";
 
@@ -232,7 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $stmt_update_reminder->execute([':user_id' => $applicant['user_id']]);
 
                     // Create an in-app notification
-                    $notification_message_remind = "Reminder: Please complete your Musabaqa application. Current status: " . htmlspecialchars($applicant['application_status']);
+                    $notification_message_remind = "Reminder: Please update your Musabaqa application. Current status: " . htmlspecialchars($applicant['application_status']);
                     $notification_query_remind = "INSERT INTO notifications (user_id, message, type, created_at) 
                                         VALUES (:user_id, :message, 'application_reminder', NOW())";
                     $stmt_notif_remind = $pdo->prepare($notification_query_remind);
@@ -400,7 +457,7 @@ $applications = $stmt_main->fetchAll(PDO::FETCH_ASSOC);
                                     <div>
                                         <button type="button" class="btn btn-sm btn-success" onclick="submitBulkAction('bulk_approve')">Bulk Approve</button>
                                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#bulkRejectModal">Bulk Reject</button>
-                                        <form method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to send reminder emails to users with incomplete applications?');">
+                                        <form method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to send reminder emails to users with incomplete or pending applications?');">
                                             <input type="hidden" name="action" value="send_reminders">
                                             <button type="submit" class="btn btn-sm btn-warning ms-2">Send Reminders</button>
                                         </form>
