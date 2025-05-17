@@ -165,7 +165,8 @@ $allowed_types = ['pdf', 'jpg', 'jpeg', 'png'];
 $max_file_size = 5 * 1024 * 1024; // 5MB
 
 // Helper function for file upload processing
-function process_file_upload($file_key, $application_id, $doc_type, $upload_dir, $allowed_types, $max_file_size, &$errors, $current_path = null, $language, $translations) {
+function process_file_upload($file_key, $application_id, $doc_type, $upload_dir, $allowed_types, $max_file_size, &$errors, $current_path = null, $language, $translations)
+{
     if (isset($_FILES[$file_key]) && $_FILES[$file_key]['error'] === UPLOAD_ERR_OK) {
         $file_tmp_path = $_FILES[$file_key]['tmp_name'];
         $file_name = $_FILES[$file_key]['name'];
@@ -216,14 +217,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $birth_certificate_path = $application_data['birth_certificate_path'] ?? null;
 
         $new_passport_path = process_file_upload(
-            'passport_scan', $application_id, 'passport', $upload_dir, $allowed_types, $max_file_size, $errors, $passport_scan_path, $language, $translations
+            'passport_scan',
+            $application_id,
+            'passport',
+            $upload_dir,
+            $allowed_types,
+            $max_file_size,
+            $errors,
+            $passport_scan_path,
+            $language,
+            $translations
         );
-        if ($new_passport_path === false) goto skip_db_ops_intl_docs;
+        if ($new_passport_path === false)
+            goto skip_db_ops_intl_docs;
 
         $new_birth_cert_path = process_file_upload(
-            'birth_certificate', $application_id, 'birth_cert', $upload_dir, $allowed_types, $max_file_size, $errors, $birth_certificate_path, $language, $translations
+            'birth_certificate',
+            $application_id,
+            'birth_cert',
+            $upload_dir,
+            $allowed_types,
+            $max_file_size,
+            $errors,
+            $birth_certificate_path,
+            $language,
+            $translations
         );
-        if ($new_birth_cert_path === false) goto skip_db_ops_intl_docs;
+        if ($new_birth_cert_path === false)
+            goto skip_db_ops_intl_docs;
 
         $passport_scan_path = ($new_passport_path !== null) ? $new_passport_path : $passport_scan_path;
         $birth_certificate_path = ($new_birth_cert_path !== null) ? $new_birth_cert_path : $birth_certificate_path;
@@ -242,7 +263,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn->begin_transaction();
 
                 $stmt_check = $conn->prepare("SELECT id FROM application_documents_international WHERE application_id = ?");
-                if (!$stmt_check) throw new Exception("Prepare failed (Check Docs): " . $conn->error);
+                if (!$stmt_check)
+                    throw new Exception("Prepare failed (Check Docs): " . $conn->error);
                 $stmt_check->bind_param("i", $application_id);
                 $stmt_check->execute();
                 $result_check = $stmt_check->get_result();
@@ -254,14 +276,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 passport_scan_path = ?, birth_certificate_path = ?, updated_at = NOW()
                             WHERE application_id = ?";
                     $stmt_save = $conn->prepare($sql);
-                    if (!$stmt_save) throw new Exception("Prepare failed (UPDATE Docs): " . $conn->error);
+                    if (!$stmt_save)
+                        throw new Exception("Prepare failed (UPDATE Docs): " . $conn->error);
                     $stmt_save->bind_param("ssi", $passport_scan_path, $birth_certificate_path, $application_id);
                 } else {
                     $sql = "INSERT INTO application_documents_international
                                 (application_id, passport_scan_path, birth_certificate_path)
                             VALUES (?, ?, ?)";
                     $stmt_save = $conn->prepare($sql);
-                    if (!$stmt_save) throw new Exception("Prepare failed (INSERT Docs): " . $conn->error);
+                    if (!$stmt_save)
+                        throw new Exception("Prepare failed (INSERT Docs): " . $conn->error);
                     $stmt_save->bind_param("iss", $application_id, $passport_scan_path, $birth_certificate_path);
                 }
 
@@ -274,7 +298,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $new_status = 'Documents Complete';
                     $next_step = 'step4';
                     $stmt_update_app = $conn->prepare("UPDATE applications SET status = ?, current_step = ?, last_updated = NOW() WHERE id = ?");
-                    if (!$stmt_update_app) throw new Exception("Prepare failed (App Update): " . $conn->error);
+                    if (!$stmt_update_app)
+                        throw new Exception("Prepare failed (App Update): " . $conn->error);
                     $stmt_update_app->bind_param("ssi", $new_status, $next_step, $application_id);
                     if (!$stmt_update_app->execute()) {
                         throw new Exception("Execute failed (App Update): " . $stmt_update_app->error);
@@ -282,7 +307,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt_update_app->close();
                 } else {
                     $stmt_update_time = $conn->prepare("UPDATE applications SET last_updated = NOW() WHERE id = ?");
-                    if (!$stmt_update_time) throw new Exception("Prepare failed (App Time Update): " . $conn->error);
+                    if (!$stmt_update_time)
+                        throw new Exception("Prepare failed (App Time Update): " . $conn->error);
                     $stmt_update_time->bind_param("i", $application_id);
                     $stmt_update_time->execute();
                     $stmt_update_time->close();
@@ -321,6 +347,7 @@ header("X-XSS-Protection: 1; mode=block");
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $language; ?>" <?php echo $is_rtl ? 'dir="rtl"' : ''; ?>>
+
 <head>
     <meta charset="utf-8" />
     <title><?php echo $translations[$language]['page_title']; ?></title>
@@ -328,19 +355,90 @@ header("X-XSS-Protection: 1; mode=block");
     <?php include 'layouts/title-meta.php'; ?>
     <?php include 'layouts/head-css.php'; ?>
     <style>
-        .form-control.is-invalid, .form-select.is-invalid { border-color: #dc3545; }
-        .invalid-feedback { display: block; color: #dc3545; font-size: 0.875em; }
-        .form-label { font-weight: 500; }
-        .progress-bar { background-color: #0acf97; }
-        .step-indicator { margin-bottom: 1.5rem; }
-        .file-upload-info { font-size: 0.9em; margin-top: 5px; }
-        .existing-file-link { font-size: 0.9em; }
-        .upload-section { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
-        .upload-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .form-control.is-invalid,
+        .form-select.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            background-color: #0acf97;
+        }
+
+        .step-indicator {
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload-info {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .existing-file-link {
+            font-size: 0.9em;
+        }
+
+        .upload-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .upload-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+    </style>
+    <style>
+        #overlaySpinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #overlaySpinner.show {
+            display: flex;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div id="overlaySpinner">
+        <div style="text-align: center; color: #fff;">
+            <div
+                style="border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px;">
+            </div>
+            <p style="font-size: 18px; font-family: Arial, sans-serif;">Please wait for this to finish</p>
+        </div>
+    </div>
     <!-- Begin page -->
     <div class="wrapper">
 
@@ -363,9 +461,14 @@ header("X-XSS-Protection: 1; mode=block");
                                 <h4 class="page-title"><?php echo $translations[$language]['page_header']; ?></h4>
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="index.php"><?php echo $translations[$language]['dashboard']; ?></a></li>
-                                        <li class="breadcrumb-item"><a href="application.php"><?php echo $translations[$language]['application']; ?></a></li>
-                                        <li class="breadcrumb-item active"><?php echo $translations[$language]['step_3']; ?></li>
+                                        <li class="breadcrumb-item"><a
+                                                href="index.php"><?php echo $translations[$language]['dashboard']; ?></a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a
+                                                href="application.php"><?php echo $translations[$language]['application']; ?></a>
+                                        </li>
+                                        <li class="breadcrumb-item active">
+                                            <?php echo $translations[$language]['step_3']; ?></li>
                                     </ol>
                                 </div>
                             </div>
@@ -376,7 +479,8 @@ header("X-XSS-Protection: 1; mode=block");
                     <div class="row step-indicator">
                         <div class="col-12">
                             <div class="progress" style="height: 10px;">
-                                <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">Step 3 of 4</div>
+                                <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75"
+                                    aria-valuemin="0" aria-valuemax="100">Step 3 of 4</div>
                             </div>
                         </div>
                     </div>
@@ -407,28 +511,42 @@ header("X-XSS-Protection: 1; mode=block");
                     <!-- Document Upload Form -->
                     <div class="row">
                         <div class="col-12">
-                            <form id="step3-form-intl" method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data" novalidate>
+                            <form id="step3-form-intl" method="POST"
+                                action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>"
+                                enctype="multipart/form-data" novalidate>
                                 <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="card-title mb-0"><i class="ri-file-upload-line me-1"></i><?php echo $translations[$language]['required_documents']; ?></h5>
+                                        <h5 class="card-title mb-0"><i
+                                                class="ri-file-upload-line me-1"></i><?php echo $translations[$language]['required_documents']; ?>
+                                        </h5>
                                     </div>
                                     <div class="card-body">
 
                                         <!-- Passport Scan Upload -->
                                         <div class="upload-section">
-                                            <label for="passport_scan" class="form-label"><?php echo $translations[$language]['passport_scan_label']; ?> <span class="text-danger">*</span></label>
-                                            <p class="text-muted fs-13"><?php echo $translations[$language]['passport_scan_instructions']; ?></p>
-                                            <input type="file" class="form-control <?php echo isset($errors['passport_scan']) ? 'is-invalid' : ''; ?>" id="passport_scan" name="passport_scan" accept=".pdf,.jpg,.jpeg,.png">
+                                            <label for="passport_scan"
+                                                class="form-label"><?php echo $translations[$language]['passport_scan_label']; ?>
+                                                <span class="text-danger">*</span></label>
+                                            <p class="text-muted fs-13">
+                                                <?php echo $translations[$language]['passport_scan_instructions']; ?>
+                                            </p>
+                                            <input type="file"
+                                                class="form-control <?php echo isset($errors['passport_scan']) ? 'is-invalid' : ''; ?>"
+                                                id="passport_scan" name="passport_scan" accept=".pdf,.jpg,.jpeg,.png">
                                             <?php if (isset($errors['passport_scan'])): ?>
-                                                <div class="invalid-feedback"><?php echo htmlspecialchars($errors['passport_scan']); ?></div>
+                                                <div class="invalid-feedback">
+                                                    <?php echo htmlspecialchars($errors['passport_scan']); ?></div>
                                             <?php endif; ?>
                                             <?php if (!empty($application_data['passport_scan_path']) && file_exists($application_data['passport_scan_path'])): ?>
                                                 <div class="mt-2">
-                                                    <span class="file-upload-info"><?php echo $translations[$language]['current_passport_scan']; ?></span>
-                                                    <a href="<?php echo htmlspecialchars($application_data['passport_scan_path']); ?>" target="_blank" class="existing-file-link ms-2">
-                                                        <i class="ri-eye-line"></i> <?php echo htmlspecialchars(basename($application_data['passport_scan_path'])); ?>
+                                                    <span
+                                                        class="file-upload-info"><?php echo $translations[$language]['current_passport_scan']; ?></span>
+                                                    <a href="<?php echo htmlspecialchars($application_data['passport_scan_path']); ?>"
+                                                        target="_blank" class="existing-file-link ms-2">
+                                                        <i class="ri-eye-line"></i>
+                                                        <?php echo htmlspecialchars(basename($application_data['passport_scan_path'])); ?>
                                                     </a>
                                                 </div>
                                             <?php endif; ?>
@@ -436,17 +554,27 @@ header("X-XSS-Protection: 1; mode=block");
 
                                         <!-- Birth Certificate Upload (Optional) -->
                                         <div class="upload-section">
-                                            <label for="birth_certificate" class="form-label"><?php echo $translations[$language]['birth_certificate_label']; ?></label>
-                                            <p class="text-muted fs-13"><?php echo $translations[$language]['birth_certificate_instructions']; ?></p>
-                                            <input type="file" class="form-control <?php echo isset($errors['birth_certificate']) ? 'is-invalid' : ''; ?>" id="birth_certificate" name="birth_certificate" accept=".pdf,.jpg,.jpeg,.png">
+                                            <label for="birth_certificate"
+                                                class="form-label"><?php echo $translations[$language]['birth_certificate_label']; ?></label>
+                                            <p class="text-muted fs-13">
+                                                <?php echo $translations[$language]['birth_certificate_instructions']; ?>
+                                            </p>
+                                            <input type="file"
+                                                class="form-control <?php echo isset($errors['birth_certificate']) ? 'is-invalid' : ''; ?>"
+                                                id="birth_certificate" name="birth_certificate"
+                                                accept=".pdf,.jpg,.jpeg,.png">
                                             <?php if (isset($errors['birth_certificate'])): ?>
-                                                <div class="invalid-feedback"><?php echo htmlspecialchars($errors['birth_certificate']); ?></div>
+                                                <div class="invalid-feedback">
+                                                    <?php echo htmlspecialchars($errors['birth_certificate']); ?></div>
                                             <?php endif; ?>
                                             <?php if (!empty($application_data['birth_certificate_path']) && file_exists($application_data['birth_certificate_path'])): ?>
                                                 <div class="mt-2">
-                                                    <span class="file-upload-info"><?php echo $translations[$language]['current_birth_certificate']; ?></span>
-                                                    <a href="<?php echo htmlspecialchars($application_data['birth_certificate_path']); ?>" target="_blank" class="existing-file-link ms-2">
-                                                        <i class="ri-eye-line"></i> <?php echo htmlspecialchars(basename($application_data['birth_certificate_path'])); ?>
+                                                    <span
+                                                        class="file-upload-info"><?php echo $translations[$language]['current_birth_certificate']; ?></span>
+                                                    <a href="<?php echo htmlspecialchars($application_data['birth_certificate_path']); ?>"
+                                                        target="_blank" class="existing-file-link ms-2">
+                                                        <i class="ri-eye-line"></i>
+                                                        <?php echo htmlspecialchars(basename($application_data['birth_certificate_path'])); ?>
                                                     </a>
                                                 </div>
                                             <?php endif; ?>
@@ -457,9 +585,21 @@ header("X-XSS-Protection: 1; mode=block");
 
                                 <!-- Action Buttons -->
                                 <div class="d-flex justify-content-between mt-4 mb-4">
-                                    <a href="application-step2-international.php" class="btn btn-secondary"><i class="ri-arrow-left-line me-1"></i><?php echo $translations[$language]['back_to_step_2']; ?></a>
-                                    <button type="submit" class="btn btn-primary"><?php echo $translations[$language]['save_continue']; ?> <i class="ri-arrow-right-line ms-1"></i></button>
+                                    <a href="application-step2-international.php" class="btn btn-secondary"><i
+                                            class="ri-arrow-left-line me-1"></i><?php echo $translations[$language]['back_to_step_2']; ?></a>
+                                    <button id="documentUploadBtn" type="submit"
+                                        class="btn btn-primary"><?php echo $translations[$language]['save_continue']; ?>
+                                        <i class="ri-arrow-right-line ms-1"></i></button>
                                 </div>
+                                <script>
+                                    document.getElementById('documentUploadBtn').addEventListener('click', function (event) {
+                                        event.preventDefault(); // Prevent form submission
+                                        document.getElementById('overlaySpinner').classList.add('show');
+
+                                        // Submit the form programmatically after showing the spinner
+                                        this.closest('form').submit();
+                                    });
+                                </script>
 
                             </form>
                         </div> <!-- end col -->
@@ -484,14 +624,15 @@ header("X-XSS-Protection: 1; mode=block");
 
     <!-- Page Specific Scripts -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]:not([disabled])'));
- [data-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            [data - toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
     </script>
 
 </body>
+
 </html>

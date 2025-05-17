@@ -212,7 +212,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $files_uploaded_in_request[$doc_type] = $destination;
 
                         $stmt_check_doc = $conn->prepare("SELECT id, file_path FROM application_documents WHERE application_id = ? AND document_type = ?");
-                        if (!$stmt_check_doc) throw new Exception("Prepare failed (Check Doc): " . $conn->error);
+                        if (!$stmt_check_doc)
+                            throw new Exception("Prepare failed (Check Doc): " . $conn->error);
                         $stmt_check_doc->bind_param("is", $application_id, $doc_type);
                         $stmt_check_doc->execute();
                         $result_check_doc = $stmt_check_doc->get_result();
@@ -223,11 +224,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if ($existing_doc_record) {
                             $old_file_path = $existing_doc_record['file_path'];
                             $stmt_save_doc = $conn->prepare("UPDATE application_documents SET file_path = ?, original_filename = ?, updated_at = NOW() WHERE id = ?");
-                            if (!$stmt_save_doc) throw new Exception("Prepare failed (Update Doc): " . $conn->error);
+                            if (!$stmt_save_doc)
+                                throw new Exception("Prepare failed (Update Doc): " . $conn->error);
                             $stmt_save_doc->bind_param("ssi", $destination, $original_filename, $existing_doc_record['id']);
                         } else {
                             $stmt_save_doc = $conn->prepare("INSERT INTO application_documents (application_id, document_type, file_path, original_filename) VALUES (?, ?, ?, ?)");
-                            if (!$stmt_save_doc) throw new Exception("Prepare failed (Insert Doc): " . $conn->error);
+                            if (!$stmt_save_doc)
+                                throw new Exception("Prepare failed (Insert Doc): " . $conn->error);
                             $stmt_save_doc->bind_param("isss", $application_id, $doc_type, $destination, $original_filename);
                         }
 
@@ -267,7 +270,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $new_status = 'Documents Uploaded';
                 $next_step = 'review';
                 $stmt_update_app = $conn->prepare("UPDATE applications SET status = ?, current_step = ?, last_updated = NOW() WHERE id = ?");
-                if (!$stmt_update_app) throw new Exception("Prepare failed (App Update): " . $conn->error);
+                if (!$stmt_update_app)
+                    throw new Exception("Prepare failed (App Update): " . $conn->error);
                 $stmt_update_app->bind_param("ssi", $new_status, $next_step, $application_id);
                 if (!$stmt_update_app->execute()) {
                     throw new Exception("Execute failed (App Update): " . $stmt_update_app->error);
@@ -276,7 +280,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $application_status = $new_status;
             } elseif (!empty($files_uploaded_in_request)) {
                 $stmt_update_time = $conn->prepare("UPDATE applications SET last_updated = NOW() WHERE id = ?");
-                if (!$stmt_update_time) throw new Exception("Prepare failed (App Time Update): " . $conn->error);
+                if (!$stmt_update_time)
+                    throw new Exception("Prepare failed (App Time Update): " . $conn->error);
                 $stmt_update_time->bind_param("i", $application_id);
                 $stmt_update_time->execute();
                 $stmt_update_time->close();
@@ -304,7 +309,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        end_of_post_processing:;
+        end_of_post_processing:
+        ;
     }
 }
 
@@ -318,6 +324,7 @@ header("X-XSS-Protection: 1; mode=block");
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $language; ?>" <?php echo $is_rtl ? 'dir="rtl"' : ''; ?>>
+
 <head>
     <meta charset="utf-8" />
     <title><?php echo $translations[$language]['page_title']; ?></title>
@@ -325,28 +332,125 @@ header("X-XSS-Protection: 1; mode=block");
     <?php include 'layouts/title-meta.php'; ?>
     <?php include 'layouts/head-css.php'; ?>
     <style>
-        .form-control.is-invalid { border-color: #dc3545; }
-        .invalid-feedback { display: block; color: #dc3545; font-size: 0.875em; }
-        .form-label { font-weight: 500; }
-        .document-list-item { border-bottom: 1px solid #eee; padding-bottom: 1rem; margin-bottom: 1rem; }
-        .document-list-item:last-child { border-bottom: none; }
-        .file-info { font-size: 0.9em; color: #6c757d; }
-        .upload-section { margin-bottom: 1.5rem; }
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .document-list-item {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .document-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-info {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .upload-section {
+            margin-bottom: 1.5rem;
+        }
+
         <?php if ($is_rtl): ?>
-        .form-label { text-align: right; }
-        .invalid-feedback { text-align: right; }
-        .text-muted { text-align: right; }
-        .d-flex.justify-content-between { flex-direction: row-reverse; }
-        .col-md-4, .col-md-8 { text-align: right; }
-        .ri-check-double-line { margin-left: 0.25rem; margin-right: 0.5rem; }
-        .file-info.ms-2 { margin-right: 0.5rem; margin-left: 0; }
-        .btn i.ri-arrow-left-line { margin-left: 0.25rem; margin-right: -0.25rem; }
-        .btn i.ri-arrow-right-line, .btn i.ri-save-line { margin-right: 0.25rem; margin-left: 0.5rem; }
+            .form-label {
+                text-align: right;
+            }
+
+            .invalid-feedback {
+                text-align: right;
+            }
+
+            .text-muted {
+                text-align: right;
+            }
+
+            .d-flex.justify-content-between {
+                flex-direction: row-reverse;
+            }
+
+            .col-md-4,
+            .col-md-8 {
+                text-align: right;
+            }
+
+            .ri-check-double-line {
+                margin-left: 0.25rem;
+                margin-right: 0.5rem;
+            }
+
+            .file-info.ms-2 {
+                margin-right: 0.5rem;
+                margin-left: 0;
+            }
+
+            .btn i.ri-arrow-left-line {
+                margin-left: 0.25rem;
+                margin-right: -0.25rem;
+            }
+
+            .btn i.ri-arrow-right-line,
+            .btn i.ri-save-line {
+                margin-right: 0.25rem;
+                margin-left: 0.5rem;
+            }
+
         <?php endif; ?>
+    </style>
+
+    <style>
+        #overlaySpinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #overlaySpinner.show {
+            display: flex;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div id="overlaySpinner">
+        <div style="text-align: center; color: #fff;">
+            <div
+                style="border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px;">
+            </div>
+            <p style="font-size: 18px; font-family: Arial, sans-serif;">Please wait for this to finish</p>
+        </div>
+    </div>
     <div class="wrapper">
         <?php include 'layouts/menu.php'; ?>
         <div class="content-page">
@@ -358,9 +462,15 @@ header("X-XSS-Protection: 1; mode=block");
                                 <h4 class="page-title"><?php echo $translations[$language]['page_header']; ?></h4>
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
-                                        <li class="breadcrumb-item"><a href="index.php"><?php echo $translations[$language]['dashboard']; ?></a></li>
-                                        <li class="breadcrumb-item"><a href="application.php"><?php echo $translations[$language]['application']; ?></a></li>
-                                        <li class="breadcrumb-item active"><?php echo $translations[$language]['step3']; ?></li>
+                                        <li class="breadcrumb-item"><a
+                                                href="index.php"><?php echo $translations[$language]['dashboard']; ?></a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a
+                                                href="application.php"><?php echo $translations[$language]['application']; ?></a>
+                                        </li>
+                                        <li class="breadcrumb-item active">
+                                            <?php echo $translations[$language]['step3']; ?>
+                                        </li>
                                     </ol>
                                 </div>
                             </div>
@@ -381,7 +491,8 @@ header("X-XSS-Protection: 1; mode=block");
                     <?php endif; ?>
                     <?php if (isset($_GET['error']) && $_GET['error'] === 'step2_incomplete'): ?>
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                            <i class="ri-alert-line me-1"></i> <?php echo $translations[$language]['error_step2_incomplete']; ?>
+                            <i class="ri-alert-line me-1"></i>
+                            <?php echo $translations[$language]['error_step2_incomplete']; ?>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <?php endif; ?>
@@ -390,35 +501,52 @@ header("X-XSS-Protection: 1; mode=block");
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title mb-3"><?php echo $translations[$language]['required_documents']; ?></h5>
-                                    <p class="text-muted mb-4"><?php echo $translations[$language]['instructions']; ?></p>
+                                    <h5 class="card-title mb-3">
+                                        <?php echo $translations[$language]['required_documents']; ?>
+                                    </h5>
+                                    <p class="text-muted mb-4"><?php echo $translations[$language]['instructions']; ?>
+                                    </p>
 
-                                    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data" novalidate>
-                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                    <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>"
+                                        enctype="multipart/form-data" novalidate>
+                                        <input type="hidden" name="csrf_token"
+                                            value="<?php echo $_SESSION['csrf_token']; ?>">
 
                                         <?php foreach ($required_documents[$language] as $doc_type => $doc_label): ?>
                                             <div class="upload-section document-list-item">
                                                 <div class="row align-items-center">
                                                     <div class="col-md-4">
-                                                        <label for="<?php echo $doc_type; ?>" class="form-label"><?php echo htmlspecialchars($doc_label); ?> <span class="text-danger">*</span></label>
+                                                        <label for="<?php echo $doc_type; ?>"
+                                                            class="form-label"><?php echo htmlspecialchars($doc_label); ?>
+                                                            <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-8">
                                                         <?php if (isset($existing_documents[$doc_type])):
                                                             $doc = $existing_documents[$doc_type];
                                                             $file_url = htmlspecialchars($doc['file_path']);
-                                                        ?>
+                                                            ?>
                                                             <div class="mb-2">
-                                                                <i class="ri-check-double-line text-success me-1"></i> <?php echo $language === 'ar' ? 'تم الرفع:' : 'Uploaded:'; ?>
-                                                                <a href="<?php echo $file_url; ?>" target="_blank" title="<?php echo $language === 'ar' ? 'عرض' : 'View'; ?> <?php echo htmlspecialchars($doc['original_filename']); ?>">
+                                                                <i class="ri-check-double-line text-success me-1"></i>
+                                                                <?php echo $language === 'ar' ? 'تم الرفع:' : 'Uploaded:'; ?>
+                                                                <a href="<?php echo $file_url; ?>" target="_blank"
+                                                                    title="<?php echo $language === 'ar' ? 'عرض' : 'View'; ?> <?php echo htmlspecialchars($doc['original_filename']); ?>">
                                                                     <?php echo htmlspecialchars($doc['original_filename']); ?>
                                                                 </a>
-                                                                <span class="file-info ms-2">(<?php echo $language === 'ar' ? 'تم الرفع:' : 'Uploaded:'; ?> <?php echo date($language === 'ar' ? 'd M Y H:i' : 'M d, Y H:i', strtotime($doc['created_at'])); ?>)</span>
+                                                                <span
+                                                                    class="file-info ms-2">(<?php echo $language === 'ar' ? 'تم الرفع:' : 'Uploaded:'; ?>
+                                                                    <?php echo date($language === 'ar' ? 'd M Y H:i' : 'M d, Y H:i', strtotime($doc['created_at'])); ?>)</span>
                                                             </div>
-                                                            <label for="<?php echo $doc_type; ?>" class="form-label text-muted small"><?php echo $language === 'ar' ? 'استبدال الملف (اختياري):' : 'Replace file (optional):'; ?></label>
+                                                            <label for="<?php echo $doc_type; ?>"
+                                                                class="form-label text-muted small"><?php echo $language === 'ar' ? 'استبدال الملف (اختياري):' : 'Replace file (optional):'; ?></label>
                                                         <?php endif; ?>
-                                                        <input type="file" class="form-control <?php echo isset($errors[$doc_type]) ? 'is-invalid' : ''; ?>" id="<?php echo $doc_type; ?>" name="<?php echo $doc_type; ?>" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                                        <input type="file"
+                                                            class="form-control <?php echo isset($errors[$doc_type]) ? 'is-invalid' : ''; ?>"
+                                                            id="<?php echo $doc_type; ?>" name="<?php echo $doc_type; ?>"
+                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                                                         <?php if (isset($errors[$doc_type])): ?>
-                                                            <div class="invalid-feedback"><?php echo htmlspecialchars($errors[$doc_type]); ?></div>
+                                                            <div class="invalid-feedback">
+                                                                <?php echo htmlspecialchars($errors[$doc_type]); ?>
+                                                            </div>
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>
@@ -429,7 +557,9 @@ header("X-XSS-Protection: 1; mode=block");
                                             <?php
                                             $prev_step_page = 'application-step2-nigerian.php';
                                             ?>
-                                            <a href="<?php echo $prev_step_page; ?>" class="btn btn-secondary"><i class="ri-arrow-left-line me-1"></i> <?php echo $translations[$language]['back_button']; ?></a>
+                                            <a href="<?php echo $prev_step_page; ?>" class="btn btn-secondary"><i
+                                                    class="ri-arrow-left-line me-1"></i>
+                                                <?php echo $translations[$language]['back_button']; ?></a>
 
                                             <?php
                                             $all_required_uploaded_final = true;
@@ -442,20 +572,33 @@ header("X-XSS-Protection: 1; mode=block");
                                             $button_text = $all_required_uploaded_final ? $translations[$language]['save_continue'] : $translations[$language]['save_documents'];
                                             $button_icon = $all_required_uploaded_final ? "ri-arrow-right-line" : "ri-save-line";
                                             ?>
-                                            <button type="submit" class="btn btn-primary"><?php echo $button_text; ?> <i class="<?php echo $button_icon; ?> ms-1"></i></button>
+                                            <button id="documentUploadBtn" type="submit"
+                                                class="btn btn-primary"><?php echo $button_text; ?> <i
+                                                    class="<?php echo $button_icon; ?> ms-1"></i></button>
                                         </div>
-                                    </form>
                                 </div>
+                                <script>
+                                    document.getElementById('documentUploadBtn').addEventListener('click', function (event) {
+                                        event.preventDefault(); // Prevent form submission
+                                        document.getElementById('overlaySpinner').classList.add('show');
+
+                                        // Submit the form programmatically after showing the spinner
+                                        this.closest('form').submit();
+                                    });
+                                </script>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <?php include 'layouts/footer.php'; ?>
         </div>
+        <?php include 'layouts/footer.php'; ?>
+    </div>
     </div>
     <?php include 'layouts/right-sidebar.php'; ?>
     <?php include 'layouts/footer-scripts.php'; ?>
     <script src="assets/js/app.min.js"></script>
 </body>
+
 </html>
